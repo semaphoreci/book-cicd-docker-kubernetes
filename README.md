@@ -1,19 +1,6 @@
 # CI/CD with Kubernetes and Semaphore Ebook
 
-Content to be used for ebook and blog posts.
-All content was initially imported as it was written by original authors.
-Use this repo to make further changes that match our goals.
+Written in Markdown, made with Pandoc. See `Makefile`.
 
-Table of contents (titles are subject to change):
-
-- [Top benefits of using Docker for continuous delivery](ch01.md) - written
-  by Jerome Pettazoni (collaboration
-  [PR](https://github.com/renderedtext/writer-collab-jpetazzo/pull/1))
-- [How Kubernetes simplifies zero-downtime deployment](ch02.md) - Jerome
-  ([PR](https://github.com/renderedtext/writer-collab-jpetazzo/pull/2))
-- [How Semaphore enables Docker-based CI/CD](ch03.md) - Marko (pending)
-- [How to implement a CI/CD pipeline for Kubernetes with Semaphore](ch04.md) - Adnan Rahić
-  ([PR](https://github.com/renderedtext/writer-collab-adnanrahic/pull/1))
-
-See full project history [on
+Full project history is [on
 Basecamp](https://3.basecamp.com/3093216/projects/8589692).

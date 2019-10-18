@@ -1,11 +1,11 @@
 BUILD = build
 BOOKNAME = CICD_with_Docker_Kubernetes_Semaphore
 TITLE = title.txt
-CHAPTERS = ch01.md ch02.md ch03.md ch04.md
+CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md
 
 all: book
 
-book: pdf #epub html
+book: pdf #epub
 
 clean:
 	rm -r $(BUILD)
@@ -16,4 +16,4 @@ $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
 	pandoc -o $@ $^
 
-.PHONY: all book clean pdf #epub html
+.PHONY: all book clean pdf #epub
