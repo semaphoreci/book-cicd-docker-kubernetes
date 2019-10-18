@@ -1,0 +1,9 @@
+---
+title: CI/CD with Docker and Kubernetes
+subtitle: Joining the Microservices Revolution
+author: Semaphore
+language: en-US
+toc: true
+include-before:
+- '`\newpage{}`{=latex}'
+...
