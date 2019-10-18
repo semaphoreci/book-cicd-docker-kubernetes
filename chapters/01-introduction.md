@@ -26,9 +26,19 @@ If you are a developer or systems administrator, besides understanding the big p
 
 TODO: Summary of each chapter. One paragraph, or sentence, for each.
 
-Chapter 1, "Using Docker for Development and Continuous Delivery", outlines the key benefits of using Docker and provides a detailed roadmap to adopting it.
+Chapter 1, "Using Docker for Development and CI/CD", outlines the key benefits of using Docker and provides a detailed roadmap to adopting it.
 
 Chapter 2, ""
+
+## Give Us Feedback
+
+We would very much love to hear your feedback after reading this book. What did you like and learn? What could be improved? Is there something we could explain further?
+
+A benefit of publishing an ebook is that we can continuously improve it. And that's exactly what we intend to do based on your feedback.
+
+This book is open source and source files are hosted on TODO. You can send us feedback by opening an issue on the Git repository, or by sending an email to learn@semaphoreci.com.
+
+TODO: move this to Final Words
 
 ## About the Authors
 

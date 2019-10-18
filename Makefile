@@ -1,7 +1,7 @@
 BUILD = build
 BOOKNAME = CICD_with_Docker_Kubernetes_Semaphore
 TITLE = title.txt
-CHAPTERS = chapters/01-introduction.md
+CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md
 
 all: book
 
