@@ -10,7 +10,7 @@ In this chapter, you will first learn about the kind of benefits that you can ex
 
 Then, a realistic roadmap that any organization can follow realistically, to attain these benefits.
 
-## 1.1 What Benefits of Docker Can We Expect?
+## 1.1 Benefits of Using Docker
 
 Containers will not instantly turn our monolithic, legacy applications into distributed, scalable microservices.
 
@@ -46,6 +46,18 @@ Once we have installed the Docker Engine (the most popular option), it can run a
 
 The ability to stage up new environments easily and reliably gives us exactly what we need to set up CI/CD (continuous integration and continuous delivery). We will see how to get there. Ultimately, it means that advanced techniques, such as blue/green deployments, or immutable infrastructure, become accessible to us, instead of being the privilege of larger organizations able to spend a lot of time to build their perfect custom tooling.
 
+### 1.1.3 Less Risky Releases
+
+Containers can help us to reduce the risks associated with a new release.
+
+When we start a new version of our app by running the corresponding container image, if something goes wrong, rolling back is very easy. All we have to do is stop the container, and restart the previous version. The image for the previous version will still be around and will start immediately.
+
+This is way safer than attempting a code rollback, especially if the new version implied some dependency upgrades. Are we sure that we can downgrade to the previous version? Is it still available on the package repositories? If we are using containers, we don’t have to worry about that, since our container image is available and ready.
+
+This pattern is sometimes called _immutable infrastructure_, because instead of changing our services, we deploy new ones. Initially, immutable infrastructure happened with virtual machines: each new release would happen by starting a new fleet of virtual machines. Containers make this even easier to use.
+
+As a result, we can deploy with more confidence, because we know that if something goes wrong, we can easily go back to the previous version.
+
 ## 1.2 A Roadmap to Adopting Docker
 
 The following roadmap works for organizations and teams of all size, regardless of their existing knowledge of containers. Even better, this roadmap will give you tangible benefits at each step, so that the gains realized give you more confidence into the whole process.
@@ -72,9 +84,9 @@ Another good candidate is an application that we are refactoring or updating, an
 
 If we have a component that is tricky enough to require a tool like Vagrant to run on our developer’s machines, it’s also a good hint that Docker can help there. While Vagrant is an amazing product, there are many scenarios where maintaining a Dockerfile is easier than maintaining a Vagrantfile; and running Docker is also easier and lighter than running Vagrant boxes.
 
-### 1.2.2 Writing Our First Dockerfile
+### 1.2.2 Writing the First Dockerfile
 
-There are various ways to write our first Dockerfile, and none of them is inherently right or wrong. Some people prefer to follow the existing environment as close as possible. For example, if you're currently using PHP 7.2 with Apache 2.4, and have some very specific Apache configuration and `.htaccess` files? Sure, makes sense to put that in containers. But if we prefer to start anew from our `.php` files, serve them with PHP FPM, and host the static assets from a separate NGINX container (an incredibly powerful and scalable combination!), that’s fine too. Either way, the [official PHP images](https://hub.docker.com/r/_/php/) got us covered.
+There are various ways to write your first Dockerfile, and none of them is inherently right or wrong. Some people prefer to follow the existing environment as close as possible. For example, if you're currently using PHP 7.2 with Apache 2.4, and have some very specific Apache configuration and `.htaccess` files? Sure, makes sense to put that in containers. But if you prefer to start anew from your `.php` files, serve them with PHP FPM, and host the static assets from a separate NGINX container, that’s fine too. Either way, the [official PHP images](https://hub.docker.com/r/_/php/) got us covered.
 
 During this phase, we’ll want to make sure that the team working on that service has Docker installed on their machine, but only a few people will have to meddle with Docker at this point. They will be leveling the field for everyone else.
 
@@ -193,8 +205,36 @@ We now have a whole sequence of actions: building images, starting containers, e
 
 ### 1.2.7 Continuous Deployment to Staging
 
-The next step is to hook our pipeline to our source repository, to run it automatically on our code when we push changes to the repository.
+The next step is to run our pipeline automatically when we push changes to the code repository.
 
-If we’re using a system like GitHub or GitLab, we can set it up to notify us through a webhook each time someone opens (or updates) a pull request. We could also monitor a specific branch, or a specific set of branches.
+A CI/CD system like Semaphore can connect to GitHub, and run the pipeline each time someone opens, or updates, a pull request. The same or a modified pipeline can also run on a specific branch, or a specific set of branches.
 
-TODO: modify this part to transition to Kubernetes and Semaphore
+Each time there are relevant changes, our pipeline will automatically perform a sequence similar to the following:
+
+- Build new container images;
+- Run unit tests on these images (if applicable);
+- Deploy them in a temporary environment;
+- Run end-to-end tests on the application;
+- Make the application available for human testing.
+
+Further in this book we will see how to actually go and implement such a pipeline.
+
+Note that we still don’t require container orchestration for all of this to work. If our application in a staging environment can fit on a single machine, we don’t need to worry about setting up a cluster, yet. In fact, thanks to Docker’s layer system, running side-by-side images that share a common ancestry, which will be the case for images corresponding to successive versions of the same component, is very disk- and memory-efficient; so there is a good chance that we will be able to run many copies of our app on a single Docker Engine.
+
+But this is also the right time to start looking into orchestration, and a platform like Kubernetes. Again, at this stage we don't need to roll that out straight to production; but we could use one of these orchestrators to deploy the staging versions of our application.
+
+This will give us a low-risk environment where we can ramp up our skills on container orchestration and scheduling, while having the same level of complexity, minus the volume of requests and data, that our production environment.
+
+### 1.2.8 Continuous Deployment to Production
+
+It might be a while before we go from the previous stage to the next, because we need to build confidence and operational experience.
+
+However, at this point, we already have a continuous deployment pipeline that takes every pull request (or every change in a specific branch or set of branches) and deploys the code on a staging cluster, in a fully automated way.
+
+Of course, we need to learn how to collect logs, and metrics, and how to face minor incidents and major outages; but eventually, we will be ready to extend our pipeline all the way to the production environment.
+
+## 1.3 Summary
+
+Building a delivery pipeline with new tools from scratch is certainly a lot of work. But with the roadmap described above, we can get there one step at a time, while enjoying concrete benefits at each step.
+
+In the next chapter, we will learn about deploying code to Kubernetes, including strategies that might not have been possible in your previous technology stack.
