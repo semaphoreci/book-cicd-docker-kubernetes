@@ -20,7 +20,7 @@ We assume that you're fairly new to the container technology stack, and that you
 
 We believe that both technology leaders and individual contributors will benefit from reading this book.
 
-If you are a CTO or otherwise ultimately responsible for effectively delivering working software to customers, this book will provide you with a clear vision of what a reliable CI/CD pipeline to Kubernetes looks like, and what it takes to build one.
+If you are a CTO or otherwise ultimately responsible for delivering working software to customers, this book will provide you with a clear vision of what a reliable CI/CD pipeline to Kubernetes looks like, and what it takes to build one.
 
 If you are a developer or systems administrator, besides understanding the big picture, you will also find working code and configuration that you can reuse in your own projects.
 
