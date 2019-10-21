@@ -1,0 +1,20 @@
+version: v1.0
+name: First pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Build the book
+    task:
+      prologue:
+        commands:
+          - checkout
+          - >-
+            sudo apt-get update && sudo apt-get install -y pandoc
+            texlive-latex-base texlive-fonts-recommended texlive-fonts-extra
+            texlive-latex-extra
+      jobs:
+        - name: Build
+          commands:
+            - make
