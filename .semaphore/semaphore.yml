@@ -18,4 +18,3 @@ blocks:
         - name: Build
           commands:
             - make
-            - artifact push workflow build
