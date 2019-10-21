@@ -14,7 +14,7 @@ TODO: Short Motivational introduction.
 
 The main goal of this book is to provide a practical roadmap to continuous delivery for software development teams who have decided to use Docker containers to package their code and Kubernetes to run it.
 
-We don't spend much time explaining why you should, or should not use container technologies to ship your applications. We also can't provide a better general reference to using Docker and Kubernetes than their respective official documentation.
+We don't spend much time explaining why you should, or should not use container technologies to ship your applications. We also don't provide a general reference to using Docker and Kubernetes. When you encounter a concept of Docker or Kubernetes that you're not familiar with, we recommend that you consult the official documentation.
 
 We assume that you're fairly new to the container technology stack, and that your goal is to establish a standardized and fully automated build, test and release process.
 
@@ -28,7 +28,11 @@ TODO: Summary of each chapter. One paragraph, or sentence, for each.
 
 Chapter 1, "Using Docker for Development and CI/CD", outlines the key benefits of using Docker and provides a detailed roadmap to adopting it.
 
-Chapter 2, ""
+Chapter 2, "Deploying to Kubernetes", explains what you need to know about Kubernetes deployments to deliver your containers to production.
+
+Chapter 3, "Principles of High-Velocity CI/CD", describes how both our culture and tools need to change in order to fully benefit from the agility that containers and cloud can offer.
+
+Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing a CI/CD pipeline with Semaphore that builds, tests and deploys a Dockerized microservice to Kubernetes.
 
 ## Give Us Feedback
 
