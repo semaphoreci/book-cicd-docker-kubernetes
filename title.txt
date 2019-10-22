@@ -1,6 +1,6 @@
 ---
 title: CI/CD with Docker and Kubernetes
-subtitle: Joining the Microservices Revolution
+subtitle: How to Deliver Cloud Native Applications at High Velocity
 author: Semaphore
 language: en-US
 toc: true

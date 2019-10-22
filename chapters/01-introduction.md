@@ -30,7 +30,7 @@ Chapter 1, "Using Docker for Development and CI/CD", outlines the key benefits o
 
 Chapter 2, "Deploying to Kubernetes", explains what you need to know about Kubernetes deployments to deliver your containers to production.
 
-Chapter 3, "Principles of High-Velocity CI/CD", describes how both our culture and tools need to change in order to fully benefit from the agility that containers and cloud can offer.
+Chapter 3, "Best Practices for Cloud Native Applications", describes how both our culture and tools related to software delivery need to change in order to fully benefit from the agility that containers and cloud can offer.
 
 Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing a CI/CD pipeline with Semaphore that builds, tests and deploys a Dockerized microservice to Kubernetes.
 
