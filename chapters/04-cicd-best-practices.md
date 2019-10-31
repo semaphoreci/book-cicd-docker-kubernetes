@@ -2,7 +2,7 @@
 
 # 3 CI/CD Best Practices for Cloud Native Applications
 
-The goal of every engineering team is to deliver bug-free products to customers at high velocity. Today’s cloud-native technology can empower you to iterate, at scale, faster than ever. But teams that don’t also change how they deliver software will struggle to benefit from the agility and speed that the cloud native technology stack can offer.
+The goal of every engineering team is to deliver bug-free products to customers as productively as possible. Today’s cloud-native technology can empower you to iterate, at scale, faster than ever. But teams that don’t also change how they deliver software will struggle to benefit from the agility and speed that the cloud native technology stack can offer.
 
 “CI/CD” stands for the combined practices of Continuous Integration (CI) and Continuous Delivery (CD). It is a timeless way of developing software in which you’re able to release updates at any time in a sustainable way. When changing code is routine, development cycles are faster and work is more fulfilling.
 
@@ -90,29 +90,97 @@ Getting the continuous integration process right is a prerequisite for successfu
 
 ### 3.2.1 Treat Master Build as If You're Going to Make a Release at Any Time
 
-When the master is broken, drop what you’re doing and fix it. Maintain a “no broken windows” policy on the pipeline.
+The reason for practicing continuous integration is that small, simple, frequent changes is a less risky way of building software in a team than making big, complex infrequent changes. This implies that team will make fewer mistakes by always being ready for release, not more.
+
+Your team's goal should be to get new code to production as soon as it's ready. And if something goes wrong — own it and handle it accordingly. Let the team grow through the sense of ownership on what they do.
+
+Being always ready for a release requires a highly developed testing culture. Code that's checked in should always be fully tested. If it's not, then there's no point in moving fast to oblivion.
+
+If you're just starting a new project, invest time to bring everyone on the same page and commit to writing automated tests for all code. When the project begins, set up the entire CI/CD pipeline, even while the application has no real functionality. Not only will the team benefit from a CI/CD feedback loop right from the start, but a fully automated pipeline will discourage any manual processes from creeping in and slowing down your team in the future.
+
+If you have an existing project with some technical debt, you can start by committing to a “no broken windows” policy on the CI pipeline. This means that when the master is broken, drop what you're doing and fix it.
+
+Every test failure is a bug. It needs to be logged, investigated and fixed. Assume that the defect is in application code, unless tests can prove otherwise. However, sometimes the test itself really is the problem, which is when the solution is to rewrite it to be more reliable.
+
+The process of cleaning up the master build is something which usually starts being very painful, but if you're committed and stick to the process, over time the pain goes away. One day you reach a stage when a failed test means there is a real bug. You don't have to re-run the CI build just to move on with your work. No one has to impose a code freeze. Days become productive again.
 
 ### 3.2.2 Keep the Build Fast: Up to 10 Minutes
 
-### 3.2.3 Run Fast and Fundamental Tests First
+Let’s take two development teams, both writing tests, as an example. Team A has a CI build which runs for about 3 minutes. Team B has a build that clocks at 45 minutes. They both use a CI service which runs tests on all branches. They both release reliable software in predictable cycles. It's just that team A has a potential to build and release over 100 times in a day, while team B can do that up to 7 times. Are they both doing *continuous* integration?
 
-### 3.2.4 Abolish Feature Branches
+The short answer is no.
 
-Work in small iterations. AKA Have all developers commit code to master at least 10 times per day
+If a CI build takes a long time, we approach our work defensively. We tend to keep branches on the local computer longer, and thus every developer’s code is in a significantly different state. Merges are rarer, and they become big and risky events. Refactoring becomes hard to do on the scale that the system needs to stay healthy.
 
-testing culture needs to be at its best
+With a slow build, every “git push” leads to a huge distraction. We either wait, or look for something else to do to avoid being completely idle. And if we context-switch to something else, we know that we’ll need to switch back again when the build is finished. The catch is that every task switch in programming is hard and it sucks up our energy.
+
+The point of continuous in continuous integration is speed. Speed drives high productivity: we want feedback as soon as possible. Fast feedback loops keep us in a state of flow, which is the source of our happiness at work.
+
+So, it’s helpful to establish criteria for how fast should a continuous integration process be:
+
+Proper continuous integration is when it takes you less than 10 minutes from pushing new code to getting results.
+
+While the 10-minute mark is about how much a developer can wait without getting too distracted, it's also adopted by a leading one of the pioneers of continuous delivery, Jez Humble, who performs the following informal poll at conferences.
+
+He usually begins the by asking his audience to raise their hands if they do continuous integration. Usually most of the audience raise their hands.
+
+He then asks them to keep their hands up if everyone on their team commits and pushes to the master branch at least daily.
+
+Over half the hands go down. He then asks them to keep their hands up if each such commit causes an automated build and test. Half the remaining hands are lowered.
+
+Finally he asks if, when the build fails, it’s usually back to green within ten minutes.
+
+With that last question only a few hands remain. Those are the people who pass the informal CI certification test.
+
+There are a couple of tactics which you can employ to reduce CI build time:
+
+- **Caching**: Project dependencies should be independently reused across builds. When building Docker containers, use the layer caching feature to reuse known layers from the registry.
+- **Built-in Docker registry**: A container-native CI solution should include a built-in registry. This not only saves a lot of money comparing to using the registry provided by your cloud provider, but it also significantly speeds up CI.
+- **Test parallelization**: A large test suite is the most common reason why CI is slow. The solution is to use a cloud-based CI service which can automatically distribute tests across as many parallel jobs as needed to achieve the 10-minute benchmark, or better.
+
+### 3.2.3 Build Only Once and Promote the Result Through the Pipeline
+
+A primary goal of a CI/CD pipeline is to build confidence in your changes and minimize the chance of unexpected outcomes. Continuous integration of container-based services should execute building containers only once, and the resulting images should be reused throughout the entire pipeline.
+
+For example, consider a a case where you need to run tests in parallel and then deploy a container. The desired pipeline should build the container in the first stage, while the later stages of parallel testing and deployment reuse the container from the registry that's part of the CI service.
+
+TODO: diagram build docker once
+
+The same principle applies to any other assets that you need to create from source code and use later in the pipeline, such as binary packages or website assets.
+
+When software is compiled or packaged multiple times, it's possible for slight inconsistencies to be injected into the resulting artifacts. It also means that tests don't target the same software that will be deployed later, making our pipeline unreliable.
+
+To avoid this problem, your CI system should be able to execute pipelines in multiple stages, each running in an identical, clean and isolated environment. The resulting artifact should be versioned and uploaded to an artifact or container storage system to be pulled down by subsequent stages of the pipeline, ensuring that the build does not change as it progresses through the system.
+
+### 3.2.4 Run Fast and Fundamental Tests First
+
+While it's great to keep your entire pipeline fast, there are often parts of the test suite that are faster than others.
+
+Unit tests run the fastest, because they are isolated and usually don't touch the database. They define the business logic, and are the most numerous, as is commonly depicted in the "test pyramid" diagram:
+
+TODO: diagram test pyramid
+
+A failure in unit tests then is a signal of a fundamental problem, which makes running the remaining high-level and long-running tests irrelevant. For these reasons, projects with test suites that run for anything longer than a minute should prioritize unit tests in the CI pipeline.
+
+TODO: diagram of multi stage testing
+
+This strategy allows developers to get feedback on trivial errors very quickly. It also encourages all team members to understand the performance impact of individual tests as the code base grows.
+
+There are additional tactics that you can use with your CI system to get fast feedback:
+
+- Conditional stage execution:
+- Fast-fail
+- Auto-cancelation strategy
+
+### 3.2.5 Abolish Feature Branches
+
+Work in small iterations...
+
+### 3.2.6 Use CI to Maintain Your Code
 
 Build in quality checking.
 
-Include pull requests.
-
-Wait for tests to pass before opening a pull request.
-
-Peer-review each pull request.
-
-Use CI to maintain your code.
-
-Keep track of key metrics.
+Schedule.
 
 ## 3.3 Continuous Delivery Best Practices
 
