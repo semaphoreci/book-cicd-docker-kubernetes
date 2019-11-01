@@ -162,7 +162,7 @@ Unit tests run the fastest, because they are isolated and usually don't touch th
 
 A failure in unit tests then is a signal of a fundamental problem, which makes running the remaining high-level and long-running tests irrelevant. For these reasons, projects with test suites that run for anything longer than a minute should prioritize unit tests in the CI pipeline.
 
-TODO: diagram of multi stage testing
+![Multi-stage testing](figures/04-multistage-testing.png){ width=70% }
 
 This strategy allows developers to get feedback on trivial errors in seconds. It also encourages all team members to understand the performance impact of individual tests as the code base grows.
 
