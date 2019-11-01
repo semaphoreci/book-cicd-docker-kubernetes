@@ -78,7 +78,7 @@ As we've seen in the first chapter, containers make it easy for developers repli
 
 This may seem obvious, but it’s worth repeating: automate everything you can.
 
-There are certainly cases when complete automation is not possible. You may have customers who simply don't want continuous updates to their systems. There maye be regulations restricting how software can be updated, as is the case for example in the aerospace, telecom, and medical industries.
+There are certainly cases when complete automation is not possible. You may have customers who simply don't want continuous updates to their systems. There may be regulations restricting how software can be updated, as is the case for example in the aerospace, telecom, and medical industries.
 
 But if these conditions do not apply and you think that something in your pipeline can't be automated, you're almost certainly wrong.
 
@@ -122,7 +122,7 @@ Proper continuous integration is when it takes you less than 10 minutes from pus
 
 While the 10-minute mark is about how much a developer can wait without getting too distracted, it's also adopted by a leading one of the pioneers of continuous delivery, Jez Humble, who performs the following informal poll at conferences.
 
-He usually begins the by asking his audience to raise their hands if they do continuous integration. Usually most of the audience raise their hands.
+He usually begins by asking his audience to raise their hands if they do continuous integration. Usually most of the audience raise their hands.
 
 He then asks them to keep their hands up if everyone on their team commits and pushes to the master branch at least daily.
 
@@ -169,7 +169,7 @@ This strategy allows developers to get feedback on trivial errors in seconds. It
 There are additional tactics that you can use with your CI system to get fast feedback:
 
 - **Conditional stage execution** lets you defer running certain parts of your build for the right moment. For example, you can configure your CI to run a subset of end-to-end tests only if one of the related components was changed.
-- **A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when you're running parallel jobs with variable duration.
+- **A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when running parallel jobs with variable duration.
 - **Automatic cancelation of queued builds** can help in situations when you push some changes, only to realize that you have missed something small, so you push a new revision immediately, but then need to wait for twice as long for feedback. With this approach you get feedback on revisions that matter while skipping all the intermediate ones.
 
 ### 3.2.5 Minimize Feature Branches, Embrace Feature Flags
@@ -206,10 +206,32 @@ You can further support the quality of your code by incorporating code style che
 
 ## 3.3 Continuous Delivery Best Practices
 
-Developers can push the code into production-like staging environments.
+### 3.3.1 The CI/CD Pipeline is the Only Way to Deploy to Production
 
-Anyone can deploy any version of the software to any environment on demand, at a push of a button.
+A CI/CD pipeline is a codified standard of quality and procedure for making a release. By rejecting any change that breaks any of the rules, the pipeline acts as a gatekeeper of quality that protects the production environment from unverified code and pushes the team to work in the spirit of continuous improvement.
 
-The CI/CD Pipeline is the Only Way to Deploy to Production
+To reap these benefits, it's important to maintain the discipline of having every single change go through the pipeline before reaching production. The CI/CD pipeline should be the only way code can reach production.
 
-Always use exactly the same environment
+It can be tempting to break this rule in cases of seemingly exceptional circumstances, and revert to manual procedures that circumvent the pipeline. On the contrary, the times of crisis are exactly when the pipeline delivers value, by making sure that the system doesn't degrade even further. When timing is critical, the pipeline should be used to roll back to the previous release.
+
+Once it happens that configuration and history of the CI/CD pipeline diverge from what teams does in reality, it’s difficult to re-establish the automation and quality-driven culture. For this reason, it’s important to invest time in making the pipeline fast, so that no one feels encouraged to skip it.
+
+### 3.3.2 Developers Can Deploy to Production-Like Staging Environments at a Push of a Button
+
+An ideal CI/CD pipeline is the one which is almost invisible. Developers get feedback from tests without losing focus, and deploy with a single command or button press. There's no delay between intent and actualization. Anything that gets in the way of that ideal state is undesirable.
+
+First, developers should be the ones who deploy their own code. This is in line with the general principle of "You build it, you run it". Delegating that task to anyone else simply makes the process an order of magnitude slower and more complicated.
+
+Developers who build containerized microservices need to have a staging Kubernetes cluster where they can deploy at will.
+
+Second, the deployment operation needs to be streamlined to a single command that is trivial to run and very unlikely to fail. This is the task for the person or team who are setting up the infrastructure at the beginning of the project. A more complicated deployment sequence invites human and infrastructure errors that slow down the flow of progress.
+
+### 3.3.3 Always Use Exactly the Same Environment
+
+Before containers, the realistic advice would be to make the pipeline, staging and production environments as similar as possible. This helps ensure that the automated tests which we run in the CI/CD pipeline accurately reflect how the change would behave in production. The bigger the differences between staging and production, the more it is likely that team will release problematic changes to customers that were reproduced while testing.
+
+Today containers guarantee that your code always runs in exactly the same environment. You can run your entire CI/CD pipeline in your custom Docker containers. And you can be sure that the containers that you build during the pipeline will be bit-exact in further pipeline tests, staging and production environments.
+
+Other environments are still not exactly the same as production, since reproducing the exact same infrastructure and load is expensive. However, the differences are manageable, and we get to avoid most of the errors that would have occurred with non-identical environments.
+
+Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can employ with Kubernetes that serve to further minimize the risk of bad deploys, such as blue-green and canary deployment.
