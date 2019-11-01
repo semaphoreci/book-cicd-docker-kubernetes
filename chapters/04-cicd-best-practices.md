@@ -22,7 +22,7 @@ Pipeline velocity manifests itself in a number of ways:
 
 **How long does it take us to build, test and deploy a simple code commit?** For example, a total time of one hour for CI and deployment means that the entire engineering team has a hard limit of up to seven deploys for the whole application in a workday. This causes developers to opt for less frequent and more risky deployments, instead of the rapid change that businesses today need.
 
-**How quickly can we set up a new pipeline?** Difficulty with scaling CI/CD infrastructure or reusing existing configuration creates friction, which stifles development. Today’s cloud infrastructure is best utilized by writing software as a composition of microservices, which calls for frequent and fast initiation of new CI/CD pipelines. This is solved by having a CI/CD tool that is programmable and fits in the existing development workflows. Most notably it should support storing all CI/CD configuration as code that can be reviewed, versioned and restored. It is also important to be able to access CI/CD resources through both a command-line interface (CLI) and remote API.
+**How quickly can we set up a new pipeline?** Difficulty with scaling CI/CD infrastructure or reusing existing configuration creates friction, which stifles development. Today’s cloud infrastructure is best utilized by writing software as a composition of microservices, which calls for frequent and fast initiation of new CI/CD pipelines. This is solved by having a CI/CD tool that is programmable and fits in the existing development workflows. Most notably it should support storing all CI/CD configuration as code that can be reviewed, versioned and restored. It is also important to be able to access CI/CD resources through both a command-line interface (CLI) and remote API. Perhaps most importantly, it should be easy to use for every developer so that projects don't depend on individuals or teams who are tasked to "set up and maintain CI" for other people.
 
 ### 3.1.2 Reliability
 
@@ -154,7 +154,7 @@ To avoid this problem, your CI system should be able to execute pipelines in mul
 
 ### 3.2.4 Run Fast and Fundamental Tests First
 
-While it's great to keep your entire pipeline fast, there are often parts of the test suite that are faster than others.
+While it's great to keep your entire pipeline fast, on many occasions you can get all the feedback from CI that you need without running all tests.
 
 Unit tests run the fastest, because they are isolated and usually don't touch the database. They define the business logic, and are the most numerous, as is commonly depicted in the "test pyramid" diagram:
 
@@ -164,29 +164,47 @@ A failure in unit tests then is a signal of a fundamental problem, which makes r
 
 TODO: diagram of multi stage testing
 
-This strategy allows developers to get feedback on trivial errors very quickly. It also encourages all team members to understand the performance impact of individual tests as the code base grows.
+This strategy allows developers to get feedback on trivial errors in seconds. It also encourages all team members to understand the performance impact of individual tests as the code base grows.
 
 There are additional tactics that you can use with your CI system to get fast feedback:
 
-- Conditional stage execution:
-- Fast-fail
-- Auto-cancelation strategy
+- **Conditional stage execution** lets you defer running certain parts of your build for the right moment. For example, you can configure your CI to run a subset of end-to-end tests only if one of the related components was changed.
+- **A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when you're running parallel jobs with variable duration.
+- **Automatic cancelation of queued builds** can help in situations when you push some changes, only to realize that you have missed something small, so you push a new revision immediately, but then need to wait for twice as long for feedback. With this approach you get feedback on revisions that matter while skipping all the intermediate ones.
 
-### 3.2.5 Abolish Feature Branches
+### 3.2.5 Minimize Feature Branches, Embrace Feature Flags
 
-Work in small iterations...
+One of the reasons why Git completely overshadowed previously used version control systems like Subversion and CVS is how it made branching easy. It quickly became common practice among some developers to create and merge branches multiple times per day.
+
+The point of making such short-lived branches is to work in isolation from master, which we agreed to keep in a releasable state at all times. In a Git branch, developers can commit and save their work at any time, then squash those commits to form a nicely formatted set of changes when they're ready to ask for feedback and eventually merge them. It's also common to call such branches "feature branches".
+
+That is not what this best practice is about.
+
+When we say you should minimize feature branches, we refer to not having long-lived branches that live for as long as a new product feature is in development, which can easily take months.
+
+Keeping a branch running for weeks or months opens the door to all the problems that come up with infrequent integration. Dependencies and internal APIs are likely to change, and the amount of work and coordination needed to merge skyrockets. The difficulty is not just to merge code on line-by-line level, but to make sure it doesn’t introduce unforeseen bugs at runtime.
+
+The solution is to use feature flags. Feature flags are basically:
+
+```ruby
+if current_user.can_use_feature?("new-feature")
+  render_new_feature_widget
+end
+```
+
+So you don’t even load the related code unless the user is a developer working on it, or a small group of beta testers. No matter how unfinished the code is, nobody will be affected. So you can work on it in small iterations and make sure each iteration is well integrated with the system as a whole. Such integrations are much easier to deal with than a big-bang merge.
 
 ### 3.2.6 Use CI to Maintain Your Code
 
-Build in quality checking.
+If you're used to working on monolithic applications, building microservices leads to an unfamiliar situation: a service often reach a phase of being done, as in no further work is necessary for the time being.
 
-Schedule.
+No one may touch the service's repository for months. And then, one day, there's an urgent need to make a change. The CI build fails with unexpected errors: there are security vulnerabilities in multiple dependencies, and many others have changes that someone needs to review. Suddenly, what seemed like a trivial update becomes a risky operation that may explode into days of work.
+
+To prevent this from happening, you can schedule a daily CI build. A scheduled build is a great way of detecting any issues with dependencies early, regardless of how often your code changes.
+
+You can further support the quality of your code by incorporating code style checkers, code smell detectors and security scanners in your CI pipeline — and running them first, before unit tests.
 
 ## 3.3 Continuous Delivery Best Practices
-
-Build Only Once and Promote the Result Through the Pipeline.
-
-Embrace feature flags.
 
 Developers can push the code into production-like staging environments.
 
