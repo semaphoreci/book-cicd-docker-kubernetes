@@ -16,6 +16,8 @@ manifests and Dockerfiles when appropiate*
 
 *Docker*
 
+*Introduce docker repositories concept*
+
   - docker login
 
   - docker build
@@ -50,12 +52,19 @@ DO, GCP.*
 *Explain what services the reader will need to provision on their cloud
 of choice: postgres and cluster.*
 
-## Setting up CI/CD
+### Create Kubernetes Cluster
+
+*The reader should create a k8s cluster. Give general pointers on how many nodes and machine types to use*
+
+### Create PostgreSQL DB
+
+*At a general level, without entering in vendor-specific details, instruct the reader to create a postgres db *
+
+## Semaphore CI/CD
+
+*Review prerequisites and tools: Semaphore, sem cli, GitHub, Git, Curl, kubectl, etc*
 
 *Fork, clone and initialize the project in Semaphore*
-
-*Review prerequisites and tools: Semaphore, GitHub, Git, Curl, kubectl,
-etc*
 
 ### Continuous Integration
 
@@ -77,6 +86,8 @@ GCP and AWS when appropiate*
 *Explain how we’re going to implement the canary deployment*
 
 *Explain pull-push block.*
+
+*Explain secrets and show what secrets are required for each vendor*
 
 *Explain how to create appropiate secret. show variants for GCP and DO*
 z *Explain canary deployment block*
