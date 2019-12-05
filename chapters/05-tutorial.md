@@ -246,7 +246,7 @@ Note that we’re using dollar ($) variables in the file. This gives us
 some flexibility and allows us to reuse it the same manifest for several
 deployments.
 
-## 5.3 How do we test, build, and deploy - The Plan
+## 5.3 Planning the Deployment
 
 How are we going to build, test, and deploy the application?
 
@@ -746,7 +746,7 @@ region, network, and VPC.
 3.  Under *Connectivity & Security* take note of the Endpoint address
     and port.
 
-**Create the database secret**
+**Create the Database Secret**
 
 The database secret is the same for all clouds. For GCP and DO, the
 database user is “demouser”, while for AWS, the user is called
@@ -880,7 +880,7 @@ $ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/perso
 To retrieve all persons, use:
 
 ``` bash
-$ curl -w "\n" 34.68.150.168/all
+$ curl -w "\n" 34.68.150.168/all                                                  
 [
     {
         "id": 1,
@@ -912,7 +912,7 @@ $ kubectl get all --wide
 Describe can show detailed information on the pods:
 
 ``` bash
-$ kubectl describe pod canary-xyz
+$ kubectl describe pod canary-xyz 
 ```
 
 The deployments:
