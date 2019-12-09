@@ -339,11 +339,11 @@ agent:
 **blocks and jobs**: Blocks and jobs organize the execution flow. Each
 block can have one or more jobs. All jobs in a block run in parallel,
 each one in an isolated environment. Semaphore waits for all jobs in a
-block to pass before starting the next one. Additionally, we can define
-environment variables at the block level, and we can import secrets.
-We’ll talk about secrets in the next section. Commands in the
-*prologue* section are executed before each job in the block. It’s a
-convenient place for setup commands.
+block to pass before starting the next one. Additionally, we can set
+environment variables and import secrets for all the jobs in the block.
+We’ll talk about secrets momentarily. Commands in the *prologue* section
+are executed before each job in the block; it’s a convenient place for
+setup commands:
 
 ``` yaml
 blocks:
@@ -468,11 +468,12 @@ called “aws-key” and “gcp-key” respectively.
 . . .
 ```
 
-Later on, we define some environment variables. These will change
-depending on the destination cloud. Check the comments on the file, as
-you may need to fill in some values. For instance, GCP reads the region
-from `$GCP_PROJECT_DEFAULT_ZONE`, and the AWS pipeline has a similar
-value and the address of `ECR_REGISTRY`.
+Later on, we define some environment variables; these will change
+depending on the destination cloud. For more details consult the
+comments on the corresponding pipeline files, as you may need to fill in
+some values. For instance, GCP reads the region from
+`$GCP_PROJECT_DEFAULT_ZONE`, and the AWS pipeline expects the Docker
+registry address in `ECR_REGISTRY`.
 
 ``` yaml
 . . .
@@ -635,7 +636,7 @@ GCP calls the service *Kubernetes Engine*. Google also offers a private
 *Container Registry*, but there is no need to activate it manually.
 
 1.  Sign up for a GCP account on `cloud.google.com`.
-2.  Create a *New Project*.
+2.  Create a *New Project* called “semaphore-demo-cicd-kubernetes”.
 3.  Go to *Kubernetes Engine* \> *Clusters* and create a cluster. Select
     “Zonal” in *Location Type* and select one of the available zones.
     Choose the default Kubernetes version. Name your cluster
@@ -791,19 +792,13 @@ deployment pipeline will start automatically:
 Once the deployment is complete, the workflow stops and waits for the
 manual promotion. Here is where we check how the canary is doing.
 
-Once you have run the whole workflow more than once, you’ll see a stable
-deployment with two pods:
+After the first time you run the workflow, you should see only the
+canary deployment:
 
 ``` bash
 $ kubectl get deployment
 NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           8m22s
-```
-
-To check the running pods:
-
-``` bash
-$ kubectl get pod
+addressbook-canary   1/1     1            1           8m40s
 ```
 
 ### 5.6.1 Stable Release
@@ -825,23 +820,24 @@ Let’s say we decide to go ahead. So go on and hit that *Promote* button.
 
 ![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=60% }
 
-The stable pods will start to get upgraded and restarted one at a time
-with the new version:
+While the block runs, you should get the existing canary deployment as
+well as the newly created “addressbook-stable” deployment:
 
 ``` bash
 $ kubectl get deployment
 NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           8m38s
-addressbook-stable   2/3     3            2           7s
+addressbook-canary   1/1     1            1           110s
+addressbook-stable   0/3     3            0           1s
 ```
 
-Until we have three replicas:
+One at a time, the numbers of replicas should increase until reaching
+the target of three:
 
 ``` bash
 $ kubectl get deployment
 NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           18m38s
-addressbook-stable   3/3     3            3           20m23s
+addressbook-canary   1/1     1            1           114s
+addressbook-stable   2/3     3            2           5s
 ```
 
 With that completed, the canary is no longer needed, so it goes away:
@@ -849,17 +845,16 @@ With that completed, the canary is no longer needed, so it goes away:
 ``` bash
 $ kubectl get deployment
 NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-stable   3/3     3            3           17s
+addressbook-stable   3/3     3            3           12s
 ```
 
 Check the service status to see the external IP:
 
 ``` bash
 $ kubectl get service
-NAME             TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
-addressbook-lb   LoadBalancer   10.44.6.242   34.68.150.168   80:30478/TCP   35m
-kubernetes       ClusterIP      10.44.0.1     <none>          443/TCP        38h
-
+NAME             TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
+addressbook-lb   LoadBalancer   10.120.14.50   35.225.210.248   80:30479/TCP   2m47s
+kubernetes       ClusterIP      10.120.0.1     <none>           443/TCP        49m
 ```
 
 We can use curl to test the API endpoint directly. For example, to
@@ -880,7 +875,7 @@ $ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/perso
 To retrieve all persons, use:
 
 ``` bash
-$ curl -w "\n" 34.68.150.168/all                                                  
+$ curl -w "\n" 34.68.150.168/all
 [
     {
         "id": 1,
@@ -906,23 +901,23 @@ Kubectl can give us a lot of insights into what is happening. First, get
 an overall picture of the resources on the cluster.
 
 ``` bash
-$ kubectl get all --wide
+$ kubectl get all -o wide
 ```
 
-Describe can show detailed information on the pods:
+Describe can show detailed information of any or all of your pods:
 
 ``` bash
-$ kubectl describe pod canary-xyz 
+$ kubectl describe <pod-name>
 ```
 
-The deployments:
+It also works with deployments:
 
 ``` bash
 $ kubectl describe deployment addressbook-stable
 $ kubectl describe deployment addressbook-canary
 ```
 
-And the services:
+And services:
 
 ``` bash
 $ kubectl describe service addressbook-lb
@@ -937,35 +932,40 @@ $ kubectl get events
 And the log output of the pods using:
 
 ``` bash
-$ kubectl get logs addressbook-xyz
-$ kubectl get logs --previous addressbook-xyz
+$ kubectl logs <pod-name>
+$ kubectl logs --previous <pod-name>
 ```
 
-If we need to jump in one of the containers, we can start a shell as
-long as the pod is online with:
+If you need to jump in one of the containers, you can start a shell as
+long as the pod is running with:
 
 ``` bash
-$ kubectl exec -it canary-xyz -- bash
+$ kubectl exec -it <pod-name> -- bash
 ```
 
-These are some common error messages that you might find when running
-the demo:
+To access a pod network from your machine, forward a port with
+`port-forward`, for instance:
 
-  - Validation error: usually means that the manifest YAML syntax is
-    incorrect. Use `kubectl apply --dry-run --validate -f file.yml` to
-    validate the manifest.
+``` bash
+$ kubectl port-forward <pod-name> 8080:80
+```
+
+These are some common error messages that you might run into:
+
+  - Manifest is invalid: usually means that the manifest YAML syntax is
+    incorrect. Use `--dry-run` or `--validate` options verify the
+    manifest.
   - `ImagePullBackOff` or `ErrImagePull`: the requested image is invalid
     or was not found. Check that the image is in the repository and that
     the reference on the manifest file is correct.
   - `CrashLoopBackOff`: the application is crashing, and the pod is
-    shutting down. Check for application errors or missing environment
-    variables.
-  - Hangs in Pending status: this could mean that one of the Kubernetes
-    secrets is missing. The AWS deployment relies on a secret to connect
-    to the ECR.
+    shutting down. Check the logs for application errors.
+  - Pod never leaves `Pending` status: this could mean that one of the
+    Kubernetes secrets is missing. The AWS deployment relies on a secret
+    to connect to the ECR.
   - Log message says that “container is unhealthy”: this message may
-    show that the pod is not passing the readiness probe. Check that the
-    probe definition is correct.
+    show that the pod is not passing a probe. Check that the probe
+    definitions are correct.
   - Log message says that there are “insufficient resources”: this may
     happen if you request too many replicas for the cluster size, or the
     pods use too much memory or CPU.
@@ -974,13 +974,7 @@ the demo:
 
 Fortunately, Kubernetes and CI/CD make an exceptional team when it comes
 to recovering from errors. Once you have enough information to diagnose
-the problem, remove the failed canary with:
-
-``` bash
-$ kubectl delete deployment/addressbook-canary
-```
-
-Next, scale up again the stable deployment:
+the problem, scale up the stable deployment:
 
 ``` bash
 $ kubectl get deployments
@@ -997,40 +991,46 @@ addressbook-stable   3/3     3            3           10h22m
 
 ```
 
+And remove the failed canary:
+
+``` bash
+$ kubectl delete deployment/addressbook-canary
+```
+
 And we’re back to normal, phew\! Just remember to fix the issue on the
 code before pushing into master again.
 
-What if we have deployed all the way to stable, only to discover later
-that it had a defect? It can happen, maybe some subtle bug that no one
-found out until hours or days after the stable deployment? Can we go
-back to a previous version?
+**But what if the problem is found after the stable release?** Let’s
+imagine that a defect sneaked its way into the stable deployment. It can
+happen, maybe there was some subtle bug that no one found out hours or
+days in. Is it too late? Can we go back to a previous version?
 
-The answer is yes—and quickly. Do you remember that we tagged each
-Docker image with a unique ID? As long as it is in the Docker registry,
-we can simply go back to the last good deployment in Semaphore and hit
-its promote button again.
-
-If the Docker image is no longer in the registry, we can just do the
-same, but instead of doing a promotion, we can press the *rerun* button
-on the top right corner to generate and test the corresponding image.
+The answer is yes, we can go to the previous version. Do you remember
+that we tagged each Docker image with a unique ID (the
+`SEMAPHORE_WORKFLOW_ID`)? As long as it is in the Docker registry, we
+can simply find the last good deployment in Semaphore and click on the
+*Promote* button. If the Docker image is no longer in the registry, we
+can just re-generate it using the *Rerun* button in the top right
+corner.
 
 ## 5.7 Summary
 
-You have learned to put the puzzle pieces of CI/CD, Docker, and
-Kubernetes together into working application. Each of the pieces has a
-role: Docker brings portability, Kubernetes adds orchestration
-(resilience), and Semaphore CI/CD joins everything together.
+You have learned how to put together the puzzle of CI/CD, Docker, and
+Kubernetes into working application. In this chapter, you have put in
+practice all that you’ve learned in this book:
 
-You have put in practice all the concepts introduced in previous
-chapters.
-
-  - You have learned how to setup pipelines in Semaphore CI/CD and use
-    it to deploy to the cloud.
+  - How to setup pipelines in Semaphore CI/CD and use them to deploy to
+    the cloud.
   - How to build Docker images and start a dev environment with the help
     of Docker Compose.
-  - How to do canaried deployments and rolling updates with probes.
+  - How to do use Kubernetes to do canaried deployments and rolling
+    updates with probes.
   - How to scale deployments and how to recover when things don’t go as
     planned.
+
+Each of the pieces has a role: Docker brings portability, Kubernetes
+adds orchestration, and Semaphore CI/CD drives the test and deployment
+process.
 
 ## Footnotes
 
