@@ -1,178 +1,1195 @@
-# Chapter 5
+# 4 Tutorial
 
-## Introduction
+Going to a restaurant and looking at menu with all those delicious
+dishes is fun. In the end, however, we have to pick something and eat
+it—the whole point of going out is to have a nice meal.
 
-*What we want to achieve in this chapter. Briefly describe demo and how
-are we going to deploy it* *Introduce what we want want to achieve in
-this chapter. High-level overview of the deployment workflow*
+So far, this book has been like a menu, showing you all the
+possibilities and their ingredients. In this chapter, you are ready to
+order. *Bon appétit*.
 
-![High Level Flow](./figures/05-high-level-steps.png){ width=70% }
+Our goal is to get an application going in Kubernetes using CI/CD best
+practices.
 
-## Kubernetes & Docker
+![High Level Flow](./figures/05-high-level-steps.png){ width=80% }
 
-*Overview of the Docker and Kubectl commands we’ll need, review commands
-that were not yet mentioned or explained in previous chapters. Show
-manifests and Dockerfiles when appropiate*
+  - **Build**: package the application into a Docker image.
+  - **End-to-end test**: run end-to-end tests inside the image.
+  - **Canary**: deploy the image as a canary to a fraction of the users.
+  - **Functional test**: verify the canary in production to decide if we
+    should go ahead
+  - **Deploy**: if the canary passes the test, deploy the image to all
+    users.
+  - **Rollback**: if it fails, undo all changes, so we can try again
+    later.
 
-*Docker*
+## 4.1 Docker and Kubernetes
 
-*Introduce docker repositories concept*
+We’ve learned most of the Docker and Kubernetes commands we need to get
+through this chapter. Here are a few that we haven’t seen yet.
 
-  - docker login
+### 4.1.1 Docker Commands
 
-  - docker build
+A *Docker registry* stores Docker images. To manage them, the Docker CLI
+provides the following commands:
+
+  - `push` and `pull`: these commands work like Git. We can use them to
+    transfer images to and from the *registry*.
+
+  - `login`: takes a username, password, and an optional registry URL.
+    We need to log in before we can push images.
+
+  - `build`: creates a custom image from a Dockerfile.
+
+  - `tag`: renames an image or changes its tag.
+
+  - `exec`: starts a process in an already-running container. Compare it
+    with `docker run` which starts a new container instead.
+
+### 4.1.2 Kubectl Commands
+
+*Kubectl* is the primary admin CLI for Kubernetes. We’ll use the
+following commands during deployments:
+
+  - `get service`: in chapter 2, we learned about services. This command
+    shows what services are running in the cluster. For instance, we can
+    check the status and external IP of the Load Balancer.
+
+  - `get events`: shows the recent cluster events.
+
+  - `describe`: prints detailed information about services, deployments,
+    nodes, and pods.
+
+  - `logs`: dumps a container’s stdout messages.
+
+  - `apply`: starts a declarative deployment. Kubernetes compares the
+    existing and target states and takes the necessary steps to
+    reconcile them.
+
+  - `rollout status`: shows the deployment progress and waits until the
+    deployment finishes.
+
+  - `exec`: works like `docker exec`, this command runs a command in one
+    already-running pod.
+
+  - `delete`: stops and removes pods, deployments, and services.
+
+## 4.2 Setting Up the Project
+
+It’s time to put the book down and get our hands busy for a few minutes.
+In this section, you’ll fork the demo repository and install some tools.
+
+### 4.2.1 Install Prerequisites
+
+You’ll need to the following tools installed in your workstation:
+
+  - **git** (`git-scm.com`) to manage the code.
+  - **kubectl** (`kubernetes.io`) to control the cluster.
+  - **curl** (`curl.haxx.se`) to test the application.
+  - **docker** (`docker.com`) to run a dev environment.
+
+### 4.2.2 Create the Semaphore Project
+
+We have prepared a demo on GitHub with everything that you’ll need. Go
+to:
+
+`https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes`
+
+To get yourself a copy:
+
+  - Click on the *Fork* button.
+  - Click on the *Clone or download* button and copy the URL.
+  - Clone the repository to your computer: `git clone
+    YOUR_REPOSITORY_URL`
+
+The project includes:
+
+  - **.semaphore**: a directory with the CI/CD pipeline.
+  - **docker-compose.yml**: Docker Compose file for the dev environment.
+  - **Dockerfile**: build file for Docker.
+  - **manifests**: Kubernetes manifests.
+  - **package.json**: the Node.js project file.
+  - **src**: the application code and tests.
+
+The application is a microservice called “addressbook” that exposes a
+few API endpoints. It runs on Node.js and requires a PostgreSQL
+database.
+
+To add your project to Semaphore:
+
+1.  Go to `https://semaphoreci.com`
+2.  Sign up with your GitHub account.
+3.  Click on the **+ (plus)** icon next to *Projects* to see a list of
+    your repositories.
+4.  Use the *Choose* button next to “semaphore-demo-cicd-kubernetes”.
+
+### 4.2.3 Dockerfile and Compose
+
+The included Dockerfile builds an image from an official Node.js image:
+
+``` dockerfile
+FROM node:10.16.0-alpine
+
+ENV APP_HOME /app
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+COPY .nvmrc .jshintrc $APP_HOME/
+COPY package*.json $APP_HOME/
+RUN npm install
+
+RUN mkdir ./src
+COPY src $APP_HOME/src/
+
+EXPOSE 3000
+CMD [ "npm", "run", "start" ]
+```
+
+What does this Dockerfile do?
+
+  - Pulls the Node.js image.
+  - Copies the application files.
+  - Runs `npm` inside the container to install the libraries.
+  - Sets the starting command to serve on port 3000.
+
+You can use `docker-compose` to start a development environment:
+
+``` bash
+$ docker-compose up --build
+```
+
+Docker Compose will build and run the image as required. It will also
+download and start a PostgreSQL database for you.
+
+### 4.2.4 Kubernetes Manifests
+
+In chapter 3, we learned why Kubernetes is a declarative system: instead
+of telling it what to do, we state what we want and trust it knows how
+to get there.
+
+The `manifests` directory contains all the Kubernetes manifest files.
+
+  - `service.yml`: the LoadBalancer service. Forwards traffic from port
+    80 (HTTP) to port 3000.
 
 <!-- end list -->
 
-  - docker tag
+``` yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: addressbook-lb
+spec:
+  selector:
+    app: addressbook
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+```
 
-  - docker push
-
-  - docker pull
-
-*Kubernetes*
-
-*Briefly explain the not-yet-seen kubectl commands we’re going to use*
-
-  - kubectl get service
+  - `desployment.yml`: all deployments. The directory also contains
+    AWS-specific deployments.
 
 <!-- end list -->
 
-  - kubectl apply
+``` yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $deployment
+spec:
+  replicas: $replicas
+  selector:
+    matchLabels:
+      app: addressbook
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: addressbook
+        deployment: $deployment
+    spec:
+      containers:
+        - name: addressbook
+          image: $img
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+          env:
+            - name: DB_USER
+              value: "$DB_USER"
+            - name: DB_PASSWORD
+              value: "$DB_PASSWORD"
+. . .
+```
+
+The deployment manifest combines many of the Kubernetes concepts we’ve
+discussed in chapter 3:
+
+1.  A deployment called “addressbook” with rolling updates.
+2.  Labels for the pods manage traffic and identify release channels.
+3.  Environment variables for the containers in the pod.
+4.  A readiness probe to detect when the pod is ready to accept
+    connections.
+
+Note that we’re using dollar ($) variables in the file. This gives us
+some flexibility to reuse it the same manifest for several deployments.
+
+## 4.3 Planning CI/CD Workflow
+
+A good CI/CD workflow takes planning as there are a lot of moving parts:
+building, testing, and deploying.
+
+### 4.3.1 Testing the Docker Image
+
+Our CI/CD workflow begins by building the Docker image:
+
+![CI Flow](./figures/05-flow-docker-build.png){ width=70% }
+
+  - **Pull**: get the latest image from the CI registry. This optional
+    step decreases the build time.
+  - **Build**: create a Docker image.
+  - **Test**: start the container and run tests inside.
+  - **Push**: if all test pass, push the accepted image to the
+    production registry.
+
+### 4.3.2 The Canary and Stable Deployments
+
+In chapter 3, we have talked about Continuous Delivery and Continuous
+Deployment. In chapter 2, we learned about canaries and rolling
+deployments. Our CI/CD workflow combines these two practices.
+
+As mentioned before, a canary deployment is a limited release of a new
+version. We’ll call it “canary release” and the older version “stable
+release”.
+
+We can do a canary deployment by connecting the canary pods to the same
+load balancer as the rest of the pods. As a result, a set fraction of
+user traffic goes to the canary. For example, if we have nine stable
+pods and one canary pod, 10% of the users would get the canary release.
+
+![Canary Flow](./figures/05-flow-canary-deployment.png){ width=70% }
+
+  - **Copy**: the image from the Semaphore registry to the production
+    registry.
+  - **Canary**: deploy a canary pod.
+  - **Test**: run functional tests on the canary pod to ensure it's
+    working.
+  - **Stable**: if test pass, update the rest of the pods.
+
+Imagine this is your initial state: you have three pods running version
+**v1**.
+
+![Stable rolling update](./figures/05-transition-canary.png){ width=80% }
+
+When you deploy **v2** as a canary, you scale down the number of **v1**
+pods to two to keep the total amount of pods to three.
+
+Then, you can start a rolling update to version **v2** on the stable
+deployment. One at a time, all its pods are updated and restarted, until
+they are all running on **v2** and you can get rid of the canary.
+
+![Stable deployment complete](./figures/05-transition-stable.png){ width=80% }
+
+## 4.4 Semaphore CI/CD
+
+In this section, we’ll learn how the Semaphore CI/CD Syntax works.
+
+### 4.4.1 The Semaphore Syntax
+
+You can completely define the CI/CD environment for your project with
+Semaphore Pipelines.
+
+A Semaphore pipeline consists of one or more YAML files that follow the
+Semaphore syntax\[1\].
+
+These are some common elements you’ll find in a pipeline:
+
+**Version**: sets the syntax version of the file; at the time of writing
+the only valid value is “v1.0”.
+
+``` yaml
+version: v1.0
+```
+
+**Name**: gives an optional name to the pipeline.
+
+``` yaml
+name: This is the name of the pipeline
+```
+
+**Agent**: the agent is the combination of hardware and software that
+runs the jobs. The `machine.type` and `machine.os_image` properties
+describe the virtual machine\[2\] and the operating system. The
+`e1-standard-2` machine has 2 CPUs and 4 GB RAM and runs a Ubuntu 18.04
+LTS\[3\]:
+
+``` yaml
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+```
+
+**Blocks** and **jobs**: define what to do at each step. Each block can
+have one or more jobs. All jobs in a block run in parallel, each in an
+isolated environment. Semaphore waits for all jobs in a block to pass
+before starting the next one.
+
+This is how a block with two jobs looks like:
+
+``` yaml
+blocks:
+  - name: The block name
+    task:
+      jobs:
+        - name: The Job name
+          commands:
+            - command 1
+            - command 2
+        - name: Another Job
+          commands:
+            - command 1
+            - command 2
+```
+
+Commands in the **prologue** section are executed before each job in the
+block; it’s a convenient place for setup commands:
+
+``` yaml
+prologue:
+    commands:
+    - checkout
+    - cache restore
+```
+
+The Ubuntu OS image comes with a bunch of convenience scripts and
+tools\[4\]:
+
+  - **checkout**: clones the Git repository at the proper code revision
+    and `cd` into the directory.
+  - **sem-service**: starts an empty database for testing\[5\].
+
+**Environment variables**: defined at the block level are applied for
+all its jobs:
+
+``` yaml
+env_vars:
+    - name: MY_ENV_1
+      value: foo
+    - name: MY_ENV_2
+      value: bar
+```
+
+When a job starts, Semaphore preloads some special variables\[6\]. One
+of these is called `$SEMAPHORE_WORKFLOW_ID` and contains a unique string
+that is preserved for all pipelines in a given run. We’ll use it to
+uniquely tag our Docker images.
+
+Also, blocks can have **secrets**. Secrets contain sensitive information
+that doesn’t belong in a Git repository. Secrets import environment
+variables and files into the job\[7\]:
+
+``` yaml
+secrets:
+    - name: secret-1
+    - name: secret-2
+```
+
+**promotions**: Semaphore always executes first the pipeline found at
+`.semaphore/semaphore.yml`. We can have multi-stage, multi-branching
+workflows by connecting pipelines together with promotions. Promotions
+can be started manually or by user-defined conditions\[8\].
+
+``` yaml
+promotions:
+  - name: A manual promotion
+    pipeline_file: pipeline-file-1.yml
+  - name: An automated promotion
+    pipeline_file: pipeline-file-2.yml
+    auto_promote:
+      when: "result = 'passed'"
+```
+
+### 4.4.2 The Continous Integration Pipeline
+
+We talked about the benefits of CI/CD in chapter 3. Our demo includes a
+full-fledged CI pipeline. Open the file from the demo located at
+`.semaphore/semaphore.yml` to learn how we can build and test the Docker
+image.
+
+We’ve already covered the basics, so let’s jump directly to the first
+block. The prologue clones the repo and logins to the Semaphore Docker
+registry:
+
+``` yaml
+blocks:
+  - name: Docker Build
+    task:
+      prologue:
+        commands:
+          - checkout
+          - docker login \
+              -u $SEMAPHORE_REGISTRY_USERNAME \
+              -p $SEMAPHORE_REGISTRY_PASSWORD \
+              $SEMAPHORE_REGISTRY_URL
+```
+
+The “Build” job then:
+
+  - Pulls the “latest” image from the registry.
+  - Builds the Docker image with the current code revision.
+  - Tags it with `$SEMAPHORE_WORKFLOW_ID` so each has a distinct ID.
+  - Pushes it back to the Registry.
 
 <!-- end list -->
 
-  - kubectl rollout status
-
-## Kubernetes on the Cloud
-
-*Introduce the Cloud options we’ll be discussing in this tutorial: AWS,
-DO, GCP.*
-
-*Explain what services the reader will need to provision on their cloud
-of choice: postgres and cluster.*
-
-### Create Kubernetes Cluster
-
-*The reader should create a k8s cluster. Give general pointers on how many nodes and machine types to use*
-
-### Create PostgreSQL DB
-
-*At a general level, without entering in vendor-specific details, instruct the reader to create a postgres db *
-
-## Semaphore CI/CD
-
-*Review prerequisites and tools: Semaphore, sem cli, GitHub, Git, Curl, kubectl, etc*
-
-*Fork, clone and initialize the project in Semaphore*
-
-### Continuous Integration
-
-*The first pipeline, Dockerize and test, just works. No reader
-intervention is required (no secrets, etc). Forking and adding the
-project is enough. Instead of showing the pipeline put a flow chart and
-briefly explain what it does.*
-
-![CI Pipeline Flowchart](./figures/05-flow-docker-build.png){ width=70% }
-
-*Explain promotions. Instruct reader to open .semaphore.yml" and
-uncomment the promotion for their cloud of choice*
-
-### Continuous Deployment - Push and Canary Deployment
-
-*We’ll show mainly the DigitalOcean blocks. Remarking differences with
-GCP and AWS when appropiate*
-
-*Explain how we’re going to implement the canary deployment*
-
-*Explain pull-push block.*
-
-*Explain secrets and show what secrets are required for each vendor*
-
-*Explain how to create appropiate secret. show variants for GCP and DO*
-z *Explain canary deployment block*
-
-*Explain transitions using figures*
-
-![Initial state](./figures/05-stable-stable-v1.png){ width=70% }
-
-``` bash
-$ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           8m38s
-addressbook-stable   2/3     3            2           7s
+``` yaml
+jobs:
+  - name: Build
+    commands:
+      - docker pull \
+          $SEMAPHORE_REGISTRY_URL/addressbook:latest || true
+      - docker build \
+          --cache-from $SEMAPHORE_REGISTRY_URL/addressbook:latest \
+          -t $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID .
+      - docker push $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID
 ```
 
-![Canary deployed](./figures/05-stable-canary-1.png){ width=70% }
+The second block:
 
-``` bash
-$ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-stable   3/3     3            3           17s
+  - Pulls the recently create image from the registry.
+  - Runs integration and end-to-end tests.
+
+<!-- end list -->
+
+``` yaml
+jobs:
+  - name: Static test
+    commands:
+      - docker run -it \
+        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
+        npm run lint
+
+  - name: Integration test
+    commands:
+      - sem-service start postgres
+      - docker run --net=host -it \
+        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
+        npm run test
+
+  - name: Functional test
+    commands:
+      - sem-service start postgres
+      - docker run --net=host -it \
+        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
+        npm run ping
+      - docker run --net=host -it \
+        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
+        npm run migrate
 ```
 
-*Explain functional test block*
+The last block repeats the pattern:
 
-### Continuous Deployment - Stable Deployment
+  - Pulls the image created on the first block.
+  - Tags it as “latest” and pushes it again to the Semaphore registry
+    for future runs.
 
-*at this point there is a manual go-no go decision*
+The last section of the file defines the promotion. Uncomment the lines
+corresponding to your cloud of choice and save the file. These
+promotions are triggered when the Git branch is master or when the
+commit tag begins with “hotfix”.
 
-*should we continue with deployment, explains how it works*
-
-*Explain deployment block*
-
-*Explain transitions with figures*
-
-![Stable rolling update 1](./figures/05-stable-canary-2.png){ width=70% }
-
-![Stable rolling update 2](./figures/05-stable-canary-3.png){ width=70% }
-
-``` bash
-$ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           18m38s
-addressbook-stable   3/3     3            3           20m23s
+``` yaml
+promotions:
+  - name: Canary Deployment (DigitalOcean)
+    pipeline_file: deploy-canary-digitalocean.yml
+    auto_promote:
+      when: "result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')"
 ```
 
-![Stable deployment complete](./figures/05-stable-stable-v2.png){ width=70% }
+### 4.4.3 Your First Run
+
+We’ve covered a lot of things in a few pages, here we have the change to
+pause for a little bit and do an initial run of the CI pipeline.
+
+You can avoid running the deployment pipeline by making a push in a
+non-master branch:
 
 ``` bash
-$ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-stable   3/3     3            3           20m45s
-
+$ git branch test-integration
+$ git checkout test-integration
+$ touch any-file
+$ git add any-file
+$ git commit -m "run integration pipeline for the first time"
+$ git push origin test-integration
 ```
 
-## Test App
+Check the progress of the pipeline from the Semaphore website:
 
-*instruct reader to push to github and test the API endpoints*
+![CI Pipeline](./figures/05-sem-ci-pipeline.png){ width=60% }
+
+## 4.5 Preparing the Cloud Services
+
+Our project supports three clouds: Amazon AWS, Google Cloud Platform
+(GCP), and DigitalOcean (DO). AWS is, by far, the most popular, but
+likely the most expensive to run Kubernetes. DigitalOcean is the easiest
+to use, while Google Cloud sits comfortably in the middle.
+
+### 4.5.1 Provision a Kubernetes Cluster
+
+In this tutorial, we’ll use a three-node Kubernetes cluster; you can
+pick a different size, though. You’ll need at least three nodes to run
+an effective canary deployment with rolling updates.
+
+**DigitalOcean Cluster**
+
+DO calls its service *Kubernetes*. Since DigitalOcean doesn’t have a
+private registry\[9\], we’ll use Docker Hub. To create a registry:
+
+  - Sign up for a free account on `hub.docker.com`.
+  - Create a public repository called “semaphore-demo-cicd-kubernetes”
+
+To create the Kubernetes cluster:
+
+  - Sign up for an account on `digitalocean.com`.
+  - Create a *New Project*.
+  - Create a *Kubernetes* cluster: select the latest version and choose
+    one of the available regions. Name your cluster
+    “semaphore-demo-cicd-kubernetes”.
+  - Go to the *API* menu and generate a *Personal Access Token*.
+
+We have to store the DigitalOcean Access Token in secret:
+
+1.  Login to `semaphoreci.com`.
+2.  On the main page, under *Configuration* select *Secrets* and click
+    on the *Create New Secret* button.
+3.  The name of the secret is “do-key”
+4.  Add the following variables:
+      - `DO_ACCESS_TOKEN` set its value to your DigitalOcean access
+        token.
+5.  Click on *Save changes*.
+
+Repeat the last steps to add the second secret, call it “dockerhub” and
+add the following variables:
+
+  - `DOCKER_USERNAME` for your DockerHub user name.
+  - `DOCKER_PASSWORD` with the corresponding password.
+
+**GCP Cluster**
+
+GCP calls the service *Kubernetes Engine*. To create the services:
+
+  - Sign up for a GCP account on `cloud.google.com`.
+  - Create a *New Project*. In *Project ID* type
+    “semaphore-demo-cicd-kubernetes”.
+  - Go to *Kubernetes Engine* \> *Clusters* and create a cluster. Select
+    “Zonal” in *Location Type* and select one of the available zones.
+  - Name your cluster “semaphore-demo-cicd-kubernetes”.
+  - Go to *IAM* \> *Service Accounts*.
+  - Generate an account with “Project Owner” permissions.
+  - Generate and download a JSON Access Key file.
+
+Create a secret for your GCP Access Key file:
+
+1.  Login to `semaphoreci.com`.
+2.  On the main page, under *Cconfiguration* select *Secrets* and click
+    on the *Create New Secret* button.
+3.  Name the secret “gcp-key”
+4.  Add the following file:
+      - `/home/semaphore/gcp-key.json` and upload the GCP Access JSON
+        from your computer.
+5.  Click on *Save changes*.
+
+**AWS Cluster**
+
+AWS calls its service *Elastic Kubernetes Service* (EKS). The Docker
+private registry is called *Elastic Container Registry* (ECR).
+
+Creating a cluster on AWS is, unequivocally, a complex, multi-step
+affair. So complex, that they created a specialized tool for it:
+
+  - Sign up for an AWS account at `aws.amazon.com`.
+  - Select one of the available regions.
+  - Find and go to the *ECR* service. Create a new repository called
+    “semaphore-demo-cicd-kubernetes” and copy its address.
+  - Install *eksctl* from `eksctl.io` and *awscli* from
+    `aws.amazon.com/cli` in your machine.
+  - Find the *IAM* console in AWS and create a user with Administrator
+    permissions. Get its *Access Key Id* and *Secret Access Key* values.
+
+Open a terminal and sign in to AWS:
 
 ``` bash
-$ touch any_file
-$ git add any_file
+$ aws configure
+AWS Access Key ID: TYPE YOUR ACCESS KEY ID
+AWS Secret Access Key: TYPE YOUR SECRET ACCESS KEY
+Default region name: TYPE A REGION
+```
+
+To create a three-node cluster of the most inexpensive machine type use:
+
+``` bash
+$ eksctl create cluster \
+    -t t2.nano -N 3 \
+    --region YOUR_REGION \
+    --name semaphore-demo-cicd-kubernetes
+```
+
+**Note**: Select the same region for all AWS services.
+
+Once it finishes, eksctl should have created a kubeconfig file at
+`$HOME/.kube/config`. Check the output from eksctl for more details.
+
+Create a secret to store the AWS Secret Access Key and the kubeconfig:
+
+1.  Login to `semaphoreci.com`.
+2.  On the main page, under *Configuration* select *Secrets* and click
+    on the *Create New Secret* button.
+3.  Call the secret “aws-key”
+4.  Add the following variables:
+      - `AWS_ACCESS_KEY_ID` should have your AWS Access Key ID string.
+      - `AWS_SECRET_ACCESS_KEY` has the AWS Access Secret Key string.
+5.  Add the following file:
+      - `/home/semaphore/aws-key.yml` and upload the Kubeconfig file
+        created by eksctl earlier.
+6.  Click on *Save changes*.
+
+### 4.5.2 Provision a Database
+
+We’ll need a database to store the data. For that, we’ll use a managed
+PostgreSQL service.
+
+**DigitalOcean Database**
+
+  - Go to *Databases*.
+  - Create a PostgreSQL database. Select the same region where the
+    cluster is running.
+  - In the *Connectivity* tab, whitelist the `0.0.0.0/0` network\[10\].
+  - Go to the *Users & Databases* tab and create a database called
+    “demo” and a user named “demouser”.
+  - In the *Overview* tab, take note of the PostgreSQL IP address and
+    port.
+
+**GCP Database**
+
+  - Select *SQL* on the console menu.
+  - Create a new PostgreSQL database instance.
+  - Select the same region and zone where the Kubernetes cluster is
+    running.
+  - Enable the *Private IP* network.
+  - Go to the *Users* tab and create a new user called “demouser”
+  - Go to the *Databases* tab and create a new DB called “demo”.
+  - In the *Overview* tab, take note of the database IP address and
+    port.
+
+**AWS Database**
+
+  - Find the service called *RDS*.
+  - Create a PostgreSQL database called “demo” and type in a secure
+    password.
+  - Choose the same region where the cluster is running.
+  - Select one of the available *templates*. The free tier is perfect
+    for demoing the application. Under *Connectivity* select all the
+    VPCs and subnets where the cluster is running (they should have
+    appeared in eksctl’s output).
+  - Under *Connectivity & Security* take note of the endpoint address
+    and port.
+
+**Create the Database Secret**
+
+The database secret is the same for all clouds. Create a secret to store
+the database credentials:
+
+1.  Login to `semaphoreci.com`.
+2.  On the main page, under *Configuration* select *Secrets* and click
+    on the *Create New Secret* button.
+3.  The secret name is “db-params”
+4.  Add the following variables:
+      - `DB_HOST` with the database hostname or IP.
+      - `DB_PORT` points to the database port (default is 5432).
+      - `DB_SCHEMA` for AWS should be called “postgres”, for the other
+        clouds its value should be “demo”.
+      - `DB_USER` for the database user.
+      - `DB_PASSWORD` should have the corresponding password.
+      - `DB_SSL` should be “true” for DigitalOcean, it can be empty for
+        the rest.
+5.  Click on *Save changes*.
+
+## 4.6 Releasing the Canary
+
+Now that we have our cloud services, we’re ready to deploy the canary
+for the first time.
+
+### 4.6.1 Continuous Deployment Pipeline
+
+Depending on your cloud, open one of the following files:
+
+  - AWS: `.semaphore/deploy-canary-aws.yml`
+  - GCP: `.semaphore/deploy-canary-gcp.yml`
+  - DO: `.semaphore/deploy-canary-digitalocean.yml`
+
+We’ll focus on the DO deployment but the process is the same for all
+clouds.
+
+The pipeline consists of three blocks:
+
+**Push**: the push block takes the docker image that we built earlier
+and uploads it to Docker Hub. The image must be in a place that is
+accessible by the Kubernetes cluster. This block imports a secret
+“dockerhub” secret:
+
+``` yaml
+. . .
+- name: Push to Registry
+  task:
+    secrets:
+      - name: dockerhub
+. . .
+```
+
+The secrets and the login command will vary depending on the cloud.
+
+The job pulls the image from Semaphore’s registry, tags it with its
+final name, and pushes it to production registry:
+
+``` yaml
+. . .
+jobs:
+  - name: Push
+    commands:
+      - docker login \
+          -u $SEMAPHORE_REGISTRY_USERNAME \
+          -p $SEMAPHORE_REGISTRY_PASSWORD \
+          $SEMAPHORE_REGISTRY_URL
+
+      - docker pull \
+          $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID
+
+      - echo "${DOCKER_PASSWORD}" | \
+          docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+      - docker tag \
+          $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID \
+          $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
+
+      - docker push \
+          $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
+. . .
+```
+
+**Deploy**: this block imports two extra secrets: “db-params” and the
+cloud-specific access token.
+
+``` yaml
+. . .
+- name: Deploy
+  task:
+    secrets:
+      - name: do-key
+      - name: db-params
+      - name: dockerhub
+. . .
+```
+
+Next, we define some environment variables. For more details, consult
+the comments on the corresponding pipeline files, as you may need to
+fill in some values.
+
+``` yaml
+. . .
+env_vars:
+    - name: CLUSTER_NAME
+      value: semaphore-demo-cicd-kubernetes
+. . .
+```
+
+The prologue installs the cloud management CLI tool and creates an
+authenticated session.
+
+``` yaml
+. . .
+prologue:
+  commands:
+    - wget https://github.com/digitalocean/../doctl-1.20.0-linux-amd64.tar.gz
+    - tar xf doctl-1.20.0-linux-amd64.tar.gz
+    - sudo cp doctl /usr/local/bin
+    - doctl auth init --access-token $DO_ACCESS_TOKEN
+    - doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+    - checkout
+. . .
+```
+
+The “Deploy” job starts the canary deployment:
+
+  - Creates a load balancer service with `kubectl apply`.
+  - Executes `apply.sh`, a convenience script for the manifest that
+    waits for the deployment to finish.
+  - Scales the stable pods down with `kubectl scale`.
+
+<!-- end list -->
+
+``` yaml
+. . .
+jobs:
+  - name: Deploy
+    commands:
+      - kubectl apply -f manifests/service.yml
+
+      - ./apply.sh manifests/deployment.yml \
+           addressbook-canary \
+           1 \
+           $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
+
+      - if kubectl get deployment addressbook-stable; then \
+           kubectl scale --replicas=2 deployment/addressbook-stable; \
+        fi
+. . .
+```
+
+**Test**: this is the last block in the pipeline. It runs some tests on
+the canary. Combining `kubectl get pod` and `kubectl exec`, we can run
+commands inside the pod.
+
+``` yaml
+. . .
+jobs:
+  - name: Test and migrate db
+    commands:
+      - kubectl exec -it \
+          $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
+          -- npm run ping
+
+      - kubectl exec -it \
+          $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
+          -- npm run migrate
+. . .
+```
+
+### 4.6.2 Your First Release
+
+This is the moment of truth. Will the canary work? Make a push on the
+master branch to get started:
+
+``` bash
+$ git checkout master
+$ git add .semaphore
 $ git commit -m "first deployment"
 $ git push origin master
 ```
 
+You can check the progress of the pipelines on the Semaphore website.
+
+![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=80% }
+
+Once the deployment is complete, the workflow stops and waits for the
+manual promotion. Here is where we can check how the canary is doing:
+
+``` bash
+$ kubectl get deployment
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+addressbook-canary   1/1     1            1           8m40s
+```
+
+## 4.7 Releasing the Stable
+
+So far, so good. Let's see where we are: we built the Docker image, and,
+after testing it, we released it as one-pod canary deployment. If the
+canary worked, we’re ready to complete the deployment.
+
+### 4.7.1 The Continuous Deployment Pipeline
+
+The stable deployment pipeline is the last one in the workflow. The
+pipeline does not introduce anything new. Again, we use `apply.sh`
+script to start a rolling update and `kubectl delete` to clean the
+canary deployment.
+
+``` yaml
+. . .
+jobs:
+  - name: Deploy
+    commands:
+      - ./apply.sh manifests/deployment.yml \
+          addressbook-stable \
+          3 \
+          $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
+
+      - if kubectl get deployment addressbook-canary; then \
+           kubectl delete deployment/addressbook-canary; \
+        fi
+. . .
+```
+
+### 4.7.2 Making the Release
+
+In tandem with the deployment, we should have a dashboard to monitor
+errors, user incidents, and performance metrics to compare against the
+baseline. After some pre-determined amount of time, we would reach a go
+vs. no-go decision. Is the canaried version good enough to be promoted
+to stable? If so, the deployment continues. If not, after collecting the
+necessary error reports and stack traces, we rollback and regroup.
+
+Let’s say we decide to go ahead. So go on and hit the *Promote* button.
+
+![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=60% }
+
+While the block runs, you should get the existing canary and a new
+“addressbook-stable” deployment:
+
+``` bash
+$ kubectl get deployment
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+addressbook-canary   1/1     1            1           110s
+addressbook-stable   0/3     3            0           1s
+```
+
+One at a time, the numbers of replicas should increase until reaching
+the target of three:
+
+``` bash
+$ kubectl get deployment
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+addressbook-canary   1/1     1            1           114s
+addressbook-stable   2/3     3            2           5s
+```
+
+With that completed, the canary is no longer needed, so it goes away:
+
+``` bash
+$ kubectl get deployment
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+addressbook-stable   3/3     3            3           12s
+```
+
+Check the service status to see the external IP:
+
 ``` bash
 $ kubectl get service
-NAME             TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
-addressbook-lb   LoadBalancer   10.44.6.242   34.68.150.168   80:30478/TCP   35m
-kubernetes       ClusterIP      10.44.0.1     <none>          443/TCP        38h
-
+NAME             TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
+addressbook-lb   LoadBalancer   10.120.14.50   35.225.210.248   80:30479/TCP   2m47s
+kubernetes       ClusterIP      10.120.0.1     <none>           443/TCP        49m
 ```
+
+We can use curl to test the API endpoint directly. For example, to
+create a person in the addressbook:
 
 ``` bash
-$ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=the Shark" 34.68.150.168/person
-{"id":2,"firstName":"Sammy","lastName":"the Shark","updatedAt":"2019-11-10T16:48:15.900Z","createdAt":"2019-11-10T16:48:15.900Z"}
+$ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/person
+{
+    "id": 1,
+    "firstName": "Sammy",
+    "lastName": "David Jr",
+    "updatedAt": "2019-11-10T16:48:15.900Z",
+    "createdAt": "2019-11-10T16:48:15.900Z"
+}
 
 ```
+
+To retrieve all persons, use:
 
 ``` bash
-$ curl -w "\n" 34.68.150.168/all                                                  
-[{"id":1,"firstName":"Sammy","lastName":"the Shark","createdAt":"2019-11-10T16:47:59.504Z","updatedAt":"2019-11-10T16:47:59.504Z"},{"id":2,"firstName":"Sammy","lastName":"the Shark","createdAt":"2019-11-10T16:48:15.900Z","updatedAt":"2019-11-10T16:48:15.900Z"}]
+$ curl -w "\n" 34.68.150.168/all
+[
+    {
+        "id": 1,
+        "firstName": "Sammy",
+        "lastName": "David Jr",
+        "updatedAt": "2019-11-10T16:48:15.900Z",
+        "createdAt": "2019-11-10T16:48:15.900Z"
+    }
+]
 ```
 
-## Conclusion
+The deployment was a success, that was no small feat. Congratulations\!
 
-*Final words, recap lessons learned*
+### 4.7.3 The Rollback Pipeline
+
+Fortunately, Kubernetes and CI/CD make an exceptional team when it comes
+to recovering from errors. Our project includes a rollback pipeline.
+
+Let’s say that we don’t like how the canary performs. In that case, we
+can click on the *Promote* button on the “Rollback canary” pipeline:
+
+![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=60% }
+
+Check the pipeline at `.semaphore/rollback-canary-digitalocean.yml`
+
+The rollback pipeline job is to collect information to diagnose the
+problem:
+
+``` yaml
+commands:
+    - kubectl get all -o wide
+    - kubectl get events
+    - kubectl describe deployment addressbook-canary || true
+    - kubectl logs \
+        $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) || true
+
+```
+
+And then undo the changes by scaling up the stable deployment and
+removing the canary:
+
+``` yaml
+- if kubectl get deployment addressbook-stable; then \
+    kubectl scale --replicas=3 deployment/addressbook-stable; \
+    fi
+
+- if kubectl get deployment addressbook-canary; then \
+    kubectl delete deployment/addressbook-canary; \
+fi
+```
+
+And we’re back to normal, phew\! Now its time to check the job logs to
+see what went wrong and fix it before merging to master again.
+
+**But what if the problem is found after the stable release?** Let’s
+imagine that a defect sneaked its way into the stable deployment. It can
+happen, maybe there was some subtle bug that no one found out hours or
+days in. Or perhaps some error not picked up by the functional test. Is
+it too late? Can we go back to a previous version?
+
+The answer is yes, we can go to the previous version. Do you remember
+that we tagged each Docker image with a unique ID (the
+`SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment
+pipeline for the last good version in Semaphore. When the Docker image
+is no longer in the registry can just regenerate it using the *Rerun*
+button in the top right corner.
+
+### 4.7.2 Troubleshooting and Tips
+
+Even the best plans can fail; failure is certainly an option in the
+software business. Maybe the canary is presented with some unexpected
+errors, perhaps it has performance problems, or we merged the wrong
+branch into master. The important thing is (1) learn something from
+them, and (2) know how to go back to solid ground.
+
+Kubectl can give us a lot of insights into what is happening. First, get
+an overall picture of the resources on the cluster.
+
+``` bash
+$ kubectl get all -o wide
+```
+
+Describe can show detailed information of any or all your pods:
+
+``` bash
+$ kubectl describe <pod-name>
+```
+
+It also works with deployments:
+
+``` bash
+$ kubectl describe deployment addressbook-stable
+$ kubectl describe deployment addressbook-canary
+```
+
+And services:
+
+``` bash
+$ kubectl describe service addressbook-lb
+```
+
+We also see the events logged on the cluster with:
+
+``` bash
+$ kubectl get events
+```
+
+And the log output of the pods using:
+
+``` bash
+$ kubectl logs <pod-name>
+$ kubectl logs --previous <pod-name>
+```
+
+If you need to jump in one of the containers, you can start a shell as
+long as the pod is running with:
+
+``` bash
+$ kubectl exec -it <pod-name> -- bash
+```
+
+To access a pod network from your machine, forward a port with
+`port-forward`, for instance:
+
+``` bash
+$ kubectl port-forward <pod-name> 8080:80
+```
+
+These are some common error messages that you might run into:
+
+  - Manifest is invalid: it usually means that the manifest YAML syntax
+    is incorrect. Use `--dry-run` or `--validate` options verify the
+    manifest.
+  - `ImagePullBackOff` or `ErrImagePull`: the requested image is invalid
+    or was not found. Check that the image is in the registry and that
+    the reference on the manifest file is correct.
+  - `CrashLoopBackOff`: the application is crashing, and the pod is
+    shutting down. Check the logs for application errors.
+  - Pod never leaves `Pending` status: this could mean that one of the
+    Kubernetes secrets is missing.
+  - Log message says that “container is unhealthy”: this message may
+    show that the pod is not passing a probe. Check that the probe
+    definitions are correct.
+  - Log message says that there are “insufficient resources”: this may
+    happen when the cluster is running low on memory or CPU.
+
+## 4.8 Summary
+
+You have learned how to put together the puzzle of CI/CD, Docker, and
+Kubernetes into a practical application. In this chapter, you have put
+in practice all that you’ve learned in this book:
+
+  - How to setup pipelines in Semaphore CI/CD and use them to deploy to
+    the cloud.
+  - How to build Docker images and start a dev environment with the help
+    of Docker Compose.
+  - How to do canaried deployments and rolling updates in Kubernetes.
+  - How to scale deployments and how to recover when things don’t go as
+    planned.
+
+Each of the pieces had its role: Docker brings portability, Kubernetes
+adds orchestration, and Semaphore CI/CD drives the test and deployment
+process.
+
+## Footnotes
+
+1.  The full pipeline reference can be fount at
+    <https://docs.semaphoreci.com/article/50-pipeline-yaml>
+
+2.  To see all the available machines, go to
+    <https://docs.semaphoreci.com/article/20-machine-types>
+
+3.  For more details on the Ubuntu image see:
+    <https://docs.semaphoreci.com/article/32-ubuntu-1804-image>
+
+4.  You can find the full toolbox reference here:
+    <https://docs.semaphoreci.com/article/54-toolbox-reference>
+
+5.  sem-service can start a lot of popular database engines, for the
+    full list check:
+    <https://docs.semaphoreci.com/article/132-sem-service-managing-databases-and-services-on-linux>
+
+6.  The full environment reference can be found at
+    <https://docs.semaphoreci.com/article/12-environment-variables>
+
+7.  For more details on secrets consult:
+    <https://docs.semaphoreci.com/article/66-environment-variables-and-secrets>
+
+8.  For more information on pipelines check
+    <https://docs.semaphoreci.com/article/67-deploying-with-promotions>
+
+9.  At the time of writing, DigitalOcean announced a beta for a private
+    registry offering. For more information, consult the available
+    documentation:
+    <https://www.digitalocean.com/docs/kubernetes/how-to/set-up-registry>
+
+10. Later, when everything is working, you can restrict access to the
+    Kubernetes nodes to increase security
