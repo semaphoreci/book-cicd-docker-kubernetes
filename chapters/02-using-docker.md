@@ -90,7 +90,7 @@ There are various ways to write your first Dockerfile, and none of them is inher
 
 During this phase, we’ll want to make sure that the team working on that service has Docker installed on their machine, but only a few people will have to meddle with Docker at this point. They will be leveling the field for everyone else.
 
-Here's an example Dockerfile, for the `hasher` microservice that's part of DockerCoins demo, written in Ruby:
+Here's an example `Dockerfile`, for the `hasher` microservice that's part of DockerCoins demo, written in Ruby:
 
 ```Dockerfile
 FROM ruby
@@ -101,7 +101,7 @@ CMD ["ruby", "hasher.rb"]
 EXPOSE 80
 ```
 
-Once we have a working `Dockerfile` for an app, we can start using this container image as the official development environment for this specific service or component. If we picked a fast-moving one, we will see the benefits very quickly, since Docker makes library and other dependency upgrades completely seamless. Rebuilding the entire environment with a different language version now becomes effortless. And if we realize after a difficult upgrade that the new version doesn’t work as well, rolling back is just as easy and instantaneous, because Docker keeps a cache of previous image builds around.
+Once we have a working Dockerfile for an app, we can start using this container image as the official development environment for this specific service or component. If we picked a fast-moving one, we will see the benefits very quickly, since Docker makes library and other dependency upgrades completely seamless. Rebuilding the entire environment with a different language version now becomes effortless. And if we realize after a difficult upgrade that the new version doesn’t work as well, rolling back is just as easy and instantaneous, because Docker keeps a cache of previous image builds around.
 
 ### 1.2.3 Writing More Dockerfiles
 

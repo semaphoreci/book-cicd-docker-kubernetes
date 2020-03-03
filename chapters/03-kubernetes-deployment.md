@@ -44,17 +44,10 @@ Instead of getting a container, you got a whole zoo of unknown beasts:
 Note: you can ignore the *service* named `kubernetes` in the example
 above; that one already existed before the `kubectl run` command.
 
-"I just wanted a container! Why do I get three different objects?"
+_"I just wanted a container! Why do I get three different objects?"_
 
 Next, you'll learn the roles of these different objects and how they 
 are essential to zero-downtime deployments in Kubernetes.
-
-At this point, you may wonder
-"What's the purpose of this?". But once you get the full picture,
-you will see the role and purpose of each component.
-
-In fact, a lot of people end up thinking that if they had been tasked
-with designing the system, they would have come up with something quite similar.
 
 Continuous integration gives you confidence that your code works.
 To extend that confidence to the release process, your deployment operations
