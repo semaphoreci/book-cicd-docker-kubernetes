@@ -250,7 +250,7 @@ building, testing, and deploying.
 
 Our CI/CD workflow begins by building the Docker image:
 
-![CI Flow](./figures/05-flow-docker-build.png){ width=70% }
+![CI Flow](./figures/05-flow-docker-build.png){ width=95% }
 
   - **Pull**: get the latest image from the CI registry. This optional
     step decreases the build time.
@@ -274,7 +274,7 @@ load balancer as the rest of the pods. As a result, a set fraction of
 user traffic goes to the canary. For example, if we have nine stable
 pods and one canary pod, 10% of the users would get the canary release.
 
-![Canary Flow](./figures/05-flow-canary-deployment.png){ width=70% }
+![Canary Flow](./figures/05-flow-canary-deployment.png){ width=95% }
 
   - **Copy**: the image from the Semaphore registry to the production
     registry.

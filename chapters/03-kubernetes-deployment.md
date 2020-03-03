@@ -484,7 +484,7 @@ reasons to do that, including:
   as possible, without even waiting for the old set of containers
   to restart.
 
-![Blue/Green Deployment](figures/03-blue-green.png){ width=70% }
+![Blue/Green Deployment](figures/03-blue-green.png){ width=95% }
 
 You can achieve blue/green deployment by creating multiple
 deployments (in the Kubernetes sense), and then switching from
@@ -562,7 +562,7 @@ Then, you compare metrics between the current version and the canary
 that you just deployed. If the metrics are similar, you can proceed.
 If latency, error rates, or anything else looks wrong, you roll back.
 
-![Canary Deployment](figures/03-canary.png){ width=70% }
+![Canary Deployment](figures/03-canary.png){ width=95% }
 
 This technique, which would be fairly involved to set up, ends up
 being relatively straightforward thanks to Kubernetes' native
