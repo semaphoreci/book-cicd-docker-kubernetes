@@ -18,7 +18,7 @@ html: $(BUILD)/html/$(BOOKNAME).html
 
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
-	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -o /data/$@ $^
+	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -o /data/$@ $^
 
 $(BUILD)/html/$(BOOKNAME).html: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/html
