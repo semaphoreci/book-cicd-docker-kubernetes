@@ -4,6 +4,9 @@ subtitle: How to Deliver Cloud Native Applications at High Velocity
 author: Semaphore
 language: en-US
 toc: true
+fontsize: 12pt
+colorlinks: true
+urlcolor: blue
 include-before:
 - '`\newpage{}`{=latex}'
 ...
