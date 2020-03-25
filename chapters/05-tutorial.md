@@ -1,4 +1,6 @@
-# 4 Tutorial
+\newpage
+
+# 4 Implementing a CI/CD Pipeline
 
 Going to a restaurant and looking at menu with all those delicious
 dishes is fun. In the end, however, we have to pick something and eat
@@ -8,124 +10,123 @@ So far, this book has been like a menu, showing you all the
 possibilities and their ingredients. In this chapter, you are ready to
 order. *Bon appétit*.
 
-Our goal is to get an application going in Kubernetes using CI/CD best
+Our goal is to get an application running on Kubernetes using CI/CD best
 practices.
 
-![High Level Flow](./figures/05-high-level-steps.png){ width=80% }
+![High Level Flow](./figures/05-high-level-steps.png){ width=95% }
 
-  - **Build**: package the application into a Docker image.
-  - **End-to-end test**: run end-to-end tests inside the image.
-  - **Canary**: deploy the image as a canary to a fraction of the users.
-  - **Functional test**: verify the canary in production to decide if we
-    should go ahead
-  - **Deploy**: if the canary passes the test, deploy the image to all
+Our process will include the following steps:
+
+- **Build**: package the application into a Docker image.
+- **Run end-to-end tests**: run end-to-end tests inside the image.
+- **Canary deploy**: deploy the image as a canary to a fraction of the users.
+- **Run functional tests**: verify the canary in production to decide if we
+    should go ahead.
+- **Deploy**: if the canary passes the test, deploy the image to all
     users.
-  - **Rollback**: if it fails, undo all changes, so we can try again
-    later.
+- **Rollback**: if it fails, undo all changes, so we can fix a problem and try again later.
 
-## 4.1 Docker and Kubernetes
+## 4.1 Docker and Kubernetes Commands
 
-We’ve learned most of the Docker and Kubernetes commands we need to get
-through this chapter. Here are a few that we haven’t seen yet.
+In previous chapters we’ve learned most of the Docker and Kubernetes commands
+that we'll need in this chapter. Here are a few that we haven’t seen yet.
 
 ### 4.1.1 Docker Commands
 
-A *Docker registry* stores Docker images. To manage them, the Docker CLI
-provides the following commands:
+A *Docker registry* stores Docker images. Docker CLI provides the following
+commands for managing images:
 
-  - `push` and `pull`: these commands work like Git. We can use them to
-    transfer images to and from the *registry*.
+- `push` and `pull`: these commands work like in Git. We can use them to
+  transfer images to and from the registry.
 
-  - `login`: takes a username, password, and an optional registry URL.
-    We need to log in before we can push images.
+- `login`: takes a username, password, and an optional registry URL.
+  We need to log in before we can push images.
 
-  - `build`: creates a custom image from a Dockerfile.
+- `build`: creates a custom image from a `Dockerfile`.
 
-  - `tag`: renames an image or changes its tag.
+- `tag`: renames an image or changes its tag.
 
-  - `exec`: starts a process in an already-running container. Compare it
-    with `docker run` which starts a new container instead.
+- `exec`: starts a process in an already-running container. Compare it
+  with `docker run` which starts a new container instead.
 
 ### 4.1.2 Kubectl Commands
 
 *Kubectl* is the primary admin CLI for Kubernetes. We’ll use the
 following commands during deployments:
 
-  - `get service`: in chapter 2, we learned about services. This command
-    shows what services are running in the cluster. For instance, we can
-    check the status and external IP of the Load Balancer.
+- `get service`: in chapter 2, we learned about services in Kubernetes.
+  This command shows what services are running in a cluster.
+  For instance, we can check the status and external IP of a load balancer.
 
-  - `get events`: shows the recent cluster events.
+- `get events`: shows recent cluster events.
 
-  - `describe`: prints detailed information about services, deployments,
-    nodes, and pods.
+- `describe`: shows detailed information about services, deployments,
+  nodes, and pods.
 
-  - `logs`: dumps a container’s stdout messages.
+- `logs`: dumps a container’s stdout messages.
 
-  - `apply`: starts a declarative deployment. Kubernetes compares the
+- `apply`: starts a declarative deployment. Kubernetes compares the
     existing and target states and takes the necessary steps to
     reconcile them.
 
-  - `rollout status`: shows the deployment progress and waits until the
+- `rollout status`: shows the deployment progress and waits until the
     deployment finishes.
 
-  - `exec`: works like `docker exec`, this command runs a command in one
-    already-running pod.
+- `exec`: works like `docker exec`, runs a command in an already-running pod.
 
-  - `delete`: stops and removes pods, deployments, and services.
+- `delete`: stops and removes pods, deployments, and services.
 
-## 4.2 Setting Up the Project
+## 4.2 Setting Up The Project
 
 It’s time to put the book down and get our hands busy for a few minutes.
-In this section, you’ll fork the demo repository and install some tools.
+In this section, you’ll fork a demo repository and install some tools.
 
 ### 4.2.1 Install Prerequisites
 
-You’ll need to the following tools installed in your workstation:
+You’ll need to the following tools installed on your computer:
 
-  - **git** (`git-scm.com`) to manage the code.
-  - **kubectl** (`kubernetes.io`) to control the cluster.
-  - **curl** (`curl.haxx.se`) to test the application.
-  - **docker** (`docker.com`) to run a dev environment.
+- **git** (_[https://git-scm.com](https://git-scm.com)_) to manage the code.
+- **docker** (_[https://www.docker.com](https://www.docker.com)_)
+  to run containers.
+- **kubectl** (_[https://kubernetes.io/docs/tasks/tools/install-kubectl/](https://kubernetes.io/docs/tasks/tools/install-kubectl/)_)
+  to control the Kubernetes cluster.
+- **curl** (_[https://curl.haxx.se](https://curl.haxx.se)_)
+  to test the application.
 
-### 4.2.2 Create the Semaphore Project
+### 4.2.2 Download The Demo Project
 
-We have prepared a demo on GitHub with everything that you’ll need. Go
-to:
+We have prepared a demo project on GitHub with everything that you’ll need
+to set up a CI/CD pipeline:
 
-`https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes`
+- Visit _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_
+- Click on the *Fork* button.
+- Click on the *Clone or download* button and copy the URL.
+- Clone the Git repository to your computer: `git clone YOUR_REPOSITORY_URL`
 
-To get yourself a copy:
+The repository contains a microservice called “addressbook” that exposes a
+few API endpoints. It runs on Node.js and uses a PostgreSQL database.
 
-  - Click on the *Fork* button.
-  - Click on the *Clone or download* button and copy the URL.
-  - Clone the repository to your computer: `git clone
-    YOUR_REPOSITORY_URL`
+You will see the following directories and files:
 
-The project includes:
+  - `.semaphore`: a directory with the CI/CD pipeline.
+  - `docker-compose.yml`: Docker Compose file for the development environment.
+  - `Dockerfile`: build file for Docker.
+  - `manifests`: Kubernetes manifests.
+  - `package.json`: the Node.js project file.
+  - `src`: the microservice code and tests.
 
-  - **.semaphore**: a directory with the CI/CD pipeline.
-  - **docker-compose.yml**: Docker Compose file for the dev environment.
-  - **Dockerfile**: build file for Docker.
-  - **manifests**: Kubernetes manifests.
-  - **package.json**: the Node.js project file.
-  - **src**: the application code and tests.
+### 4.2.3 Running The Microservice Locally
 
-The application is a microservice called “addressbook” that exposes a
-few API endpoints. It runs on Node.js and requires a PostgreSQL
-database.
+Use `docker-compose` to start a development environment:
 
-To add your project to Semaphore:
+```
+$ docker-compose up --build
+```
 
-1.  Go to `https://semaphoreci.com`
-2.  Sign up with your GitHub account.
-3.  Click on the **+ (plus)** icon next to *Projects* to see a list of
-    your repositories.
-4.  Use the *Choose* button next to “semaphore-demo-cicd-kubernetes”.
+Docker Compose will build and run the container image as required. It will also
+download and start a PostgreSQL database for you.
 
-### 4.2.3 Dockerfile and Compose
-
-The included Dockerfile builds an image from an official Node.js image:
+The included `Dockerfile` builds an image from an official Node.js image:
 
 ``` dockerfile
 FROM node:10.16.0-alpine
@@ -145,23 +146,21 @@ EXPOSE 3000
 CMD [ "npm", "run", "start" ]
 ```
 
-What does this Dockerfile do?
+Based on this configuration, Docker will run the following steps:
 
-  - Pulls the Node.js image.
-  - Copies the application files.
-  - Runs `npm` inside the container to install the libraries.
-  - Sets the starting command to serve on port 3000.
+- Pull the Node.js image.
+- Copy the application files.
+- Run `npm` inside the container to install the libraries.
+- Set the starting command to serve on port 3000.
 
-You can use `docker-compose` to start a development environment:
+To verify that everything is running correctly, TODO:
 
-``` bash
-$ docker-compose up --build
+```
+TODO TEST CURL COMMANDS AND THEIR OUTPUT
 ```
 
-Docker Compose will build and run the image as required. It will also
-download and start a PostgreSQL database for you.
 
-### 4.2.4 Kubernetes Manifests
+### 4.2.4 Reviewing Kubernetes Manifests
 
 In chapter 3, we learned why Kubernetes is a declarative system: instead
 of telling it what to do, we state what we want and trust it knows how
@@ -240,6 +239,16 @@ discussed in chapter 3:
 
 Note that we’re using dollar ($) variables in the file. This gives us
 some flexibility to reuse it the same manifest for several deployments.
+
+## TODO Unclear when is best to do this and in what detail to walk through
+
+To add your project to Semaphore:
+
+1.  Go to `https://semaphoreci.com`
+2.  Sign up with your GitHub account.
+3.  Click on the **+ (plus)** icon next to *Projects* to see a list of
+    your repositories.
+4.  Use the *Choose* button next to “semaphore-demo-cicd-kubernetes”.
 
 ## 4.3 Planning CI/CD Workflow
 
