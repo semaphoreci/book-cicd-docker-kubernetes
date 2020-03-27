@@ -76,7 +76,7 @@ following commands during deployments:
 
 - `delete`: stops and removes pods, deployments, and services.
 
-## 4.2 Setting Up The Project
+## 4.2 Setting Up The Demo Project
 
 It’s time to put the book down and get our hands busy for a few minutes.
 In this section, you’ll fork a demo repository and install some tools.
@@ -93,7 +93,7 @@ You’ll need to the following tools installed on your computer:
 - **curl** (_[https://curl.haxx.se](https://curl.haxx.se)_)
   to test the application.
 
-### 4.2.2 Download The Demo Project
+### 4.2.2 Download The Git Repository
 
 We have prepared a demo project on GitHub with everything that you’ll need
 to set up a CI/CD pipeline:
@@ -126,24 +126,27 @@ $ docker-compose up --build
 Docker Compose will build and run the container image as required. It will also
 download and start a PostgreSQL database for you.
 
-The included `Dockerfile` builds an image from an official Node.js image:
+The included `Dockerfile` builds a container image from an official Node.js
+image:
 
 ``` dockerfile
-FROM node:10.16.0-alpine
+FROM node:12.16.1-alpine3.10
 
+ENV APP_USER node
 ENV APP_HOME /app
-RUN mkdir $APP_HOME
+
+RUN mkdir -p $APP_HOME && chown -R $APP_USER:$APP_USER $APP_HOME
+
+USER $APP_USER
 WORKDIR $APP_HOME
 
-COPY .nvmrc .jshintrc $APP_HOME/
-COPY package*.json $APP_HOME/
+COPY package*.json .jshintrc $APP_HOME/
 RUN npm install
 
-RUN mkdir ./src
 COPY src $APP_HOME/src/
 
 EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+CMD ["node", "src/app.js"]
 ```
 
 Based on this configuration, Docker will run the following steps:
@@ -153,25 +156,36 @@ Based on this configuration, Docker will run the following steps:
 - Run `npm` inside the container to install the libraries.
 - Set the starting command to serve on port 3000.
 
-To verify that everything is running correctly, TODO:
+To verify that the microservice is running correctly, run the following
+command to create a new record:
 
 ```
-TODO TEST CURL COMMANDS AND THEIR OUTPUT
+$ curl -w "\n" -X PUT -d "firstName=al&lastName=pacino" localhost:3000/person
+{"id":1,"firstName":"al","lastName":"pacino", \
+  "updatedAt":"2020-03-27T10:59:09.987Z", \
+  "createdAt":"2020-03-27T10:59:09.987Z"}
+```
+
+To list all records:
+
+```
+$ curl -w "\n" localhost:3000/all
+[{"id":1,"firstName":"al","lastName":"pacino", \
+  "createdAt":"2020-03-27T10:59:09.987Z", \
+  "updatedAt":"2020-03-27T10:59:09.987Z"}]
 ```
 
 
 ### 4.2.4 Reviewing Kubernetes Manifests
 
-In chapter 3, we learned why Kubernetes is a declarative system: instead
+In chapter 3, we learned that Kubernetes is a declarative system: instead
 of telling it what to do, we state what we want and trust it knows how
 to get there.
 
 The `manifests` directory contains all the Kubernetes manifest files.
 
-  - `service.yml`: the LoadBalancer service. Forwards traffic from port
-    80 (HTTP) to port 3000.
-
-<!-- end list -->
+`manifests/service.yml`: the LoadBalancer service. Forwards traffic from port
+80 (HTTP) to port 3000.
 
 ``` yaml
 apiVersion: v1
@@ -187,10 +201,8 @@ spec:
       targetPort: 3000
 ```
 
-  - `desployment.yml`: all deployments. The directory also contains
-    AWS-specific deployments.
-
-<!-- end list -->
+`manifests/deployment.yml`: all deployments. The directory also contains
+an AWS-specific deployment manifest.
 
 ``` yaml
 apiVersion: apps/v1
@@ -221,11 +233,22 @@ spec:
               path: /ready
               port: 3000
           env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "$PORT"
+            - name: DB_SCHEMA
+              value: "$DB_SCHEMA"
             - name: DB_USER
               value: "$DB_USER"
             - name: DB_PASSWORD
               value: "$DB_PASSWORD"
-. . .
+            - name: DB_HOST
+              value: "$DB_HOST"
+            - name: DB_PORT
+              value: "$DB_PORT"
+            - name: DB_SSL
+              value: "$DB_SSL"
 ```
 
 The deployment manifest combines many of the Kubernetes concepts we’ve
@@ -238,7 +261,8 @@ discussed in chapter 3:
     connections.
 
 Note that we’re using dollar ($) variables in the file. This gives us
-some flexibility to reuse it the same manifest for several deployments.
+some flexibility to reuse the same manifest for deploying to multiple
+environments.
 
 ## TODO Unclear when is best to do this and in what detail to walk through
 
@@ -250,61 +274,72 @@ To add your project to Semaphore:
     your repositories.
 4.  Use the *Choose* button next to “semaphore-demo-cicd-kubernetes”.
 
-## 4.3 Planning CI/CD Workflow
+## 4.3 Overview of the CI/CD Workflow
 
-A good CI/CD workflow takes planning as there are a lot of moving parts:
-building, testing, and deploying.
+A good CI/CD workflow takes planning as there are many moving parts:
+building, testing, and safely deploying code.
 
-### 4.3.1 Testing the Docker Image
+### 4.3.1 CI Pipeline: Building a Docker Image and Running Tests
 
-Our CI/CD workflow begins by building the Docker image:
+Our CI/CD workflow begins with the mandatory continuous integration pipeline:
 
-![CI Flow](./figures/05-flow-docker-build.png){ width=95% }
+![Continuous Integration Flow](./figures/05-flow-docker-build.png)
 
-  - **Pull**: get the latest image from the CI registry. This optional
-    step decreases the build time.
-  - **Build**: create a Docker image.
-  - **Test**: start the container and run tests inside.
-  - **Push**: if all test pass, push the accepted image to the
-    production registry.
+The CI pipeline performs the following steps:
 
-### 4.3.2 The Canary and Stable Deployments
+- **Git checkout**: Get the latest source code.
+- **Docker pull**: Get the latest available application image, if it exists,
+  from the CI Docker registry. This optional step decreases the build time
+  in the following step.
+- **Docker build**: Create a Docker image.
+- **Test**: Start the container and run tests inside.
+- **Docker push**: If all test pass, push the accepted image to the
+  production registry.
+
+In this process we will use Semaphore's built-in Docker registry. This is both
+faster and cheaper than using a registry from a cloud vendor to work with
+containers in the CI/CD context.
+
+### 4.3.2 CD Pipelines: Canary and Stable Deployments
 
 In chapter 3, we have talked about Continuous Delivery and Continuous
 Deployment. In chapter 2, we learned about canaries and rolling
 deployments. Our CI/CD workflow combines these two practices.
 
-As mentioned before, a canary deployment is a limited release of a new
-version. We’ll call it “canary release” and the older version “stable
-release”.
+A canary deployment is a limited release of a new version.
+We’ll call it _canary release_, and the previous version that is still used
+by a majority of users the _stable release_.
 
 We can do a canary deployment by connecting the canary pods to the same
 load balancer as the rest of the pods. As a result, a set fraction of
 user traffic goes to the canary. For example, if we have nine stable
 pods and one canary pod, 10% of the users would get the canary release.
 
-![Canary Flow](./figures/05-flow-canary-deployment.png){ width=95% }
+![Canary release flow](./figures/05-flow-canary-deployment.png)
 
-  - **Copy**: the image from the Semaphore registry to the production
-    registry.
-  - **Canary**: deploy a canary pod.
-  - **Test**: run functional tests on the canary pod to ensure it's
-    working.
-  - **Stable**: if test pass, update the rest of the pods.
+The canary release performs the following steps:
 
-Imagine this is your initial state: you have three pods running version
+- **Copy** the image from the Semaphore registry to the production registry.
+- **Canary deploy** a canary pod.
+- **Test** the canary pod to ensure it's working by running automate functional
+  tests. We may optionally also perform manual QA.
+- **Stable release**: if test pass, update the rest of the pods.
+
+Let's take a closer look at how the stable release works.
+
+Imagine that this is your initial state: you have three pods running version
 **v1**.
 
-![Stable rolling update](./figures/05-transition-canary.png){ width=80% }
+![Stable release via rolling update](./figures/05-transition-canary.png)
 
 When you deploy **v2** as a canary, you scale down the number of **v1**
-pods to two to keep the total amount of pods to three.
+pods to 2, to keep the total amount of pods to 3.
 
 Then, you can start a rolling update to version **v2** on the stable
 deployment. One at a time, all its pods are updated and restarted, until
 they are all running on **v2** and you can get rid of the canary.
 
-![Stable deployment complete](./figures/05-transition-stable.png){ width=80% }
+![Completing a stable release](./figures/05-transition-stable.png)
 
 ## 4.4 Semaphore CI/CD
 
