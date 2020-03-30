@@ -1,6 +1,47 @@
-## 4.4 Semaphore CI/CD
+## 4.4 Implementing a CI/CD Pipeline With Semaphore
 
-In this section, we’ll learn how the Semaphore CI/CD Syntax works.
+In this section, we’ll learn about Semaphore and how to use it to build
+cloud-based CI/CD pipelines.
+
+### 4.4.1 Introduction to Semaphore
+
+For a long time, engineers who needed to implement CI/CD had to choose between
+power and ease of use.
+
+On one hand, there was predominantly Jenkins which can
+do just about anything, but requires companies to allocate dedicated ops teams
+to configure, maintain and scale it — along with the infrastructure on which
+it runs. On the other hand, there were several hosted services which let
+developers just push their code and not worry about the rest of the process.
+However, these services are usually limited to running simple build and test
+steps, and would often fall short in need of more elaborate continuous delivery
+workflows, which is often the case with containers.
+
+Semaphore (_[https://semaphoreci.com](https://semaphoreci.com)_) is a CI/CD
+product that removes all technical barriers to adopting continuous delivery at
+scale. It started as one of the simple hosted CI services, but eventually
+evolved to support custom continuous delivery pipelines with containers, while
+retaining a way of being easy to use by any developer, not just dedicated ops
+teams.
+
+Here's what you need to know about Semaphore before we go hands-on:
+
+- It's a cloud-based service: there's no software for you to install and
+  maintain.
+- It provides a visual interface to model CI/CD workflows quickly.
+- It's the fastest CI/CD service, due to being based on dedicated hardware
+  instead of common cloud computing services.
+- It's free for open source and small private projects.
+
+The key benefit of using Semaphore is increased team productivity.
+Since there is there is no need to hire supporting staff or expensive
+infrastructure, and it runs CI/CD workflows faster than any other solution,
+companies that adopt Semaphore report a very large, 41x ROI comparing to their
+previous solution [^roi].
+
+We'll learn about Semaphore's features as we move on in this chapter.
+
+[^roi]: Whitepaper: The 41:1 ROI of Moving CI/CD to Semaphore (_[https://semaphoreci.com/resources/roi](https://semaphoreci.com/resources/roi)_)
 
 ### TODO Unclear when is best to do this and in what detail to walk through
 
