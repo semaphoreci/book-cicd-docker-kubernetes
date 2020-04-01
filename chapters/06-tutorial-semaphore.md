@@ -5,26 +5,25 @@ cloud-based CI/CD pipelines.
 
 ### 4.4.1 Introduction to Semaphore
 
-For a long time, engineers who needed to implement CI/CD had to choose between
+For a long time, engineers looking for a CI/CD tool had to choose between
 power and ease of use.
 
 On one hand, there was predominantly Jenkins which can
-do just about anything, but requires companies to allocate dedicated ops teams
-to configure, maintain and scale it — along with the infrastructure on which
-it runs. On the other hand, there were several hosted services which let
+do just about anything, but is difficult to use and requires companies to
+allocate dedicated ops teams to configure, maintain and scale it — along with
+the infrastructure on which it runs.
+On the other hand, there were several hosted services which let
 developers just push their code and not worry about the rest of the process.
 However, these services are usually limited to running simple build and test
 steps, and would often fall short in need of more elaborate continuous delivery
 workflows, which is often the case with containers.
 
-Semaphore (_[https://semaphoreci.com](https://semaphoreci.com)_) is a CI/CD
-product that removes all technical barriers to adopting continuous delivery at
-scale. It started as one of the simple hosted CI services, but eventually
+Semaphore (_[https://semaphoreci.com](https://semaphoreci.com)_) started
+as one of the simple hosted CI services, but eventually
 evolved to support custom continuous delivery pipelines with containers, while
 retaining a way of being easy to use by any developer, not just dedicated ops
-teams.
-
-Here's what you need to know about Semaphore before we go hands-on:
+teams. As such it removes all technical barriers to adopting continuous
+delivery at scale:
 
 - It's a cloud-based service: there's no software for you to install and
   maintain.
@@ -39,21 +38,63 @@ infrastructure, and it runs CI/CD workflows faster than any other solution,
 companies that adopt Semaphore report a very large, 41x ROI comparing to their
 previous solution [^roi].
 
-We'll learn about Semaphore's features as we move on in this chapter.
+We'll learn about Semaphore's features as we go hands-on in this chapter.
 
 [^roi]: Whitepaper: The 41:1 ROI of Moving CI/CD to Semaphore (_[https://semaphoreci.com/resources/roi](https://semaphoreci.com/resources/roi)_)
 
-### TODO Unclear when is best to do this and in what detail to walk through
+### 4.4.1 Creating a Semaphore Account
 
-To add your project to Semaphore:
+To get started with Semaphore:
 
-1.  Go to `https://semaphoreci.com`
-2.  Sign up with your GitHub account.
-3.  Click on the **+ (plus)** icon next to *Projects* to see a list of
-    your repositories.
-4.  Use the *Choose* button next to “semaphore-demo-cicd-kubernetes”.
+- Go to [https://semaphoreci.com](https://semaphoreci.com) and click to
+  sign up with your GitHub account.
+- GitHub will ask you to let Semaphore access your profile information.
+  Allow this so that Semaphore can create an account for you.
+- Semaphore will walk you through the process of creating an organization.
+  Since software development is a team sport, all Semaphore projects belong to
+  an organization. Your organization will have its own domain, for example
+  `awesomecode.semaphoreci.com`.
+- Semaphore will ask you to choose between a time-limited free trial
+  with unlimited capacity, free plan and open source plan. Since we're going
+  to work with an open source repository you can choose the open source option.
+- Finally you'll be greeted with a quick product tour.
 
-### 4.4.1 The Semaphore Syntax
+### 4.4.2 Creating a Semaphore Project For The Demo Repository
+
+We assume that you have previously forked the demo project from
+[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)
+to your GitHub account.
+
+Follow the prompt to create a project. The first time you do this,
+you will see a screen which asks you to choose between connecting Semaphore
+to either your public, or both public and private repositories on GitHub:
+
+![Authorizing Semaphore to access your GitHub repositories](./figures/05-github-repo-auth.png)
+
+To keep things simple, select the "Public repositories" option.
+If you decide that you want to use Semaphore with your private projects as well,
+you can extend the permission at any time.
+
+Next, Semaphore will present you a list of repositories to choose from as the
+source of your project:
+
+![Choosing a repository to set up CI/CD for](./figures/05-choose-repo.png)
+
+In the search field, start typing `semaphore-demo-cicd-kubernetes` and choose
+that repository.
+
+Semaphore will quickly initialize the project. Behind the scenes, it will
+set up everything that's needed to know about every Git push automatically
+pull the latest code — without you configuring anything.
+
+The next screen optionally lets you invite your repository collaborators
+to join the Semaphore project. Semaphore mirrors access permissions of GitHub,
+so if you add some people to the GitHub repository later, you can "sync" them
+inside project settings on Semaphore.
+
+TBC  
+
+### 4.4.3 The Semaphore Syntax
 
 You can completely define the CI/CD environment for your project with
 Semaphore Pipelines.
