@@ -2,11 +2,9 @@
 
 # 3 CI/CD Best Practices for Cloud Native Applications
 
-The goal of every engineering team is to deliver bug-free products to customers as productively as possible. Today’s cloud-native technology can empower you to iterate, at scale, faster than ever. But teams that don’t also change how they deliver software will struggle to benefit from the agility and speed that the cloud native technology stack can offer.
+The goal of every engineering team is to deliver bug-free products to customers as cheaply, efficiently and safely as possible. Today’s cloud-native technology can empower you to iterate, at scale, faster than ever. But teams that don’t change how they deliver software will not benefit from the agility that the cloud native stack can provide.
 
-“CI/CD” stands for the combined practices of Continuous Integration (CI) and Continuous Delivery (CD). It is a timeless way of developing software in which you’re able to release updates at any time in a sustainable way. When changing code is routine, development cycles are faster and work is more fulfilling.
-
-As a result, a CI/CD practice that is well-tailored to their technology stack enables the leading technology companies to improve their products many times per day.
+“CI/CD” stands for the combined practices of Continuous Integration (CI) and Continuous Delivery (CD). It is a timeless way of developing software in which you’re able to release updates at any time in a sustainable way. When changing code is routine, development cycles are faster and work is more fulfilling. A well-implemented CI/CD process enables technology companies to improve their products many times per day.
 
 In this chapter we'll review the principles of CI/CD and see how we can apply them to developing cloud native applications.
 
@@ -18,23 +16,25 @@ A good CI/CD pipeline is fast, reliable and comprehensive.
 
 Pipeline velocity manifests itself in a number of ways:
 
-**How quickly do we get feedback on the correctness of our work?** If it’s longer than the time it takes to get a cup of coffee, pushing code to CI is the equivalent of asking a developer to join a meeting in the middle of solving a problem. Developers will work less effectively due to context switching.
+**How quickly do we get feedback on the correctness of our work?** If it’s longer than the time it takes to get a cup of coffee, pushing code to CI is too distracting. It's like asking a developer to join a meeting in the middle of solving a problem. Developers will work less effectively due to context switching.
 
 **How long does it take us to build, test and deploy a simple code commit?** For example, a total time of one hour for CI and deployment means that the entire engineering team has a hard limit of up to seven deploys for the whole application in a workday. This causes developers to opt for less frequent and more risky deployments, instead of the rapid change that businesses today need.
 
-**How quickly can we set up a new pipeline?** Difficulty with scaling CI/CD infrastructure or reusing existing configuration creates friction, which stifles development. Today’s cloud infrastructure is best utilized by writing software as a composition of microservices, which calls for frequent and fast initiation of new CI/CD pipelines. This is solved by having a CI/CD tool that is programmable and fits in the existing development workflows. Most notably it should support storing all CI/CD configuration as code that can be reviewed, versioned and restored. It is also important to be able to access CI/CD resources through both a command-line interface (CLI) and remote API. Perhaps most importantly, it should be easy to use for every developer so that projects don't depend on individuals or teams who are tasked to "set up and maintain CI" for other people.
+**How quickly can we set up a new pipeline?** Difficulty with scaling CI/CD infrastructure or reusing existing configuration creates friction. Today’s cloud infrastructure is best utilized by writing software as a composition of microservices. Developers need new CI/CD pipelines often, and they need them fast. This is solved by having a CI/CD tool that is programmable and fits in the existing development workflows.
+
+Such a CI/CD tool should support storing all pipeline configuration as code that can be reviewed, versioned and restored. But most importantly, it should be easy to use for every developer. That way projects don't depend on individuals or teams who set up and maintain CI for others.
 
 ### 3.1.2 Reliability
 
-A reliable pipeline always produces the same output for a given input, and with no significant oscillations in runtime. Intermittent failures cause intense frustration among developers.
+A reliable pipeline always produces the same output for a given input with consistent runtime. Intermittent failures cause intense frustration among developers.
 
 Operating and scaling CI/CD infrastructure that provides on-demand, clean, identical and isolated resources for a growing team is a complex job. What seems to work well for one project or a few developers usually breaks down when the team and the number of projects grow, or the technology stack changes. This is a top reason why engineering teams move from a self-hosted to a cloud-based CI/CD solution.
 
 ### 3.1.3 Completeness
 
-Any degree of automation is a positive change. However, the job is not fully complete until the CI/CD pipeline accurately runs and visualizes the entire software delivery process. This requires the use of a CI/CD tool that can model both simple and when needed, complex workflows, so that manual error in repetitive tasks is all but impossible.
+Any degree of automation is a positive change. However, the job is not complete until the CI/CD pipeline accurately runs and visualizes the entire software delivery process. This requires the use of a CI/CD tool that can model both simple and when needed, complex workflows, so that manual error in repetitive tasks is all but impossible.
 
-For example, it’s not uncommon to have the CI phase fully automated, but to leave out deployment as a manual operation to be performed by often a single person on the team. If a CI/CD tool can successfully model the deployment workflow needed, for example with use of secrets, multi-stage pipeline promotions and an audit log, this bottleneck can be removed.
+For example, it’s not uncommon to have the CI phase automated, but to leave out deployment as a manual operation to be performed by often a single person on the team. If a CI/CD tool can model the deployment workflow needed, for example with use of secrets, multi-stage pipeline promotions and an audit log, this bottleneck can be removed.
 
 ## 3.1 General Principles
 
@@ -62,23 +62,23 @@ Today, the best product organizations are made of small autonomous teams owning 
 
 The idea that autonomous engineering teams are responsible for the quality and stability of the software they build means that they are responsible for releasing it. This breaks down the silos between traditional developers and operations groups, as they work together to achieve high-level goals.
 
-It's not rare that in newly formed teams there is actually no dedicated operations or "DevOps" person, and the developers who write code also fully own the delivery pipeline and rely on cloud providers for hosting and monitoring production services.
+It's not rare that in newly formed teams there is actually no dedicated operations or "DevOps" person, and the developers who write code also own the delivery pipeline and rely on cloud providers for hosting and monitoring production services.
 
 ### 3.1.3 Use Ephemeral Resources
 
 There are three main reasons for using ephemeral resources to run your CI/CD pipeline.
 
-The speed imperative demands the ability to scale CI/CD capacity up to meet the growth of your team, applications and their test suites. This is easiest to accomplish if you rely on a cloud service which automatically scales CI/CD pipelines on demand, both up and down. Typically this comes at a pay-as-you-go pricing model, so that you only pay for the CI/CD resources that you have used.
+The speed imperative demands the ability to scale CI/CD capacity up to meet the growth of your team, applications and their test suites. This is easiest to accomplish if you rely on a cloud service which automatically scales CI/CD pipelines on demand, both up and down. Ideally this would come at a pay-as-you-go pricing model, so that you only pay for the CI/CD resources that you have used.
 
-Ephemeral resources help ensure that your tests always run the same at various stages and are key for pipeline reliability. Cloud-based CI/CD solutions can typically run your code in both containers, and clean and isolated virtual machines (VM) that are spun up on demand.
+Ephemeral resources help ensure that your tests always run the same at various stages and are key for pipeline reliability. Cloud-based CI/CD solutions can run your code in both containers, and clean and isolated virtual machines (VM) that are spun up on demand.
 
-As we've seen in the first chapter, containers make it easy for developers replicate the configuration that will be used later on in the pipeline without having to either manually set up and maintain infrastructure or sacrifice environmental fidelity.
+As we've seen in the first chapter, containers make it easy for developers replicate the configuration that will be used later on in the pipeline. There's no need to set up and maintain infrastructure or sacrifice environmental fidelity.
 
 ### 3.1.4 Automate Everything
 
 This may seem obvious, but it’s worth repeating: automate everything you can.
 
-There are certainly cases when complete automation is not possible. You may have customers who simply don't want continuous updates to their systems. There may be regulations restricting how software can be updated, as is the case for example in the aerospace, telecom, and medical industries.
+There are cases when complete automation is not possible. You may have customers who simply don't want continuous updates to their systems. There may be regulations restricting how software can be updated, as is the case for example in the aerospace, telecom, and medical industries.
 
 But if these conditions do not apply and you think that something in your pipeline can't be automated, you're almost certainly wrong.
 
@@ -94,15 +94,15 @@ The reason for practicing continuous integration is that small, simple, frequent
 
 Your team's goal should be to get new code to production as soon as it's ready. And if something goes wrong — own it and handle it accordingly. Let the team grow through the sense of ownership on what they do.
 
-Being always ready for a release requires a highly developed testing culture. Code that's checked in should always be fully tested. If it's not, then there's no point in moving fast to oblivion.
+Being always ready for a release requires a highly developed testing culture. Code that's checked in should always be tested. If it's not, then there's no point in moving fast to oblivion.
 
-If you're just starting a new project, invest time to bring everyone on the same page and commit to writing automated tests for all code. When the project begins, set up the entire CI/CD pipeline, even while the application has no real functionality. Not only will the team benefit from a CI/CD feedback loop right from the start, but a fully automated pipeline will discourage any manual processes from creeping in and slowing down your team in the future.
+If you're starting a new project, invest time to bring everyone on the same page and commit to writing automated tests for all code. When the project begins, set up the entire CI/CD pipeline, even while the application has no real functionality. Not only will the team benefit from a CI/CD feedback loop right from the start, but a fully automated pipeline will discourage any manual processes from creeping in and slowing down your team in the future.
 
 If you have an existing project with some technical debt, you can start by committing to a “no broken windows” policy on the CI pipeline. This means that when the master is broken, drop what you're doing and fix it.
 
-Every test failure is a bug. It needs to be logged, investigated and fixed. Assume that the defect is in application code, unless tests can prove otherwise. However, sometimes the test itself really is the problem, which is when the solution is to rewrite it to be more reliable.
+Every test failure is a bug. It needs to be logged, investigated and fixed. Assume that the defect is in application code, unless tests can prove otherwise. However, sometimes the test itself is the problem, which is when the solution is to rewrite it to be more reliable.
 
-The process of cleaning up the master build is something which usually starts being very painful, but if you're committed and stick to the process, over time the pain goes away. One day you reach a stage when a failed test means there is a real bug. You don't have to re-run the CI build just to move on with your work. No one has to impose a code freeze. Days become productive again.
+The process of cleaning up the master build is something which usually starts as being frustrating. But if you're committed and stick to the process, over time the pain goes away. One day you reach a stage when a failed test means there is a real bug. You don't have to re-run the CI build to move on with your work. No one has to impose a code freeze. Days become productive again.
 
 ### 3.2.2 Keep the Build Fast: Up to 10 Minutes
 
@@ -198,7 +198,7 @@ So you don’t even load the related code unless the user is a developer working
 
 If you're used to working on monolithic applications, building microservices leads to an unfamiliar situation: a service often reach a phase of being done, as in no further work is necessary for the time being.
 
-No one may touch the service's repository for months. And then, one day, there's an urgent need to make a change. The CI build fails with unexpected errors: there are security vulnerabilities in multiple dependencies, and many others have changes that someone needs to review. Suddenly, what seemed like a trivial update becomes a risky operation that may explode into days of work.
+No one may touch the service's repository for months. And then, one day, there's an urgent need to make a change. The CI build fails with unexpected errors: there are security vulnerabilities in multiple dependencies, and many others have changes that someone needs to review. What seemed like a trivial update becomes a risky operation that may explode into days of work.
 
 To prevent this from happening, you can schedule a daily CI build. A scheduled build is a great way of detecting any issues with dependencies early, regardless of how often your code changes.
 
@@ -236,7 +236,7 @@ Today containers guarantee that your code always runs in exactly the same enviro
 
 Other environments are still not exactly the same as production, since reproducing the exact same infrastructure and load is expensive. However, the differences are manageable, and we get to avoid most of the errors that would have occurred with non-identical environments.
 
-Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can employ with Kubernetes that serve to further minimize the risk of bad deploys, such as blue-green and canary deployment. Now that we know what a good CI/CD pipeline should look like, it's time to start implementing it.
+Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can use with Kubernetes. Strategies like blue-green and canary deployment reduce the risk of bad deploys. Now that we know what a good CI/CD pipeline should look like, it's time to start implementing it.
 
 [^jez]: What is Proper Continuous Integration, Semaphore
   [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html)
