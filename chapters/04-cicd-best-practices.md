@@ -120,7 +120,7 @@ So, it’s helpful to establish criteria for how fast should a continuous integr
 
 Proper continuous integration is when it takes you less than 10 minutes from pushing new code to getting results.
 
-While the 10-minute mark is about how much a developer can wait without getting too distracted, it's also adopted by a leading one of the pioneers of continuous delivery, Jez Humble, who performs the following informal poll at conferences.
+While the 10-minute mark is about how much a developer can wait without getting too distracted, it's also adopted by a leading one of the pioneers of continuous delivery, Jez Humble, who performs the following informal poll at conferences[^jez].
 
 He usually begins by asking his audience to raise their hands if they do continuous integration. Usually most of the audience raise their hands.
 
@@ -234,4 +234,7 @@ Today containers guarantee that your code always runs in exactly the same enviro
 
 Other environments are still not exactly the same as production, since reproducing the exact same infrastructure and load is expensive. However, the differences are manageable, and we get to avoid most of the errors that would have occurred with non-identical environments.
 
-Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can employ with Kubernetes that serve to further minimize the risk of bad deploys, such as blue-green and canary deployment.
+Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can employ with Kubernetes that serve to further minimize the risk of bad deploys, such as blue-green and canary deployment. Now that we know what a good CI/CD pipeline should look like, it's time to start implementing it.
+
+[^jez]: What is Proper Continuous Integration, Semaphore
+  [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html)
