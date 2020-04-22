@@ -1,8 +1,9 @@
 \newpage
 
-# Introduction
+© 2020 Rendered Text. All rights reserved.
 
-TODO: The fine print, copyright, date of update, brought to you by etc.
+First edition. Published on the Semaphore website
+(_[https://semaphoreci.com](https://semaphoreci.com)_).
 
 \newpage
 
@@ -21,6 +22,8 @@ A new generation of tools has democratized the way of building such *cloud nativ
 The great opportunity comes potentially at a great cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
 
 This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline which automatically configures, builds, tests, and deploys code. This book will show you how to do that the cloud native way — so you can focus on building great products and solutions.
+
+\newpage
 
 ### Who Is This Book For, and What Does It Cover?
 
@@ -50,7 +53,7 @@ We would very much love to hear your feedback after reading this book. What did 
 
 A benefit of publishing an ebook is that we can continuously improve it. And that's exactly what we intend to do based on your feedback.
 
-This book is open source and source files are hosted on TODO. You can send us feedback by opening an issue on the Git repository, or by sending an email to learn@semaphoreci.com.
+You can send us feedback by sending an email to learn@semaphoreci.com.
 
 ## About the Authors
 
