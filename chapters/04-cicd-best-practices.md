@@ -224,6 +224,8 @@ First, developers should be the ones who deploy their own code. This is in line 
 
 Developers who build containerized microservices need to have a staging Kubernetes cluster where they can deploy at will.
 
+![Deploy button on Semaphore](figures/03-deploy-button.png){ width=80% }
+
 Second, the deployment operation needs to be streamlined to a single command that is trivial to run and very unlikely to fail. This is the task for the person or team who are setting up the infrastructure at the beginning of the project. A more complicated deployment sequence invites human and infrastructure errors that slow down the flow of progress.
 
 ### 3.3.3 Always Use Exactly the Same Environment
