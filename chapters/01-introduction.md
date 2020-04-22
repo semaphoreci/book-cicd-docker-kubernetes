@@ -8,7 +8,19 @@ TODO: The fine print, copyright, date of update, brought to you by etc.
 
 ## Preface
 
-TODO: Short Motivational introduction.
+To maximize the rate of learning, we must minimize the time to try things.
+
+In software development, the cloud has been a key factor in increasing the speed of building innovative products.
+
+Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
+
+Doing so successfully, however, requires our applications to adapt. They need to be disposable and horizontally scalable. They should have a minimal divergence between development and production so that we can continuously deploy them multiple times per day.
+
+A new generation of tools has democratized the way of building such *cloud native* software. Docker container is now the standard way of packaging software in a way that can be deployed, scaled and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will undoubtedly emerge, but it's almost certain that they will be based on Kubernetes.
+
+The great opportunity comes potentially at a great cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
+
+This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline which automatically configures, builds, tests, and deploys code. This book will show you how to do that the cloud native way — so you can focus on building great products and solutions.
 
 ### Who Is This Book For, and What Does It Cover?
 
