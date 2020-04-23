@@ -92,65 +92,99 @@ to join the Semaphore project. Semaphore mirrors access permissions of GitHub,
 so if you add some people to the GitHub repository later, you can "sync" them
 inside project settings on Semaphore.
 
-TBC  
 
-### 4.4.3 The Semaphore Syntax
+TODO: new version begins here
+-------------------------------------------------
 
-You can completely define the CI/CD environment for your project with
-Semaphore Pipelines.
+![Add collaborators](./figures/05-add-collaborators.png)
 
-A Semaphore pipeline consists of one or more YAML files that follow the
-Semaphore syntax\[1\].
+Click on **Go to Workflow Builder**. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the existing configuration to get directly to the final workflow. In this chapter, however, we’ll make a fresh start so we can learn how to create the pipelines.
 
-These are some common elements you’ll find in a pipeline:
+![Start from scratch or use existing pipeline](./figures/05-existing-pipeline.png)
 
-**Version**: sets the syntax version of the file; at the time of writing
-the only valid value is “v1.0”.
+TBC
 
-``` yaml
-version: v1.0
+### 4.4.3 The Semaphore Workflow Builder
+
+If you chose to start from scratch, Semaphore should be asking you to pick a starter workflow. These are templates that come preloaded with popular languages and frameworks. Choose the Build Docker workflow and click on **Run this Workflow**.
+
+![Choosing a starter workflow](./figures/05-starter-workflow.png)
+
+Semaphore will immediately start the workflow. Wait a few seconds and, congratulations, your first Docker image is ready.
+
+![Starter run](./figures/05-starter-run.png)
+
+Of course, since the image is not stored anywhere yet, it’s lost once the workflow completes. We’ll correct that now.
+
+See the **Edit Workflow** button on the top right corner? Click it to open the Workflow Builder.
+
+![Workflow builder overview](./figures/05-wb-overview.png)
+
+Now it’s a good moment to learn how the Workflow Builder works.
+
+**Pipelines**
+
+Pipelines are represented on the builder as big gray boxes. Pipelines organize the workflow in blocks that are executed from left to right. Each pipeline usually has a specific objective such as test, build, or deploy. Pipelines can be chained together to make a complex workflow.
+
+**Agent**
+
+The agent is the combination of hardware and software that powers the pipeline. The **machine type** determines the amount of CPUs and memory allocated to the virtual machine. The operating system is controlled by the **environment type** and **OS image** settings.
+
+The default machine is called `e1-standard-2` and has 2 CPUs, 4 GB RAM, and runs a custom Ubuntu 18.04 image.
+
+**Jobs and Blocks**
+
+Blocks and jobs define what to do at each step. Jobs define the commands that do the work. A block is a group of jobs with a common objective and shared settings.
+
+Jobs inherit their configuration from their parent block. All the jobs in a block run in parallel, each in its isolated environment. If any of the jobs fails, the pipeline stops with an error.
+
+Blocks run sequentially, once all the jobs in the block complete, the next block starts.
+
+
+### 4.4.4 The Continous Integration Pipeline
+
+We talked about the benefits of CI/CD in chapter 3. In the previous section, we created our very first pipeline. In this section, we’ll customize it to build, test, and store a Docker image.
+
+At this point, you should be seeing the Workflow Builder with the Docker Build starter workflow. Click on the **Build** block so we can see how it works.
+
+![Build block](./figures/05-build-block.png)
+
+Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision and changes the current directory. The next command, `docker build`, builds the image using the `Dockerfile` pushed to the repository.
+
+When the job ends, the machine in which runs is deleted. We have to push the Docker image to a registry to preserve it.
+
+Replace the contents of the job with the following commands:
+
+```bash
+checkout
+docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker pull $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest || true
+docker build --cache-from $SEMAPHORE_REGISTRY_URL/seamphore-demo-cicd-kubernetes:latest -t $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID .
+docker push $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 ```
 
-**Name**: gives an optional name to the pipeline.
+This is the sequence:
 
-``` yaml
-name: This is the name of the pipeline
-```
+1. Clones the repository with `checkout`.
+2. Logs in the Semaphore private Docker registry.
+3. Pulls the Docker image tagged as `latest`.
+4. Builds a newer version of the image using the latest code in the revision.
+5. Pushes the new image to the registry.
 
-**Agent**: the agent is the combination of hardware and software that
-runs the jobs. The `machine.type` and `machine.os_image` properties
-describe the virtual machine\[2\] and the operating system. The
-`e1-standard-2` machine has 2 CPUs and 4 GB RAM and runs a Ubuntu 18.04
-LTS\[3\]:
+The perceptive reader will note that we used some special environment variables. These are preset by Semaphore automatically in every job. The variables starting with `SEMAPHORE_REGISTRY` are used to access the private registry. `SEMAPHORE_WORKFLOW_ID` is guaranteed to be unique for each workflow run. In our case, we’re using it to tag the resulting Docker image.
 
-``` yaml
-agent:
-  machine:
-    type: e1-standard-2
-    os_image: ubuntu1804
-```
+We can try the pipeline now. Click on the **Run the workflow** button on the top-right corner and then click on **Start**.
 
-**Blocks** and **jobs**: define what to do at each step. Each block can
-have one or more jobs. All jobs in a block run in parallel, each in an
-isolated environment. Semaphore waits for all jobs in a block to pass
-before starting the next one.
+Wait until the pipeline is complete then go to the top level of the project by clicking on its name on the left navigation menu. Click on the **Docker Registry** button. Open the repository to verify that the Docker image is there.
 
-This is how a block with two jobs looks like:
+![Docker registry](./figures/05-registry.png)
 
-``` yaml
-blocks:
-  - name: The block name
-    task:
-      jobs:
-        - name: The Job name
-          commands:
-            - command 1
-            - command 2
-        - name: Another Job
-          commands:
-            - command 1
-            - command 2
-```
+TODO: end of the new version
+-------------------------------------------------
+
+
+TODO: some of this can be reused
+-------------------------------------------------
 
 Commands in the **prologue** section are executed before each job in the
 block; it’s a convenient place for setup commands:
@@ -209,10 +243,34 @@ promotions:
     auto_promote:
       when: "result = 'passed'"
 ```
+-----------------------
 
-### 4.4.2 The Continous Integration Pipeline
+Commands in the **prologue** section are executed before each job in the
+block; it’s a convenient place for setup commands:
 
-We talked about the benefits of CI/CD in chapter 3. Our demo includes a
+``` yaml
+prologue:
+    commands:
+    - checkout
+    - cache restore
+```
+
+The Ubuntu OS image comes with a bunch of convenience scripts and
+tools\[4\]:
+
+  - **checkout**: clones the Git repository at the proper code revision
+    and `cd` into the directory.
+
+ENV
+CHECKOUT
+PROLOGUE
+
+
+
+
+TODO: this most likely goes
+-----------
+Our demo includes a
 full-fledged CI pipeline. Open the file from the demo located at
 `.semaphore/semaphore.yml` to learn how we can build and test the Docker
 image.
@@ -307,13 +365,17 @@ promotions:
       when: "result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')"
 ```
 
-### 4.4.3 Your First Run
+-----
+
+### 4.4.5 Your First Build
 
 We’ve covered a lot of things in a few pages, here we have the change to
 pause for a little bit and do an initial run of the CI pipeline.
 
 You can avoid running the deployment pipeline by making a push in a
 non-master branch:
+
+TODO: pull first and switch to setup-semaphore branch
 
 ``` bash
 $ git branch test-integration
