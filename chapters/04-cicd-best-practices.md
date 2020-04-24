@@ -179,7 +179,7 @@ On many occasions, you can get all the feedback from CI that you need without ru
 
 Unit tests run the fastest because they are isolated from the rest of the system and usually don’t touch the database. They define business logic and are the most frequent. The “test pyramid” diagram is a common representation of the kinds of tests in a system:
 
-![Test pyramid](figures/04-test-pyramid.png){ width=95% }
+![Test pyramid](figures/04-test-pyramid.png){ width=60% }
 
 If a team follows this strategy, a failing unit test is usually a signal of a fundamental problem. Then the remaining high-level and long-running tests are irrelevant.
 
