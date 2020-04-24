@@ -92,33 +92,27 @@ to join the Semaphore project. Semaphore mirrors access permissions of GitHub,
 so if you add some people to the GitHub repository later, you can "sync" them
 inside project settings on Semaphore.
 
-
-TODO: new version begins here
--------------------------------------------------
-
-![Add collaborators](./figures/05-add-collaborators.png)
+![Add collaborators](./figures/05-sem-add-collaborators.png)
 
 Click on **Go to Workflow Builder**. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the existing configuration to get directly to the final workflow. In this chapter, however, we’ll make a fresh start so we can learn how to create the pipelines.
 
-![Start from scratch or use existing pipeline](./figures/05-existing-pipeline.png)
-
-TBC
+![Start from scratch or use existing pipeline](./figures/05-sem-existing-pipeline.png)
 
 ### 4.4.3 The Semaphore Workflow Builder
 
 If you chose to start from scratch, Semaphore should be asking you to pick a starter workflow. These are templates that come preloaded with popular languages and frameworks. Choose the Build Docker workflow and click on **Run this Workflow**.
 
-![Choosing a starter workflow](./figures/05-starter-workflow.png)
+![Choosing a starter workflow](./figures/05-sem-starter-workflow.png)
 
 Semaphore will immediately start the workflow. Wait a few seconds and, congratulations, your first Docker image is ready.
 
-![Starter run](./figures/05-starter-run.png)
+![Starter run](./figures/05-sem-starter-run.png)
 
 Of course, since the image is not stored anywhere yet, it’s lost once the workflow completes. We’ll correct that now.
 
 See the **Edit Workflow** button on the top right corner? Click it to open the Workflow Builder.
 
-![Workflow builder overview](./figures/05-wb-overview.png)
+![Workflow builder overview](./figures/05-sem-wb-overview.png)
 
 Now it’s a good moment to learn how the Workflow Builder works.
 
@@ -147,7 +141,7 @@ We talked about the benefits of CI/CD in chapter 3. In the previous section, we 
 
 At this point, you should be seeing the Workflow Builder with the Docker Build starter workflow. Click on the **Build** block so we can see how it works.
 
-![Build block](./figures/05-build-block.png)
+![Build block](./figures/05-sem-build-block.png)
 
 Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision and changes the current directory. The next command, `docker build`, builds the image using the `Dockerfile` pushed to the repository.
 
@@ -173,219 +167,82 @@ This is the sequence:
 
 The perceptive reader will note that we used some special environment variables. These are preset by Semaphore automatically in every job. The variables starting with `SEMAPHORE_REGISTRY` are used to access the private registry. `SEMAPHORE_WORKFLOW_ID` is guaranteed to be unique for each workflow run. In our case, we’re using it to tag the resulting Docker image.
 
-We can try the pipeline now. Click on the **Run the workflow** button on the top-right corner and then click on **Start**.
 
-Wait until the pipeline is complete then go to the top level of the project by clicking on its name on the left navigation menu. Click on the **Docker Registry** button. Open the repository to verify that the Docker image is there.
+Now that we have a Docker image that we can test, let’s add a second block. Click on the **+Add Block** dotted box.
 
-![Docker registry](./figures/05-registry.png)
+We’ll add three jobs:
 
-TODO: end of the new version
--------------------------------------------------
+- Static tests
+- Integration tests
+- Functional tests
 
+The general sequence is the same for all tests:
 
-TODO: some of this can be reused
--------------------------------------------------
+1. Pull the image from the registry
+2. Start the container
+3. Run the tests
 
-Commands in the **prologue** section are executed before each job in the
-block; it’s a convenient place for setup commands:
+Blocks have a **Prologue** where we can place common setup commands for the jobs. Open the Prologue section on the right side of the block and type the following commands. These will be executed before each job starts:
 
-``` yaml
-prologue:
-    commands:
-    - checkout
-    - cache restore
+```bash
+docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker pull $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 ```
 
-The Ubuntu OS image comes with a bunch of convenience scripts and
-tools\[4\]:
+Next, rename the job as “Unit test” and type the following command, which runs JSHint, a static code analysis tool, inside the container:
 
-  - **checkout**: clones the Git repository at the proper code revision
-    and `cd` into the directory.
-  - **sem-service**: starts an empty database for testing\[5\].
-
-**Environment variables**: defined at the block level are applied for
-all its jobs:
-
-``` yaml
-env_vars:
-    - name: MY_ENV_1
-      value: foo
-    - name: MY_ENV_2
-      value: bar
+```bash
+docker run -it $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID npm run lint
 ```
 
-When a job starts, Semaphore preloads some special variables\[6\]. One
-of these is called `$SEMAPHORE_WORKFLOW_ID` and contains a unique string
-that is preserved for all pipelines in a given run. We’ll use it to
-uniquely tag our Docker images.
+Next, click on the *+Add another job* link below the job to create a new one called “Functional test”. Type these commands:
 
-Also, blocks can have **secrets**. Secrets contain sensitive information
-that doesn’t belong in a Git repository. Secrets import environment
-variables and files into the job\[7\]:
-
-``` yaml
-secrets:
-    - name: secret-1
-    - name: secret-2
+```bash
+sem-service start postgres
+docker run --net=host -it $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID npm run ping
+docker run --net=host -it $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID npm run migrate
 ```
 
-**promotions**: Semaphore always executes first the pipeline found at
-`.semaphore/semaphore.yml`. We can have multi-stage, multi-branching
-workflows by connecting pipelines together with promotions. Promotions
-can be started manually or by user-defined conditions\[8\].
+This job tests two things: that the container connects to the database (ping) and that it can create the tables on it (migrate). Obviously, we’ll a database for this to work; fortunately,
+we have `sem-service`, which lets us start database engines like MySQL, Postgres or MongoDB with a single command.
 
-``` yaml
-promotions:
-  - name: A manual promotion
-    pipeline_file: pipeline-file-1.yml
-  - name: An automated promotion
-    pipeline_file: pipeline-file-2.yml
-    auto_promote:
-      when: "result = 'passed'"
-```
------------------------
+Finally, add a third job called “Integration test” and type these commands:
 
-Commands in the **prologue** section are executed before each job in the
-block; it’s a convenient place for setup commands:
-
-``` yaml
-prologue:
-    commands:
-    - checkout
-    - cache restore
+```bash
+sem-service start postgres
+docker run --net=host -it $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID npm run test
 ```
 
-The Ubuntu OS image comes with a bunch of convenience scripts and
-tools\[4\]:
+This last test runs the code in ~src/database.test.js~, which checks if the application can write and delete rows.
 
-  - **checkout**: clones the Git repository at the proper code revision
-    and `cd` into the directory.
+![Test block](./figures/05-sem-test-block.png)
 
-ENV
-CHECKOUT
-PROLOGUE
+Create the third and final block for this pipeline. This block, called “Push”, will:
 
+1. Pull the image created on the first block.
+2. Tags it as “latest”
+3. Pushes it again to the Semaphore registry for future runs.
 
+Type these commands for the Push block:
 
-
-TODO: this most likely goes
------------
-Our demo includes a
-full-fledged CI pipeline. Open the file from the demo located at
-`.semaphore/semaphore.yml` to learn how we can build and test the Docker
-image.
-
-We’ve already covered the basics, so let’s jump directly to the first
-block. The prologue clones the repo and logins to the Semaphore Docker
-registry:
-
-``` yaml
-blocks:
-  - name: Docker Build
-    task:
-      prologue:
-        commands:
-          - checkout
-          - docker login \
-              -u $SEMAPHORE_REGISTRY_USERNAME \
-              -p $SEMAPHORE_REGISTRY_PASSWORD \
-              $SEMAPHORE_REGISTRY_URL
+```bash
+docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker pull $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker tag $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest
+docker push $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest
 ```
 
-The “Build” job then:
+![Push block](./figures/05-sem-push-block.png)
 
-  - Pulls the “latest” image from the registry.
-  - Builds the Docker image with the current code revision.
-  - Tags it with `$SEMAPHORE_WORKFLOW_ID` so each has a distinct ID.
-  - Pushes it back to the Registry.
-
-<!-- end list -->
-
-``` yaml
-jobs:
-  - name: Build
-    commands:
-      - docker pull \
-          $SEMAPHORE_REGISTRY_URL/addressbook:latest || true
-      - docker build \
-          --cache-from $SEMAPHORE_REGISTRY_URL/addressbook:latest \
-          -t $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID .
-      - docker push $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID
-```
-
-The second block:
-
-  - Pulls the recently create image from the registry.
-  - Runs integration and end-to-end tests.
-
-<!-- end list -->
-
-``` yaml
-jobs:
-  - name: Static test
-    commands:
-      - docker run -it \
-        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-        npm run lint
-
-  - name: Integration test
-    commands:
-      - sem-service start postgres
-      - docker run --net=host -it \
-        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-        npm run test
-
-  - name: Functional test
-    commands:
-      - sem-service start postgres
-      - docker run --net=host -it \
-        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-        npm run ping
-      - docker run --net=host -it \
-        $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-        npm run migrate
-```
-
-The last block repeats the pattern:
-
-  - Pulls the image created on the first block.
-  - Tags it as “latest” and pushes it again to the Semaphore registry
-    for future runs.
-
-The last section of the file defines the promotion. Uncomment the lines
-corresponding to your cloud of choice and save the file. These
-promotions are triggered when the Git branch is master or when the
-commit tag begins with “hotfix”.
-
-``` yaml
-promotions:
-  - name: Canary Deployment (DigitalOcean)
-    pipeline_file: deploy-canary-digitalocean.yml
-    auto_promote:
-      when: "result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')"
-```
-
------
+This completes the setup of the CI pipeline.
 
 ### 4.4.5 Your First Build
 
-We’ve covered a lot of things in a few pages, here we have the change to
-pause for a little bit and do an initial run of the CI pipeline.
+We’ve covered a lot of things in a few pages, here we have the chance to pause for a little bit and try the CI pipeline. Click on the **Run the workflow** button on the top-right corner and then click on **Start**.
 
-You can avoid running the deployment pipeline by making a push in a
-non-master branch:
+![Run workflow](./figures/05-sem-ci-pipeline.png)
 
-TODO: pull first and switch to setup-semaphore branch
+Wait until the pipeline is complete then go to the top level of the project by clicking on its name on the left navigation menu. Click on the **Docker Registry** button. Open the repository to verify that the Docker image is there.
 
-``` bash
-$ git branch test-integration
-$ git checkout test-integration
-$ touch any-file
-$ git add any-file
-$ git commit -m "run integration pipeline for the first time"
-$ git push origin test-integration
-```
+![Docker registry](./figures/05-sem-registry.png)
 
-Check the progress of the pipeline from the Semaphore website:
-
-![CI Pipeline](./figures/05-sem-ci-pipeline.png)
