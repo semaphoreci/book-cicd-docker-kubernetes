@@ -158,7 +158,7 @@ In the context of container-based services, this principle means building contai
 
 For example, consider a case where you need to run tests in parallel and then deploy a container. The desired pipeline should build the container image in the first stage. The later stages of testing and deployment reuse the container from the registry. Ideally, the registry would be part of the CI service to save costs and avoid network overhead.
 
-TODO: diagram build docker once
+![Build Docker once](figures/04-build-docker-once.png){ width=95% }
 
 The same principle applies to any other assets that you need to create from source code and use later. The most common are binary packages and website assets.
 
