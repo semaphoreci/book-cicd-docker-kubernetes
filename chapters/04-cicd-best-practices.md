@@ -177,13 +177,25 @@ These steps ensure that the build doesn’t change as it progresses through the 
 
 On many occasions, you can get all the feedback from CI that you need without running the entire test suite.
 
-Unit tests run the fastest because they are isolated from the rest of the system and usually don’t touch the database. They define business logic and are the most frequent. The “test pyramid” diagram is a common representation of the kinds of tests in a system:
+**Unit tests** run the fastest because they:
 
-![Test pyramid](figures/04-test-pyramid.png){ width=60% }
+- Test small units of code in isolation from the rest of the system.
+- Verify the core business logic, not behavior from the end-user perspective.
+- Usually don’t touch the database.
 
-If a team follows this strategy, a failing unit test is usually a signal of a fundamental problem. Then the remaining high-level and long-running tests are irrelevant.
+The **test pyramid** diagram is a common representation of the distribution of tests in a system:
 
-For these reasons, projects with test suites that run for anything longer than a minute should prioritize unit tests in the CI pipeline.
+![Test pyramid](figures/04-test-pyramid.png){ width=70% }
+
+According to this strategy, a test suite has:
+
+- The most unit tests.
+- Somewhat less service-level tests, which include calls to the database and any other core external resource.
+- Few user interface, or end-to-end tests. These serve to verify the behavior of the system as a whole, usually from the user's perspective.
+
+If a team follows this strategy, a failing unit test is a signal of a fundamental problem. The remaining high-level and long-running tests are irrelevant until we resolve the problem.
+
+For these reasons, projects with test suites that run for anything longer than a minute should prioritize unit tests in the CI pipeline. For example, such a pipeline may look like this:
 
 ![Multi-stage testing](figures/04-multistage-testing.png){ width=95% }
 
