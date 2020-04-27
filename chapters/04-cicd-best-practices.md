@@ -66,7 +66,7 @@ Metrics and monitoring are also an essential enabler of iterative development. B
 
 ### 3.1.2 You Build It, You Run It
 
-In the [seminal 2006 interview to ACM](https://queue.acm.org/detail.cfm?id=1142065), Werner Vogels, Amazon CTO, pioneered the mindset of *you build it, you run it*. The idea is that developers should be in direct contact with the operation of their software, which, in turn, puts them in close contact with customers. 
+In the seminal 2006 interview to ACM[^vogels-acm], Werner Vogels, Amazon CTO, pioneered the mindset of *you build it, you run it*. The idea is that developers should be in direct contact with the operation of their software, which, in turn, puts them in close contact with customers. 
 
 The critical insight is that involving developers in the customer feedback loop is essential for improving the quality of the service. Which ultimately leads to better business results.
 
@@ -77,6 +77,9 @@ Since then, the philosophy has passed the test of time. Today the best product o
 Being responsible for the quality of software requires being responsible for releasing it. This breaks down the silos between traditional developers and operations groups. Everyone must work together to achieve high-level goals.
 
 It’s not rare that in newly formed teams there is no dedicated operations person. Instead, the approach is to do “NoOps”. Developers who write code also own the delivery pipeline. The cloud providers take care of hosting and monitoring production services.
+
+[^vogels-acm]: A Conversation with Werner Vogels, ACMQueue
+  _[https://queue.acm.org/detail.cfm?id=1142065](https://www.youtube.com/watch?v=wW9CAH9nSLs)_
 
 ### 3.1.3 Use Ephemeral Resources
 
@@ -132,7 +135,7 @@ The point of continuous in continuous integration is speed. Speed drives high pr
 
 So, it’s helpful to establish criteria for how fast should a CI process be:
 
-Proper continuous integration is when it takes you less than 10 minutes from pushing new code to getting results.
+_Proper continuous integration is when it takes you less than 10 minutes from pushing new code to getting results_.
 
 The 10-minute mark is about how much a developer can wait without getting too distracted. It’s also adopted by one of the pioneers of continuous delivery, Jez Humble. He performs the following informal poll at conferences[^jez].
 
@@ -241,7 +244,7 @@ If you’re used to working on monolithic applications, building microservices l
 
 No one may touch the service’s repository for months. And then, one day, there’s an urgent need to deploy a change. The CI build unexpectedly fails: there are security vulnerabilities in several dependencies, some of which have introduced breaking changes. What seemed like a minor update becomes a high-risk operation that may drag into days of work.
 
-To prevent this from happening, you can schedule a daily CI build. A scheduled build is an excellent way of detecting any issues with dependencies early, regardless of how often your code changes (or doesn’t).
+To prevent this from happening, you can **schedule a daily CI build**. A scheduled build is an excellent way of detecting any issues with dependencies early, regardless of how often your code changes (or doesn’t).
 
 You can further support the quality of your code by incorporating in your CI pipeline:
 

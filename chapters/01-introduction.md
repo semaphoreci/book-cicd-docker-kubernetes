@@ -2,8 +2,10 @@
 
 © 2020 Rendered Text. All rights reserved.
 
-First edition. Published on the Semaphore website
+Published on the Semaphore website
 (_[https://semaphoreci.com](https://semaphoreci.com)_).
+
+May 2020: First edition (v1.0)
 
 \newpage
 
@@ -11,23 +13,27 @@ First edition. Published on the Semaphore website
 
 To maximize the rate of learning, we must minimize the time to try things.
 
-In software development, the cloud has been a key factor in increasing the speed of building innovative products.
+In software development, the cloud has been a critical factor in increasing the speed of building innovative products.
 
-Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
+Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft, who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
 
 Doing so successfully, however, requires our applications to adapt. They need to be disposable and horizontally scalable. They should have a minimal divergence between development and production so that we can continuously deploy them multiple times per day.
 
-A new generation of tools has democratized the way of building such *cloud native* software. Docker container is now the standard way of packaging software in a way that can be deployed, scaled and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will undoubtedly emerge, but it's almost certain that they will be based on Kubernetes.
+A new generation of tools has democratized the way of building such *cloud native* software. Docker container is now the standard way of packaging software in a way that can be deployed, scaled, and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will emerge, but it's almost certain that they will be based on Kubernetes.
 
-The great opportunity comes potentially at a great cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
+The great opportunity comes potentially at a high cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
 
-This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline which automatically configures, builds, tests, and deploys code. This book will show you how to do that the cloud native way — so you can focus on building great products and solutions.
+This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline, which automatically configures, builds, tests, and deploys code. This book shows you how to do that in a cloud native way — so you can focus on building great products and solutions.
 
 \newpage
 
 ### Who Is This Book For, and What Does It Cover?
 
-The main goal of this book is to provide a practical roadmap to continuous delivery for software development teams who want to use Docker containers to package their code and Kubernetes to run it.
+The main goal of this book is to provide a practical roadmap for software development teams who want to:
+
+- Use Docker containers to package their code,
+- Run it on Kubernetes, and
+- Continuously deliver all changes.
 
 We don't spend much time explaining why you should, or should not use container technologies to ship your applications. We also don't provide a general reference to using Docker and Kubernetes. When you encounter a concept of Docker or Kubernetes that you're not familiar with, we recommend that you consult the official documentation.
 
@@ -57,8 +63,8 @@ You can send us feedback by sending an email to learn@semaphoreci.com.
 
 ## About the Authors
 
-**Marko Anastasov** is a software engineer, author and entrepreneur. Marko co-founded Rendered Text, a software company behind the Semaphore CI/CD service. He worked on building and scaling Semaphore from an idea to a cloud-based platform used by some of the world's engineering teams. He writes about architectures, practices and tools that support continuous delivery on https://semaphoreci.com/blog. Follow Marko on Twitter at @markoa.
+**Marko Anastasov** is a software engineer, author and entrepreneur. Marko co-founded Rendered Text, a software company behind the Semaphore CI/CD service. He worked on building and scaling Semaphore from an idea to a cloud-based platform used by some of the world's best engineering teams. He writes about architectures, practices and tools that support continuous delivery on [https://semaphoreci.com/blog](https://semaphoreci.com/blog). Follow Marko on Twitter at [\@markoa](https://twitter.com/markoa).
 
-**Jérôme Petazzoni** was part of the team that built, scaled, and operated the dotCloud PAAS, before that company became Docker. He worked seven years at the container startup, where he wore countless hats and ran containers in production before it was cool. He loves to share what he knows, which led him to give hundreds of talks and demos on containers, Docker, and Kubernetes. He has trained thousands of people to deploy their apps in confidence on these platforms, and continues to do so as an independent consultant. He values diversity, and strives to be a good ally, or at least a decent social justice sidekick. He also collects musical instruments and can arguably play the theme of Zelda on a dozen of them. Follow Jérôme on Twitter at @jpetazzo.
+**Jérôme Petazzoni** was part of the team that built, scaled, and operated the dotCloud PAAS, before that company became Docker. He worked seven years at the container startup, where he wore countless hats and ran containers in production before it was cool. He loves to share what he knows, which led him to give hundreds of talks and demos on containers, Docker, and Kubernetes. He has trained thousands of people to deploy their apps in confidence on these platforms, and continues to do so as an independent consultant. He values diversity, and strives to be a good ally, or at least a decent social justice sidekick. He also collects musical instruments and can arguably play the theme of Zelda on a dozen of them. Follow Jérôme on Twitter at [\@jpetazzo](https://twitter.com/jpetazzo).
 
-**Pablo Tomas Fernandez Zavalia** is an electronic engineer and writer. He started his career in developing for the City of Buenos Aires City Hall (buenosaires.gob.ar). After graduating, he joined British Telecom as head of the Web Services department in Argentina. He then worked on IBM as a database administrator, where he also did tutoring, DevOps, and cloud migrations. In his free time he enjoys writing, sailing and board games. Follow Tomas on Twitter at @tomfernblog.
+**Pablo Tomas Fernandez Zavalia** is an electronic engineer and writer. He started his career in developing for the City of Buenos Aires City Hall (buenosaires.gob.ar). After graduating, he joined British Telecom as head of the Web Services department in Argentina. He then worked on IBM as a database administrator, where he also did tutoring, DevOps, and cloud migrations. In his free time he enjoys writing, sailing and board games. Follow Tomas on Twitter at [\@tomfernblog](https://twitter.com/tomfernblog).
