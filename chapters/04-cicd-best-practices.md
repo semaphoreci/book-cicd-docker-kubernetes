@@ -203,9 +203,15 @@ This strategy allows developers to get feedback on trivial errors in seconds. It
 
 There are additional tactics that you can use with your CI system to get fast feedback:
 
-- **Conditional stage execution** lets you defer running certain parts of your build for the right moment. For example, you can configure your CI to run a subset of end-to-end tests only if a related component has changed.
-- **A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when running parallel jobs with variable duration.
-- **Automatic cancelation of queued builds** can help in situations when you push some changes, only to realize that you have made a mistake. So you push a new revision immediately but would then need to wait for twice as long for feedback. Using automatic cancelations, you can get feedback on revisions that matter while skipping the intermediate ones.
+**Conditional stage execution** lets you defer running certain parts of your build for the right moment. For example, you can configure your CI to run a subset of end-to-end tests only if a related component has changed.
+
+![Conditional pipeline execution](figures/04-pipeline-deps.png){ width=95% }
+
+In the pipeline above, backend and frontend tests run if code changed in the corresponding directories. End-to-end tests run if any of the two has passed and none has failed.
+
+**A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when running parallel jobs with variable duration.
+
+**Automatic cancelation of queued builds** can help in situations when you push some changes, only to realize that you have made a mistake. So you push a new revision immediately but would then need to wait for twice as long for feedback. Using automatic cancelations, you can get feedback on revisions that matter while skipping the intermediate ones.
 
 ### 3.2.5 Minimize Feature Branches, Embrace Feature Flags
 
