@@ -192,167 +192,96 @@ for the first time.
 
 ### 4.6.1 Continuous Deployment Pipeline
 
-Depending on your cloud, open one of the following files:
+Our project includes three ready-to-use reference pipelines for deployment. They should work with the secrets as described earlier.
 
-  - AWS: `.semaphore/deploy-canary-aws.yml`
-  - GCP: `.semaphore/deploy-canary-gcp.yml`
-  - DO: `.semaphore/deploy-canary-digitalocean.yml`
+  - AWS: `.semaphore/deploy-canary-aws.yml` and `.semaphore/deploy-stable-aws.yml`
+  - GCP: `.semaphore/deploy-canary-gcp.yml` and `.semaphore/deploy-stable-gcp.yml`
+  - DO: `.semaphore/deploy-canary-digitalocean.yml` and `.semaphore/deploy-stable-digitalocean.yml`
 
-We’ll focus on the DO deployment but the process is the same for all
+In this section, we’ll focus on the DO deployment but the process is the same for all
 clouds.
 
-The pipeline consists of three blocks:
+Open the Workflow Builder again to create the new pipeline.
 
-**Push**: the push block takes the docker image that we built earlier
-and uploads it to Docker Hub. The image must be in a place that is
-accessible by the Kubernetes cluster. This block imports a secret
-“dockerhub” secret:
+Create a new promotion using the **+Add First Promotion** button. Promotions connect pipelines together to create complex workflows. Let’s call it “Canary”
 
-``` yaml
-. . .
-- name: Push to Registry
-  task:
-    secrets:
-      - name: dockerhub
-. . .
+![Create promotion](./figures/05-sem-canary-create-promotion.png)
+
+Check the **Enable automatic promotion** box. Now we can define the following auto-starting conditions for the new pipeline:
+
+```
+result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 ```
 
-The secrets and the login command will vary depending on the cloud.
+![Automatic promotion](./figures/05-sem-canary-auto-promotion.png)
 
-The job pulls the image from Semaphore’s registry, tags it with its
-final name, and pushes it to production registry:
+Click on the new pipeline and change its name to “Deploy to Kubernetes (DigitalOcean)”.
 
-``` yaml
-. . .
-jobs:
-  - name: Push
-    commands:
-      - docker login \
-          -u $SEMAPHORE_REGISTRY_USERNAME \
-          -p $SEMAPHORE_REGISTRY_PASSWORD \
-          $SEMAPHORE_REGISTRY_URL
+Click on the first block, we’ll call it “Push to Registry”. The push block takes the docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
 
-      - docker pull \
-          $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID
+- Open the **Secrets** section and check the `dockerhub` secret.
+- Type the following commands in the job:
 
-      - echo "${DOCKER_PASSWORD}" | \
-          docker login -u "${DOCKER_USERNAME}" --password-stdin
+```bash
+docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker pull $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 
-      - docker tag \
-          $SEMAPHORE_REGISTRY_URL/addressbook:$SEMAPHORE_WORKFLOW_ID \
-          $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
-
-      - docker push \
-          $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
-. . .
+echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+docker tag $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker push $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 ```
 
-**Deploy**: this block imports two extra secrets: “db-params” and the
-cloud-specific access token.
+Create the “Deploy” block and enable the `dockerhub` secret. This block also needs two extra secrets: `db-params` and the cloud-specific access token, which is `do-key` in our case.
 
-``` yaml
-. . .
-- name: Deploy
-  task:
-    secrets:
-      - name: do-key
-      - name: db-params
-      - name: dockerhub
-. . .
-```
-
-Next, we define some environment variables. For more details, consult
-the comments on the corresponding pipeline files, as you may need to
-fill in some values.
-
-``` yaml
-. . .
-env_vars:
-    - name: CLUSTER_NAME
-      value: semaphore-demo-cicd-kubernetes
-. . .
-```
-
-The prologue installs the cloud management CLI tool and creates an
-authenticated session.
-
-``` yaml
-. . .
-prologue:
-  commands:
-    - wget https://github.com/digitalocean/../doctl-1.20.0-linux-amd64.tar.gz
-    - tar xf doctl-1.20.0-linux-amd64.tar.gz
-    - sudo cp doctl /usr/local/bin
-    - doctl auth init --access-token $DO_ACCESS_TOKEN
-    - doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
-    - checkout
-. . .
-```
-
-The “Deploy” job starts the canary deployment:
+This job starts the canary deployment:
 
   - Creates a load balancer service with `kubectl apply`.
   - Executes `apply.sh`, a convenience script for the manifest that
     waits for the deployment to finish.
   - Scales the stable pods down with `kubectl scale`.
 
-<!-- end list -->
+Open the **Environment Variables** section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
 
-``` yaml
-. . .
-jobs:
-  - name: Deploy
-    commands:
-      - kubectl apply -f manifests/service.yml
+Next, type the following commands in the **Prologue**:
 
-      - ./apply.sh manifests/deployment.yml \
-           addressbook-canary \
-           1 \
-           $DOCKER_USERNAME/addressbook:$SEMAPHORE_WORKFLOW_ID
-
-      - if kubectl get deployment addressbook-stable; then \
-           kubectl scale --replicas=2 deployment/addressbook-stable; \
-        fi
-. . .
+```bash
+wget https://github.com/digitalocean/doctl/releases/download/v1.20.0/doctl-1.20.0-linux-amd64.tar.gz
+tar xf doctl-1.20.0-linux-amd64.tar.gz
+sudo cp doctl /usr/local/bin
+doctl auth init --access-token $DO_ACCESS_TOKEN
+doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+checkout
 ```
 
-**Test**: this is the last block in the pipeline. It runs some tests on
-the canary. Combining `kubectl get pod` and `kubectl exec`, we can run
+The first three lines install DigitalOcean’s `doctl` management tool and the next two lines set up a connection with the cluster.
+
+The prologue installs the cloud management CLI tool and creates an authenticated session. Type the following commands in the job:
+
+```bash
+kubectl apply -f manifests/service.yml
+./apply.sh manifests/deployment.yml addressbook-canary 1 $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+if kubectl get deployment addressbook-stable; then kubectl scale --replicas=2 deployment/addressbook-stable; fi
+```
+
+Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block.
+
+This is the last block in the pipeline. It runs some tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run
 commands inside the pod.
 
-``` yaml
-. . .
-jobs:
-  - name: Test and migrate db
-    commands:
-      - kubectl exec -it \
-          $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-          -- npm run ping
+Type the following commands in the job:
 
-      - kubectl exec -it \
-          $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-          -- npm run migrate
-. . .
+```bash
+kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run ping
+kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run migrate
 ```
 
 ### 4.6.2 Your First Release
 
-This is the moment of truth. Will the canary work? Make a push on the
-master branch to get started:
-
-``` bash
-$ git checkout master
-$ git add .semaphore
-$ git commit -m "first deployment"
-$ git push origin master
-```
-
-You can check the progress of the pipelines on the Semaphore website.
+This is the moment of truth. Will the canary work? Click on **Run the workflow** and then **Start**.
 
 ![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=80% }
 
-Once the deployment is complete, the workflow stops and waits for the
-manual promotion. Here is where we can check how the canary is doing:
+Once the deployment is complete, the workflow stops and waits for the manual promotion. Here is where we can check how the canary is doing:
 
 ``` bash
 $ kubectl get deployment
@@ -362,16 +291,17 @@ addressbook-canary   1/1     1            1           8m40s
 
 ## 4.7 Releasing the Stable
 
-So far, so good. Let's see where we are: we built the Docker image, and,
-after testing it, we released it as one-pod canary deployment. If the
-canary worked, we’re ready to complete the deployment.
+So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we released it as one-pod canary deployment. If the canary worked, we’re ready to complete the deployment.
 
 ### 4.7.1 The Continuous Deployment Pipeline
 
-The stable deployment pipeline is the last one in the workflow. The
-pipeline does not introduce anything new. Again, we use `apply.sh`
-script to start a rolling update and `kubectl delete` to clean the
-canary deployment.
+The stable deployment pipeline is the last one in the workflow. The pipeline does not introduce anything new. Again, we use `apply.sh`
+script to start a rolling update and `kubectl delete` to clean the canary deployment.
+
+Open the Workflow Builder once again and open the canary pipeline. Create a new pipeline branching from the canary and name it “Deploy Stable (DigitalOcean)”.
+
+Create the “Deploy Stable” block with the
+
 
 ``` yaml
 . . .
