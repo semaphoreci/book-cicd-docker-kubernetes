@@ -2,13 +2,16 @@
 
 # 1 Using Docker for Development and CI/CD
 
-In 2013, Solomon Hykes showed [a demo of the first version of Docker during the PyCon conference in Santa Clara](https://www.youtube.com/watch?v=wW9CAH9nSLs). Since then, the benefits of Docker containers have spread to seemingly every corner of the software industry. While Docker (the project and the company) made containers so popular, they were not the first project to leverage containers out there; and they are definitely not the last either.
+In 2013, Solomon Hykes showed a demo of the first version of Docker during the PyCon conference in Santa Clara[^docker-demo]. Since then, the benefits of Docker containers have spread to seemingly every corner of the software industry. While Docker (the project and the company) made containers so popular, they were not the first project to leverage containers out there; and they are definitely not the last either.
 
-Six years later, we can hopefully see beyond the hype as some powerful, efficient patterns emerged to leverage containers to develop and ship better software, faster.
+Several years later, we can hopefully see beyond the hype as some powerful, efficient patterns emerged to leverage containers to develop and ship better software, faster.
 
 In this chapter, you will first learn about the kind of benefits that you can expect from implementing Docker containers.
 
 Then, a realistic roadmap that any organization can follow realistically, to attain these benefits.
+
+[^docker-demo]: The future of Linux Containers (2013),
+  _[https://www.youtube.com/watch?v=wW9CAH9nSLs](https://www.youtube.com/watch?v=wW9CAH9nSLs)_
 
 ## 1.1 Benefits of Using Docker
 
