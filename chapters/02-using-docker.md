@@ -47,7 +47,7 @@ Configuration management systems (like Ansible, Chef, Puppet, or Salt) help us b
 
 Once we have installed the Docker Engine (the most popular option), it can run any container image and effectively abstract these environment discrepancies.
 
-The ability to stage up new environments easily and reliably gives us exactly what we need to set up CI/CD (continuous integration and continuous delivery). We will see how to get there. Ultimately, it means that advanced techniques, such as blue/green deployments, or immutable infrastructure, become accessible to us, instead of being the privilege of larger organizations able to spend a lot of time to build their perfect custom tooling.
+The ability to stage up new environments easily and reliably gives us exactly what we need to set up CI/CD (continuous integration and continuous delivery). We will see how to get there. Ultimately, it means that advanced techniques, such as blue/green deployments, or immutable infrastructure, become accessible to us, instead of being a privilege of larger organizations able to spend a lot of time to build their perfect custom tooling.
 
 ### 1.1.3 Less Risky Releases
 
@@ -57,7 +57,7 @@ When we start a new version of our app by running the corresponding container im
 
 This is way safer than attempting a code rollback, especially if the new version implied some dependency upgrades. Are we sure that we can downgrade to the previous version? Is it still available on the package repositories? If we are using containers, we don’t have to worry about that, since our container image is available and ready.
 
-This pattern is sometimes called _immutable infrastructure_, because instead of changing our services, we deploy new ones. Initially, immutable infrastructure happened with virtual machines: each new release would happen by starting a new fleet of virtual machines. Containers make this even easier to use.
+This pattern is sometimes called **immutable infrastructure**, because instead of changing our services, we deploy new ones. Initially, immutable infrastructure happened with virtual machines: each new release would happen by starting a new fleet of virtual machines. Containers make this even easier to use.
 
 As a result, we can deploy with more confidence, because we know that if something goes wrong, we can easily go back to the previous version.
 
