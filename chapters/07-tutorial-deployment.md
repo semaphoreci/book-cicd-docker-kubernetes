@@ -176,7 +176,7 @@ result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 
 Click on the new pipeline and change its name to “Deploy to Kubernetes (DigitalOcean)”.
 
-Click on the first block, we’ll call it “Push to Registry”. The push block takes the docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
+Click on the first block, we’ll call it “Push”. The push block takes the docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
 
 - Open the **Secrets** section and check the `dockerhub` secret.
 - Type the following commands in the job:
@@ -190,13 +190,14 @@ docker tag $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WOR
 docker push $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 ```
 
+![Push block](./figures/05-sem-canary-push-block.png)
+
 Create the “Deploy” block and enable the `dockerhub` secret. This block also needs two extra secrets: `db-params` and the cloud-specific access token, which is `do-key` in our case.
 
 This job starts the canary deployment:
 
   - Creates a load balancer service with `kubectl apply`.
-  - Executes `apply.sh`, a convenience script for the manifest that
-    waits for the deployment to finish.
+  - Executes `apply.sh`, a convenience script for the manifest that waits for the deployment to finish.
   - Scales the stable pods down with `kubectl scale`.
 
 Open the **Environment Variables** section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
@@ -222,6 +223,8 @@ kubectl apply -f manifests/service.yml
 if kubectl get deployment addressbook-stable; then kubectl scale --replicas=2 deployment/addressbook-stable; fi
 ```
 
+![Deploy block](./figures/05-sem-canary-deploy-block.png)
+
 Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block.
 
 This is the last block in the pipeline. It runs some tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run
@@ -233,15 +236,20 @@ Type the following commands in the job:
 kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run ping
 kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run migrate
 ```
+
+![Test block](./figures/05-sem-canary-test-block.png)
+
 ## 4.7 Your First Release
 
-So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we released it as one-pod canary deployment. If the canary worked, we’re ready to complete the deployment.
+So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve setup the a one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
 
 ### 4.7.1 The Stable Deployment Pipeline
 
 The stable deployment pipeline is the last one in the workflow. The pipeline does not introduce anything new. Again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
 
-Open the Workflow Builder once again and open the canary pipeline. Create a new pipeline branching out from the canary and name it “Deploy Stable (DigitalOcean)”.
+Open the Workflow Builder once again and open the canary pipeline. Create a new pipeline branching out from it and name it “Deploy Stable (DigitalOcean)”.
+
+![Stable promotion](./figures/05-sem-stable-promotion.png)
 
 Create the “Deploy to Kubernetes” block with the `do-key`, `db-params`, and `dockerhub` secrets. Also, create the `CLUSTER_NAME` variable and repeat the same commands in the prologue as we did in the previous step.
 
@@ -252,15 +260,18 @@ In the job command box, type the following lines to make the rolling deployment 
 if kubectl get deployment addressbook-canary; then kubectl delete deployment/addressbook-canary; fi
 ```
 
+![Deploy block](./figures/05-sem-stable-deploy-block.png)
+
 We’re done with the release pipeline.
 
 ### 4.7.2 Releasing the Canary
 
-This is the moment of truth. Will the canary work? Click on **Run the workflow** and then **Start**.
+Here is the moment of truth. Will the canary work? Click on **Run the workflow** and then **Start**.
 
 ![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=80% }
 
-Once the deployment is complete, the workflow stops and waits for the manual promotion. Here is where we can check how the canary is doing:
+Wait until the CI pipeline is done an click on **Promote** to start the canary pipeline \[11\]. Once it completes, we can check how the canary is doing.
+
 
 ``` bash
 $ kubectl get deployment
@@ -270,13 +281,13 @@ addressbook-canary   1/1     1            1           8m40s
 
 ### 4.7.3 Releasing the Stable
 
-In tandem with the deployment, we should have a dashboard to monitor errors, user incidents, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canaried version good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
+In tandem with the deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canaried version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
 
-Let’s say we decide to go ahead. So go on and hit the **Promote** button.
+Let’s say we decide to go ahead. So go on and hit the **Promote** button next to the stable pipeline.
 
 ![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=60% }
 
-While the block runs, you should get the existing canary and a new “addressbook-stable” deployment:
+While the block runs, you should see both the existing canary and a new “addressbook-stable” deployment:
 
 ``` bash
 $ kubectl get deployment
@@ -346,15 +357,17 @@ The deployment was a success, that was no small feat. Congratulations\!
 
 Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Our project includes a rollback pipeline.
 
-Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline.
+Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline\[12\].
 
 Open the Workflow Builder once more and go to the end of the canary pipeline. Create a new promotion branching out of it, check the **Enable automatic promotion** box, and set this condition:
 
 ```text
-"result = 'failed'"
+result = 'failed'
 ```
 
-The rollback pipeline job is to collect information to diagnose the problem. Create a new block called “Rollback Canary”, import the `do-ctl` secret, and create the `CLUSTER_NAME` variable as before. Repeat the prologue commands like we did before and type these lines in the job:
+![Rollback promotion](./figures/05-sem-rollback-promotion.png)
+
+The rollback job collects information to help diagnose the problem. Create a new block called “Rollback Canary”, import the `do-ctl` secret, and create `CLUSTER_NAME`. Repeat the prologue commands like we did before and type these lines in the job:
 
 ```bash
 kubectl get all -o wide
@@ -365,7 +378,9 @@ if kubectl get deployment addressbook-stable; then kubectl scale --replicas=3 de
 if kubectl get deployment addressbook-canary; then kubectl delete deployment/addressbook-canary; fibash
 ```
 
-The first four lines print out information about the cluster. The last two, undo the changes in the cluster by scaling up the stable deployment and removing the canary:
+![Rollback block](./figures/05-sem-rollback-block.png)
+
+The first four lines print out information about the cluster. The last two, undoes the changes by scaling up the stable deployment and removing the canary:
 
 ![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=60% }
 
@@ -470,3 +485,7 @@ Each of the pieces had its role: Docker brings portability, Kubernetes adds orch
 9.  At the time of writing, DigitalOcean announced a beta for a private registry offering. For more information, consult the available documentation: <https://www.digitalocean.com/docs/kubernetes/how-to/set-up-registry>
 
 10. Later, when everything is working, you can restrict access to the Kubernetes nodes to increase security
+
+11. You might be wondering why the automatic promotion hasn’t kicked in for the canary pipeline. The reason is that we set it to trigger only for the master branch, and the Workflow Builder by default saves all its changes on a separate branch called `setup-semaphore`.
+
+12. This isn’t technically true for applications that use data persistence like a database. Changes to the database are not automatically rolled back using our setup.
