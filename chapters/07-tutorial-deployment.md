@@ -1,14 +1,16 @@
+\newpage
+
 ## 4.5 Preparing the Cloud Services
 
-Our project supports three clouds: Amazon AWS, Google Cloud Platform (GCP), and DigitalOcean (DO). AWS is, by far, the most popular, but likely the most expensive to run Kubernetes. DigitalOcean is the easiest to use, while Google Cloud sits comfortably in the middle.
+Our project supports three clouds out of the box: Amazon AWS, Google Cloud Platform (GCP), and DigitalOcean (DO), but with small modifications, it could run in any other cloud. AWS is, by far, the most popular, but likely the most expensive to run Kubernetes. DigitalOcean is the easiest to use, while Google Cloud sits comfortably in the middle.
 
 ### 4.5.1 Provision a Kubernetes Cluster
 
-In this tutorial, we’ll use a three-node Kubernetes cluster; you can pick a different size, though. You’ll need at least three nodes to run an effective canary deployment with rolling updates.
+In this tutorial, we’ll deploy the application in a three-node Kubernetes cluster; you can pick a different size though, but you’ll need at least three nodes to run an effective canary deployment with rolling updates.
 
 **DigitalOcean Cluster**
 
-DO calls its service *Kubernetes*. Since DigitalOcean doesn’t have a private registry\[9\], we’ll use Docker Hub. To create a registry:
+DO has a managed Kubernetes service but lacks a private Docker registry\[9\], so we’ll use Docker Hub for the images.
 
   - Sign up for a free account on `hub.docker.com`.
   - Create a public repository called “semaphore-demo-cicd-kubernetes”
@@ -20,13 +22,12 @@ To create the Kubernetes cluster:
   - Create a *Kubernetes* cluster: select the latest version and choose one of the available regions. Name your cluster “semaphore-demo-cicd-kubernetes”.
   - Go to the *API* menu and generate a *Personal Access Token*.
 
-We have to store the DigitalOcean Access Token in secret:
+We have to store the DigitalOcean Access Token with a secret:
 
 1.  Login to `semaphoreci.com`.
 2.  On the main page, under *Configuration* select *Secrets* and click on the *Create New Secret* button.
 3.  The name of the secret is “do-key”
-4.  Add the following variables:
-      - `DO_ACCESS_TOKEN` set its value to your DigitalOcean access token.
+4.  Add the `DO_ACCESS_TOKEN` variable and set its value with your personal token.
 5.  Click on *Save changes*.
 
 Repeat the last steps to add the second secret, call it “dockerhub” and add the following variables:
@@ -51,15 +52,14 @@ Create a secret for your GCP Access Key file:
 1.  Login to `semaphoreci.com`.
 2.  On the main page, under *Cconfiguration* select *Secrets* and click on the *Create New Secret* button.
 3.  Name the secret “gcp-key”
-4.  Add the following file:
-      - `/home/semaphore/gcp-key.json` and upload the GCP Access JSON from your computer.
+4.  Add this file: `/home/semaphore/gcp-key.json` and upload the GCP Access JSON from your computer.
 5.  Click on *Save changes*.
 
 **AWS Cluster**
 
 AWS calls its service *Elastic Kubernetes Service* (EKS). The Docker private registry is called *Elastic Container Registry* (ECR).
 
-Creating a cluster on AWS is, unequivocally, a complex, multi-step affair. So complex, that they created a specialized tool for it:
+Creating a cluster on AWS is, unequivocally, a complex, multi-step affair. So complex that they created a specialized tool for it:
 
   - Sign up for an AWS account at `aws.amazon.com`.
   - Select one of the available regions.
@@ -103,8 +103,7 @@ Create a secret to store the AWS Secret Access Key and the kubeconfig:
 
 ### 4.5.2 Provision a Database
 
-We’ll need a database to store the data. For that, we’ll use a managed
-PostgreSQL service.
+We’ll need a database to store the data. For that, we’ll use a managed PostgreSQL service.
 
 **DigitalOcean Database**
 
@@ -112,8 +111,7 @@ PostgreSQL service.
   - Create a PostgreSQL database. Select the same region where the cluster is running.
   - In the *Connectivity* tab, whitelist the `0.0.0.0/0` network\[10\].
   - Go to the *Users & Databases* tab and create a database called “demo” and a user named “demouser”.
-  - In the *Overview* tab, take note of the PostgreSQL IP address and
-    port.
+  - In the *Overview* tab, take note of the PostgreSQL IP address and port.
 
 **GCP Database**
 
@@ -123,8 +121,7 @@ PostgreSQL service.
   - Enable the *Private IP* network.
   - Go to the *Users* tab and create a new user called “demouser”
   - Go to the *Databases* tab and create a new DB called “demo”.
-  - In the *Overview* tab, take note of the database IP address and
-    port.
+  - In the *Overview* tab, take note of the database IP address and port.
 
 **AWS Database**
 
@@ -137,8 +134,7 @@ PostgreSQL service.
 
 **Create the Database Secret**
 
-The database secret is the same for all clouds. Create a secret to store
-the database credentials:
+The database secret is the same for all clouds. Create a secret to store the database credentials:
 
 1.  Login to `semaphoreci.com`.
 2.  On the main page, under *Configuration* select *Secrets* and click on the *Create New Secret* button.
@@ -148,17 +144,13 @@ the database credentials:
       - `DB_PORT` points to the database port (default is 5432).
       - `DB_SCHEMA` for AWS should be called “postgres”, for the other clouds its value should be “demo”.
       - `DB_USER` for the database user.
-      - `DB_PASSWORD` should have the corresponding password.
-      - `DB_SSL` should be “true” for DigitalOcean, it can be empty for the rest.
+      - `DB_PASSWORD` with the password.
+      - `DB_SSL` should be “true” for DigitalOcean, it can be left empty for the rest.
 5.  Click on *Save changes*.
 
 ## 4.6 The Canary Pipeline
 
-Now that we have our cloud services, we’re ready to deploy the canary for the first time.
-
-Our project includes three ready-to-use reference pipelines for deployment. They should work with the secrets as described earlier. For further details, check the `.semaphore` folder in the project.
-
-In this section, we’ll focus on the DO deployment but the process is the same for all clouds.
+Now that we have our cloud services, we’re ready to prepare the canary deployment pipeline. Our project includes three ready-to-use reference pipelines for deployment. They should work with the secrets as described earlier. For further details, check the `.semaphore` folder in the project. In this section, we’ll focus on the DO deployment but the process is the same for all clouds.
 
 Open the Workflow Builder again to create the new pipeline.
 
@@ -208,14 +200,15 @@ Next, type the following commands in the **Prologue**:
 wget https://github.com/digitalocean/doctl/releases/download/v1.20.0/doctl-1.20.0-linux-amd64.tar.gz
 tar xf doctl-1.20.0-linux-amd64.tar.gz
 sudo cp doctl /usr/local/bin
+
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
 checkout
 ```
 
-The first three lines install DigitalOcean’s `doctl` management tool and the next two lines set up a connection with the cluster.
+The first three lines install DigitalOcean’s `doctl` manager and the last two lines set up a connection with the cluster.
 
-The prologue installs the cloud management CLI tool and creates an authenticated session. Type the following commands in the job:
+Type the following commands in the job:
 
 ```bash
 kubectl apply -f manifests/service.yml
@@ -225,10 +218,7 @@ if kubectl get deployment addressbook-stable; then kubectl scale --replicas=2 de
 
 ![Deploy block](./figures/05-sem-canary-deploy-block.png)
 
-Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block.
-
-This is the last block in the pipeline. It runs some tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run
-commands inside the pod.
+Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block. This is the last block in the pipeline. It runs some tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
 
 Type the following commands in the job:
 
@@ -245,9 +235,9 @@ So far, so good. Let's see where we are: we built the Docker image, and, after t
 
 ### 4.7.1 The Stable Deployment Pipeline
 
-The stable deployment pipeline is the last one in the workflow. The pipeline does not introduce anything new. Again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
+The stable pipeline completes the deployment cycle. This pipeline does not introduce anything new; again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
 
-Open the Workflow Builder once again and open the canary pipeline. Create a new pipeline branching out from it and name it “Deploy Stable (DigitalOcean)”.
+Create a new pipeline (using the **Add promotion** button) branching out from the canary and name it “Deploy Stable (DigitalOcean)”.
 
 ![Stable promotion](./figures/05-sem-stable-promotion.png)
 
@@ -262,7 +252,7 @@ if kubectl get deployment addressbook-canary; then kubectl delete deployment/add
 
 ![Deploy block](./figures/05-sem-stable-deploy-block.png)
 
-We’re done with the release pipeline.
+Good! We’re done with the release pipeline.
 
 ### 4.7.2 Releasing the Canary
 
@@ -271,7 +261,6 @@ Here is the moment of truth. Will the canary work? Click on **Run the workflow**
 ![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=80% }
 
 Wait until the CI pipeline is done an click on **Promote** to start the canary pipeline \[11\]. Once it completes, we can check how the canary is doing.
-
 
 ``` bash
 $ kubectl get deployment
@@ -336,7 +325,7 @@ $ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/perso
 
 ```
 
-To retrieve all persons, use:
+To retrieve all persons, try:
 
 ``` bash
 $ curl -w "\n" 34.68.150.168/all
@@ -355,9 +344,7 @@ The deployment was a success, that was no small feat. Congratulations\!
 
 ### 4.7.4 The Rollback Pipeline
 
-Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Our project includes a rollback pipeline.
-
-Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline\[12\].
+Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline\[12\].
 
 Open the Workflow Builder once more and go to the end of the canary pipeline. Create a new promotion branching out of it, check the **Enable automatic promotion** box, and set this condition:
 
@@ -388,11 +375,11 @@ And we’re back to normal, phew\! Now its time to check the job logs to see wha
 
 **But what if the problem is found after the stable release?** Let’s imagine that a defect sneaked its way into the stable deployment. It can happen, maybe there was some subtle bug that no one found out hours or days in. Or perhaps some error not picked up by the functional test. Is it too late? Can we go back to a previous version?
 
-The answer is yes, we can go to the previous version, but manual intervention is required. Do you remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline for the last good version in Semaphore. When the Docker image is no longer in the registry can just regenerate it using the *Rerun* button in the top right corner.
+The answer is yes, we can go to the previous version, but manual intervention is required. Do you remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline for the last good version in Semaphore. If the Docker image is no longer in the registry, we can just regenerate it using the *Rerun* button in the top right corner.
 
 ### 4.7.5 Troubleshooting and Tips
 
-Even the best plans can fail; failure is certainly an option in the software business. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
+Even the best plans can fail; failure is certainly an option in the software development business. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
 
 Kubectl can give us a lot of insights into what is happening. First, get an overall picture of the resources on the cluster.
 
@@ -488,4 +475,4 @@ Each of the pieces had its role: Docker brings portability, Kubernetes adds orch
 
 11. You might be wondering why the automatic promotion hasn’t kicked in for the canary pipeline. The reason is that we set it to trigger only for the master branch, and the Workflow Builder by default saves all its changes on a separate branch called `setup-semaphore`.
 
-12. This isn’t technically true for applications that use data persistence like a database. Changes to the database are not automatically rolled back using our setup.
+12. This isn’t technically true for applications that use databases, changes to the database are not automatically rolled back. We should use database backups and migration scripts to manage upgrades.
