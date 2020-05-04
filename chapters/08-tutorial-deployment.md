@@ -29,12 +29,17 @@ Open the *Secrets* section and check the `dockerhub` secret.
 Type the following commands in the job:
 
 ```bash
-docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
-docker pull $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker login -u $SEMAPHORE_REGISTRY_USERNAME \
+   -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker pull \
+   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 
 echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-docker tag $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
-docker push $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker tag \
+   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
+   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker push \
+   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
 ```
 
 ![Push block](./figures/05-sem-canary-push-block.png){ width=95% }
@@ -47,11 +52,11 @@ Create a new block called “Deploy” and enable secrets:
 
 Open the *Environment Variables* section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
 
-Next, type the following commands in the *prologue*:
+Find the latest release of the doctl utility at _[https://github.com/digitalocean/doctl/releases](https://github.com/digitalocean/doctl/releases)_ and copy the path of the Linux amd64 tar.gz file. Next, use this path in the *prologue*:
 
 ```bash
-wget https://github.com/digitalocean/doctl/releases/download/v1.20.0/doctl-1.20.0-linux-amd64.tar.gz
-tar xf doctl-1.20.0-linux-amd64.tar.gz
+wget https://github.com/digitalocean/doctl/releases/download/<VERSION>/<FILENAME>
+tar xf doctl-*-linux-amd64.tar.gz
 sudo cp doctl /usr/local/bin
 
 doctl auth init --access-token $DO_ACCESS_TOKEN
@@ -65,8 +70,10 @@ Type the following commands in the job:
 
 ```bash
 kubectl apply -f manifests/service.yml
-./apply.sh manifests/deployment.yml addressbook-canary 1 $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
-if kubectl get deployment addressbook-stable; then kubectl scale --replicas=2 deployment/addressbook-stable; fi
+./apply.sh manifests/deployment.yml addressbook-canary 1 \
+   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+if kubectl get deployment addressbook-stable; then \
+   kubectl scale --replicas=2 deployment/addressbook-stable; fi
 ```
 
 This is the canary job sequence:
@@ -82,8 +89,12 @@ Create a third block called “Functional test and migration” and enable the `
 Type the following commands in the job:
 
 ```bash
-kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run ping
-kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) -- npm run migrate
+kubectl exec -it \
+   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
+   -- npm run ping
+kubectl exec -it \
+   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
+   -- npm run migrate
 ```
 
 ![Test block](./figures/05-sem-canary-test-block.png){ width=95% }
@@ -105,8 +116,10 @@ Create the “Deploy to Kubernetes” block with the `do-key`, `db-params`, and 
 In the job command box, type the following lines to make the rolling deployment and delete the canary pods:
 
 ```bash
-./apply.sh manifests/deployment.yml addressbook-stable 3 $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
-if kubectl get deployment addressbook-canary; then kubectl delete deployment/addressbook-canary; fi
+./apply.sh manifests/deployment.yml addressbook-stable 3 \
+   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+if kubectl get deployment addressbook-canary; then \
+   kubectl delete deployment/addressbook-canary; fi
 ```
 
 ![Deploy block](./figures/05-sem-stable-deploy-block.png){ width=95% }
@@ -226,9 +239,12 @@ The rollback job collects information to help diagnose the problem. Create a new
 kubectl get all -o wide
 kubectl get events
 kubectl describe deployment addressbook-canary || true
-kubectl logs $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) || true
-if kubectl get deployment addressbook-stable; then kubectl scale --replicas=3 deployment/addressbook-stable; fi
-if kubectl get deployment addressbook-canary; then kubectl delete deployment/addressbook-canary; fibash
+kubectl logs \
+   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) || true
+if kubectl get deployment addressbook-stable; then \
+   kubectl scale --replicas=3 deployment/addressbook-stable; fi
+if kubectl get deployment addressbook-canary; then \
+   kubectl delete deployment/addressbook-canary; fi
 ```
 
 ![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
