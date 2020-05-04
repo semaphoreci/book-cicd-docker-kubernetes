@@ -1,14 +1,12 @@
 \newpage
 
-## 4.5 Preparing the Cloud Services
+### 4.5 Provisioning a Kubernetes Cluster
 
 Our project supports three clouds out of the box: Amazon AWS, Google Cloud Platform (GCP), and DigitalOcean (DO), but with small modifications, it could run in any other cloud. AWS is, by far, the most popular, but likely the most expensive to run Kubernetes. DigitalOcean is the easiest to use, while Google Cloud sits comfortably in the middle.
 
-### 4.5.1 Provision a Kubernetes Cluster
-
 In this tutorial, we’ll deploy the application in a three-node Kubernetes cluster; you can pick a different size though, but you’ll need at least three nodes to run an effective canary deployment with rolling updates.
 
-**DigitalOcean Cluster**
+#### 4.5.1 DigitalOcean Cluster
 
 DO has a managed Kubernetes service but lacks a private Docker registry[^do-private-reg], so we’ll use Docker Hub for the images.
 
@@ -37,7 +35,7 @@ Repeat the last steps to add the second secret, call it “dockerhub” and add 
   - `DOCKER_USERNAME` for your DockerHub user name.
   - `DOCKER_PASSWORD` with the corresponding password.
 
-**GCP Cluster**
+#### 4.5.2 Google Cloud Cluster
 
 GCP calls the service *Kubernetes Engine*. To create the services:
 
@@ -57,7 +55,7 @@ Create a secret for your GCP Access Key file:
 4.  Add this file: `/home/semaphore/gcp-key.json` and upload the GCP Access JSON from your computer.
 5.  Click on *Save changes*.
 
-**AWS Cluster**
+#### 4.5.3 AWS Cluster
 
 AWS calls its service *Elastic Kubernetes Service* (EKS). The Docker private registry is called *Elastic Container Registry* (ECR).
 
@@ -103,11 +101,11 @@ Create a secret to store the AWS Secret Access Key and the kubeconfig:
       - `/home/semaphore/aws-key.yml` and upload the Kubeconfig file created by eksctl earlier.
 6.  Click on *Save changes*.
 
-### 4.5.2 Provision a Database
+### 4.6 Provisioning a Database
 
 We’ll need a database to store the data. For that, we’ll use a managed PostgreSQL service.
 
-**DigitalOcean Database**
+#### 4.6.1 DigitalOcean Database
 
   - Go to *Databases*.
   - Create a PostgreSQL database. Select the same region where the cluster is running.
@@ -117,7 +115,7 @@ We’ll need a database to store the data. For that, we’ll use a managed Postg
 
 [^network-whitelist]: Later, when everything is working, you can restrict access to the Kubernetes nodes to increase security
 
-**GCP Database**
+#### 4.6.2 Google Cloud Database
 
   - Select *SQL* on the console menu.
   - Create a new PostgreSQL database instance.
@@ -127,7 +125,7 @@ We’ll need a database to store the data. For that, we’ll use a managed Postg
   - Go to the *Databases* tab and create a new DB called “demo”.
   - In the *Overview* tab, take note of the database IP address and port.
 
-**AWS Database**
+#### 4.6.3 AWS Database
 
   - Find the service called *RDS*.
   - Create a PostgreSQL database called “demo” and type in a secure password.
@@ -136,7 +134,7 @@ We’ll need a database to store the data. For that, we’ll use a managed Postg
   - Under *Connectivity & Security* take note of the endpoint address
     and port.
 
-**Create the Database Secret**
+#### 4.6.4 Creating the Database Secret
 
 The database secret is the same for all clouds. Create a secret to store the database credentials:
 
@@ -152,7 +150,7 @@ The database secret is the same for all clouds. Create a secret to store the dat
       - `DB_SSL` should be “true” for DigitalOcean, it can be left empty for the rest.
 5.  Click on *Save changes*.
 
-## 4.6 The Canary Pipeline
+## 4.7 The Canary Pipeline
 
 Now that we have our cloud services, we’re ready to prepare the canary deployment pipeline. Our project includes three ready-to-use reference pipelines for deployment. They should work with the secrets as described earlier. For further details, check the `.semaphore` folder in the project. In this section, we’ll focus on the DO deployment but the process is the same for all clouds.
 
@@ -231,11 +229,11 @@ kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | he
 
 ![Test block](./figures/05-sem-canary-test-block.png){ width=95% }
 
-## 4.7 Your First Release
+## 4.8 Your First Release
 
 So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve setup the a one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
 
-### 4.7.1 The Stable Deployment Pipeline
+### 4.8.1 The Stable Deployment Pipeline
 
 The stable pipeline completes the deployment cycle. This pipeline does not introduce anything new; again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
 
@@ -256,7 +254,7 @@ if kubectl get deployment addressbook-canary; then kubectl delete deployment/add
 
 Good! We’re done with the release pipeline.
 
-### 4.7.2 Releasing the Canary
+### 4.8.2 Releasing the Canary
 
 Here is the moment of truth. Will the canary work? Click on *Run the workflow* and then *Start*.
 
@@ -275,7 +273,7 @@ NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
 addressbook-canary   1/1     1            1           8m40s
 ```
 
-### 4.7.3 Releasing the Stable
+### 4.8.3 Releasing the Stable
 
 In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canaried version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
 
@@ -349,7 +347,7 @@ $ curl -w "\n" 34.68.150.168/all
 
 The deployment was a success, that was no small feat. Congratulations\!
 
-### 4.7.4 The Rollback Pipeline
+### 4.8.4 The Rollback Pipeline
 
 Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline [^no-db-rollback].
 
@@ -388,7 +386,7 @@ And we’re back to normal, phew\! Now its time to check the job logs to see wha
 
 The answer is yes, we can go to the previous version, but manual intervention is required. Do you remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline for the last good version in Semaphore. If the Docker image is no longer in the registry, we can just regenerate it using the *Rerun* button in the top right corner.
 
-### 4.7.5 Troubleshooting and Tips
+### 4.8.5 Troubleshooting and Tips
 
 Even the best plans can fail; failure is certainly an option in the software development business. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
 
@@ -451,7 +449,7 @@ These are some common error messages that you might run into:
   - Log message says that “container is unhealthy”: this message may show that the pod is not passing a probe. Check that the probe definitions are correct.
   - Log message says that there are “insufficient resources”: this may happen when the cluster is running low on memory or CPU.
 
-## 4.8 Summary
+## 4.9 Summary
 
 You have learned how to put together the puzzle of CI/CD, Docker, and Kubernetes into a practical application. In this chapter, you have put in practice all that you’ve learned in this book:
 
