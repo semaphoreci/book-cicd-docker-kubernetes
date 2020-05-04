@@ -334,21 +334,3 @@ You have learned how to put together the puzzle of CI/CD, Docker, and Kubernetes
   - How to scale deployments and how to recover when things don’t go as planned.
 
 Each of the pieces had its role: Docker brings portability, Kubernetes adds orchestration, and Semaphore CI/CD drives the test and deployment process.
-
-## Footnotes
-
-1.  The full pipeline reference can be fount at <https://docs.semaphoreci.com/article/50-pipeline-yaml>
-
-2.  To see all the available machines, go to <https://docs.semaphoreci.com/article/20-machine-types>
-
-3.  For more details on the Ubuntu image see: <https://docs.semaphoreci.com/article/32-ubuntu-1804-image>
-
-4.  You can find the full toolbox reference here: <https://docs.semaphoreci.com/article/54-toolbox-reference>
-
-5.  sem-service can start a lot of popular database engines, for the full list check: <https://docs.semaphoreci.com/article/132-sem-service-managing-databases-and-services-on-linux>
-
-6.  The full environment reference can be found at <https://docs.semaphoreci.com/article/12-environment-variables>
-
-7.  For more details on secrets consult: <https://docs.semaphoreci.com/article/66-environment-variables-and-secrets>
-
-8.  For more information on pipelines check <https://docs.semaphoreci.com/article/67-deploying-with-promotions>

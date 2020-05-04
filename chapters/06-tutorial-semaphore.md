@@ -88,9 +88,11 @@ Pipelines are represented in Workflow Builder as big gray boxes. Pipelines organ
 
 **Agent**
 
-The agent is the combination of hardware and software that powers the pipeline. The *machine type* determines the amount of CPUs and memory allocated to the virtual machine. The operating system is controlled by the *Environment Type* and *OS Image* settings.
+The agent is the combination of hardware and software that powers the pipeline. The *machine type* determines the amount of CPUs and memory allocated to the virtual machine[^vm-types]. The operating system is controlled by the *Environment Type* and *OS Image* settings.
 
 The default machine is called `e1-standard-2` and has 2 CPUs, 4 GB RAM, and runs a custom Ubuntu 18.04 image.
+
+[^vm-types]: To see all the available machines, go to <https://docs.semaphoreci.com/ci-cd-environment/machine-types>
 
 **Jobs and Blocks**
 
@@ -108,7 +110,9 @@ At this point, you should be seeing the Workflow Builder with the Docker Build s
 
 ![Build block](./figures/05-sem-build-block.png){ width=95% }
 
-Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision. The next command, `docker build`, builds the image using our `Dockerfile`.
+Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision[^sem-toolbox]. The next command, `docker build`, builds the image using our `Dockerfile`.
+
+[^sem-toolbox]: You can find the complete Semaphore toolbox at <https://docs.semaphoreci.com/reference/toolbox-reference>
 
 **Note**: Long commands have been broken down into two or more lines with backslash (\\) to fit on the page. Semaphore expects one command per line, so when typing them, remove the backslashes and newlines.
 
@@ -135,7 +139,9 @@ Each command has its purpose:
 4. Builds a newer version of the image using the latest code.
 5. Pushes the new image to the registry.
 
-The perceptive reader will note that we introduced special environment variables; these come predefined in every job. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
+The perceptive reader will note that we introduced special environment variables; these come predefined in every job[^environment]. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
+
+[^environment]: The full environment reference can be found at <https://docs.semaphoreci.com/ci-cd-environment/environment-variables>
 
 ![Build block](./figures/05-sem-build-block-2.png){ width=95% }
 
@@ -182,7 +188,9 @@ docker run --net=host -it \
    npm run migrate
 ```
 
-This job tests two things: that the container connects to the database (`ping`) and that it can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command.
+This job tests two things: that the container connects to the database (`ping`) and that it can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command[^sem-service].
+
+[^sem-service]: For the complete list of services sem-service can manage check: <https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/>
 
 Finally, add a third job called “Integration test” and type these commands:
 
