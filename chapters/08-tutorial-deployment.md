@@ -1,10 +1,16 @@
 ## 4.7 The Canary Pipeline
 
-Now that we have our cloud services, we’re ready to prepare the canary deployment pipeline. Our project includes three ready-to-use reference pipelines for deployment. They should work with the secrets as described earlier. For further details, check the `.semaphore` folder in the project. In this section, we’ll focus on the DO deployment but the process is the same for all clouds.
+Now that we have our cloud services, we’re ready to prepare the canary deployment pipeline.
 
-Open the Workflow Builder again to create the new pipeline.
+Our project on GitHub includes three ready-to-use reference pipelines for deployment. They should work out-of-the-box in combination with the secrets as described earlier. For further details, check the `.semaphore` folder in the project.
 
-Create a new promotion using the *+Add First Promotion* button. Promotions connect pipelines together to create complex workflows. Let’s call it “Canary”.
+In this section, you'll learn how to create deployment pipelines on Semaphore from scratch. We'll use DigitalOcean and Docker Hub registry as an example, but the process is essentially the same for other clouds.
+
+### 4.7.1 Creating a Promotion and Deployment Pipeline
+
+On Semaphore, open the Workflow Builder to create a new pipeline.
+
+Create a new promotion using the *+Add First Promotion* button. Promotions connect pipelines together to create complex workflows. Let’s call the new pipeline “Canary”.
 
 ![Create promotion](./figures/05-sem-canary-create-promotion.png){ width=95% }
 
@@ -16,10 +22,11 @@ result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
 
-Click on the first block, we’ll call it “Push”. The push block takes the docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
+In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
 
-- Open the *Secrets* section and check the `dockerhub` secret.
-- Type the following commands in the job:
+Open the *Secrets* section and check the `dockerhub` secret.
+
+Type the following commands in the job:
 
 ```bash
 docker login -u $SEMAPHORE_REGISTRY_USERNAME -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
@@ -32,7 +39,11 @@ docker push $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_
 
 ![Push block](./figures/05-sem-canary-push-block.png){ width=95% }
 
-Create the “Deploy” block and enable the `dockerhub` secret. This block also needs two extra secrets: `db-params` and the cloud-specific access token, which is `do-key` in our case.
+Create a new block called “Deploy” and enable secrets:
+
+- `dockerhub` to communicate with Docker Hub;
+- `db-params` to use the cloud database;
+- `do-key` which is the cloud-specific access token.
 
 Open the *Environment Variables* section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
 
@@ -66,7 +77,7 @@ This is the canary job sequence:
 
 ![Deploy block](./figures/05-sem-canary-deploy-block.png){ width=95% }
 
-Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block. This is the last block in the pipeline and it runs some tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
+Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
 
 Type the following commands in the job:
 
@@ -79,11 +90,11 @@ kubectl exec -it $(kubectl get pod -l deployment=addressbook-canary -o name | he
 
 ## 4.8 Your First Release
 
-So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve setup the a one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
+So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve setup the one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
 
 ### 4.8.1 The Stable Deployment Pipeline
 
-The stable pipeline completes the deployment cycle. This pipeline does not introduce anything new; again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
+The stable pipeline completes the deployment cycle. This pipeline doesn't introduce anything new; again, we use `apply.sh` script to start a rolling update and `kubectl delete` to clean the canary deployment.
 
 Create a new pipeline (using the *Add promotion* button) branching out from the canary and name it “Deploy Stable (DigitalOcean)”.
 
@@ -123,7 +134,7 @@ addressbook-canary   1/1     1            1           8m40s
 
 ### 4.8.3 Releasing the Stable
 
-In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canaried version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
+In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
 
 Let’s say we decide to go ahead. So go on and hit the *Promote* button next to the stable pipeline.
 
@@ -230,13 +241,13 @@ Run the workflow once more and make a canary release, but this time try rollback
 
 And we’re back to normal, phew\! Now its time to check the job logs to see what went wrong and fix it before merging to master again.
 
-**But what if the problem is found after the stable release?** Let’s imagine that a defect sneaked its way into the stable deployment. It can happen, maybe there was some subtle bug that no one found out hours or days in. Or perhaps some error not picked up by the functional test. Is it too late? Can we go back to a previous version?
+**But what if we discover a problem after we deploy a stable release?** Let’s imagine that a defect sneaked its way into production. It can happen, maybe there was some subtle bug that no one found out hours or days in. Or perhaps some error not picked up by the functional test. Is it too late? Can we go back to the previous version?
 
-The answer is yes, we can go to the previous version, but manual intervention is required. Do you remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline for the last good version in Semaphore. If the Docker image is no longer in the registry, we can just regenerate it using the *Rerun* button in the top right corner.
+The answer is yes, we can go to the previous version, but a manual intervention is required. Remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline from the last good version in Semaphore. If the Docker image is no longer in the registry, we can just regenerate it using the *Rerun* button in the top right corner.
 
 ### 4.8.5 Troubleshooting and Tips
 
-Even the best plans can fail; failure is certainly an option in the software development business. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
+Even the best plans can fail; failure is certainly an option in the software development. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
 
 Kubectl can give us a lot of insights into what is happening. First, get an overall picture of the resources on the cluster.
 
@@ -303,7 +314,7 @@ You have learned how to put together the puzzle of CI/CD, Docker, and Kubernetes
 
   - How to setup pipelines in Semaphore CI/CD and use them to deploy to the cloud.
   - How to build Docker images and start a dev environment with the help of Docker Compose.
-  - How to do canaried deployments and rolling updates in Kubernetes.
+  - How to do canary deployments and rolling updates in Kubernetes.
   - How to scale deployments and how to recover when things don’t go as planned.
 
 Each of the pieces had its role: Docker brings portability, Kubernetes adds orchestration, and Semaphore CI/CD drives the test and deployment process.
