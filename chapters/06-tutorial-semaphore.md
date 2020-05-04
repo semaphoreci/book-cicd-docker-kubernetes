@@ -7,16 +7,16 @@ In this section, we’ll learn about Semaphore and how to use it to build cloud-
 
 ### 4.4.1 Introduction to Semaphore
 
-For a long time, engineers looking for a CI/CD tool had to choose between power and ease of use.
+For a long time, developers looking for a CI/CD tool had to choose between power and ease of use.
 
-On one hand, there was predominantly Jenkins which can do just about anything, but is difficult to use and requires companies to allocate dedicated ops teams to configure, maintain and scale it — along with the infrastructure on which it runs.
+On one hand, there was Jenkins which can do just about anything, but is difficult to use and requires dedicated ops teams to configure, maintain and scale.
 
 On the other hand, there were several hosted services that let developers just push their code and not worry about the rest of the process. However, these services are usually limited to running simple build and test steps, and would often fall short in need of more elaborate continuous delivery workflows, which is often the case with containers.
 
 Semaphore (_[https://semaphoreci.com](https://semaphoreci.com)_) started as one of the simple hosted CI services, but eventually evolved to support custom continuous delivery pipelines with containers, while retaining a way of being easy to use by any developer, not just dedicated ops teams. As such, it removes all technical barriers to adopting continuous delivery at scale:
 
-- It's a cloud-based service: there's no software for you to install and maintain.
-- It provides a visual interface to model CI/CD workflows quickly.
+- It's a cloud-based service that scales on demand. There's no software for you to install and maintain.
+- It provides a visual interface to model custom CI/CD workflows quickly.
 - It's the fastest CI/CD service, due to being based on dedicated hardware instead of common cloud computing services.
 - It's free for open source and small private projects.
 
@@ -40,7 +40,7 @@ To get started with Semaphore:
 
 We assume that you have previously forked the demo project from _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_ to your GitHub account.
 
-Follow the prompts to create a project. The first time you do this, you will see a screen which asks you to choose between connecting Semaphore to either your public, or both public and private repositories on GitHub:
+On Semaphore, follow the prompts to create a project. The first time you do this, you will see a screen which asks you to choose between connecting Semaphore to either your public, or both public and private repositories on GitHub:
 
 ![Authorizing Semaphore to access your GitHub repositories](./figures/05-github-repo-auth.png){ width=95% }
 
@@ -62,9 +62,11 @@ Click on *Go to Workflow Builder*. Semaphore will ask you if you want to use the
 
 ![Start from scratch or use existing pipeline](./figures/05-sem-existing-pipeline.png){ width=95% }
 
+Click on the option to configure the project from scratch.
+
 ### 4.4.3 The Semaphore Workflow Builder
 
-When choosing to start from scratch, Semaphore shows some starter workflows with popular frameworks and languages. Choose the Build Docker workflow and click on *Run this workflow*.
+To make the process of creating projects easier, Semaphore provides starter workflows for popular frameworks and languages. Choose the "Build Docker" workflow and click on *Run this workflow*.
 
 ![Choosing a starter workflow](./figures/05-sem-starter-workflow.png){ width=95% }
 
@@ -72,17 +74,17 @@ Semaphore will immediately start the workflow. Wait a few seconds and your first
 
 ![Starter run](./figures/05-sem-starter-run.png){ width=95% }
 
-Of course, since we haven’t told Semaphore where to store the image yet, it’s lost as soon as the job ends. We’ll correct that next.
+Since we haven’t told Semaphore where to store the image yet, it’s lost as soon as the job ends. We’ll correct that next.
 
 See the *Edit Workflow* button on the top right corner? Click it to open the Workflow Builder.
 
-![Workflow builder overview](./figures/05-sem-wb-overview.png){ width=95% }
+Now it’s a good moment to learn the basic concepts of Semaphore by exploring the Workflow Builder.
 
-Now it’s a good moment to learn how the Workflow Builder works.
+![Workflow Builder overview](./figures/05-sem-wb-overview.png){ width=95% }
 
 **Pipelines**
 
-Pipelines are represented on the builder as big gray boxes. Pipelines organize the workflow in blocks that are executed from left to right. Each pipeline usually has a specific objective such as test, build, or deploy. Pipelines can be chained together to make complex workflows.
+Pipelines are represented in Workflow Builder as big gray boxes. Pipelines organize the workflow in blocks that are executed from left to right. Each pipeline usually has a specific objective such as test, build, or deploy. Pipelines can be chained together to make complex workflows.
 
 **Agent**
 
