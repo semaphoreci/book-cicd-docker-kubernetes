@@ -10,17 +10,17 @@ Our goal is to get an application running on Kubernetes using CI/CD best practic
 
 Our process will include the following steps:
 
-- **Build**: package the application into a Docker image.
+- **Build**: Package the application into a Docker image.
 
-- **Run end-to-end tests**: run end-to-end tests inside the image.
+- **Run end-to-end tests**: Run end-to-end tests inside the image.
 
-- **Canary deploy**: deploy the image as a canary to a fraction of the users.
+- **Canary deploy**: Deploy the image as a canary to a fraction of the users.
 
-- **Run functional tests**: verify the canary in production to decide if we should go ahead.
+- **Run functional tests**: Verify the canary in production to decide if we should go ahead.
 
-- **Deploy**: if the canary passes the test, deploy the image to all users.
+- **Deploy**: If the canary passes the test, deploy the image to all users.
 
-- **Rollback**: if it fails, undo all changes, so we can fix a problem and try again later.
+- **Rollback**: If it fails, undo all changes, so we can fix a problem and try again later.
 
 ## 4.1 Docker and Kubernetes Commands
 
@@ -131,7 +131,7 @@ EXPOSE 3000
 CMD ["node", "src/app.js"]
 ```
 
-Based on this configuration, Docker runs the following steps:
+Based on this configuration, Docker performs the following steps:
 
 - Pull the Node.js image.
 - Copy the application files.
@@ -163,7 +163,7 @@ In chapter 3, we learned that Kubernetes is a declarative system: instead of tel
 
 The `manifests` directory contains all the Kubernetes manifest files.
 
-- `service.yml`: the LoadBalancer service. Forwards traffic from port 80 (HTTP) to port 3000.
+`service.yml` describes the LoadBalancer service. Forwards traffic from port 80 (HTTP) to port 3000.
 
 ``` yaml
 apiVersion: v1
@@ -179,7 +179,7 @@ spec:
       targetPort: 3000
 ```
 
-- `deployment.yml`: the deployment, the directory also has some AWS-specific manifests.
+`deployment.yml` describes deployment. The directory also contains some AWS-specific manifests.
 
 ``` yaml
 apiVersion: apps/v1
@@ -228,7 +228,7 @@ spec:
               value: "$DB_SSL"
 ```
 
-The deployment manifest combines many of the Kubernetes concepts we’ve discussed in chapter 3:
+The deployment manifest combines several Kubernetes concepts we’ve discussed in chapter 3:
 
 1.  A deployment called “addressbook” with rolling updates.
 2.  Labels for the pods manage traffic and identify release channels.
