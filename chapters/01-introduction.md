@@ -7,6 +7,19 @@ Published on the Semaphore website
 
 May 2020: First edition (v1.0)
 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+
+Share this book:
+
+> _I just started reading "CI/CD with Docker and Kubernetes", a free ebook by @semaphoreci: BITLY ([Tweet this!](https://twitter.com))_
+
 \newpage
 
 ## Preface
