@@ -7,6 +7,19 @@ Published on the Semaphore website
 
 May 2020: First edition (v1.0)
 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+\ 
+
+Share this book:
+
+> _I just started reading "CI/CD with Docker and Kubernetes", a free ebook by @semaphoreci: BITLY ([Tweet this!](https://twitter.com))_
+
 \newpage
 
 ## Preface
@@ -27,7 +40,7 @@ This is where this book comes into play, dear reader. Our goal is to help you tr
 
 \newpage
 
-### Who Is This Book For, and What Does It Cover?
+## Who Is This Book For, and What Does It Cover?
 
 The main goal of this book is to provide a practical roadmap for software development teams who want to:
 
@@ -53,13 +66,19 @@ Chapter 3, "Best Practices for Cloud Native Applications", describes how both ou
 
 Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing a CI/CD pipeline with Semaphore that builds, tests, and deploys a Dockerized microservice to Kubernetes.
 
-## Give Us Feedback
+## How to Contact Us
 
 We would very much love to hear your feedback after reading this book. What did you like and learn? What could be improved? Is there something we could explain further?
 
 A benefit of publishing an ebook is that we can continuously improve it. And that's exactly what we intend to do based on your feedback.
 
-You can send us feedback by sending an email to learn@semaphoreci.com.
+You can send us feedback by sending an email to <learn@semaphoreci.com>.
+
+Find us on Twitter: <https://twitter.com/semaphoreci>
+
+Find us on Facebook: <https://facebook.com/SemaphoreCI>
+
+Find us on LinkedIn: <https://www.linkedin.com/company/rendered-text>
 
 ## About the Authors
 
