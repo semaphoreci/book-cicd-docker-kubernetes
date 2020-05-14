@@ -66,7 +66,7 @@ Metrics and monitoring are also an essential enabler of iterative development. B
 
 ### 3.1.2 You Build It, You Run It
 
-In the seminal 2006 interview to ACM[^vogels-acm], Werner Vogels, Amazon CTO, pioneered the mindset of *you build it, you run it*. The idea is that developers should be in direct contact with the operation of their software, which, in turn, puts them in close contact with customers. 
+In the seminal 2006 interview to ACM[^vogels-acm], Werner Vogels, Amazon CTO, pioneered the mindset of *you build it, you run it*. The idea is that developers should be in direct contact with the operation of their software, which, in turn, puts them in close contact with customers.
 
 The critical insight is that involving developers in the customer feedback loop is essential for improving the quality of the service. Which ultimately leads to better business results.
 
@@ -289,4 +289,4 @@ Other environments are still not the same as production, since reproducing the s
 Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can use with Kubernetes. Strategies like blue-green and canary deployment reduce the risk of bad deploys. Now that we know what a proper CI/CD pipeline should look like, it’s time to start implementing it.
 
 [^jez]: What is Proper Continuous Integration, Semaphore
-  [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html)
+  [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)

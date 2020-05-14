@@ -27,4 +27,4 @@ We would absolutely love to hear your feedback. What did you get out of reading 
 
 ## 5.3 About Semaphore
 
-Semaphore <https://semaphoreci.com> helps developers continuously build, test and deploy code at the push of a button. It provides the fastest, enterprise-grade CI/CD pipelines as a serverless service. Trusted by thousands of organizations around the globe, Semaphore can help your team move faster too.
+Semaphore [https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore) helps developers continuously build, test and deploy code at the push of a button. It provides the fastest, enterprise-grade CI/CD pipelines as a serverless service. Trusted by thousands of organizations around the globe, Semaphore can help your team move faster too.

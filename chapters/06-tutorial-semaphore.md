@@ -13,7 +13,7 @@ On one hand, there was Jenkins which can do just about anything, but is difficul
 
 On the other hand, there were several hosted services that let developers just push their code and not worry about the rest of the process. However, these services are usually limited to running simple build and test steps, and would often fall short in need of more elaborate continuous delivery workflows, which is often the case with containers.
 
-Semaphore (_[https://semaphoreci.com](https://semaphoreci.com)_) started as one of the simple hosted CI services, but eventually evolved to support custom continuous delivery pipelines with containers, while retaining a way of being easy to use by any developer, not just dedicated ops teams. As such, it removes all technical barriers to adopting continuous delivery at scale:
+Semaphore (_[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_) started as one of the simple hosted CI services, but eventually evolved to support custom continuous delivery pipelines with containers, while retaining a way of being easy to use by any developer, not just dedicated ops teams. As such, it removes all technical barriers to adopting continuous delivery at scale:
 
 - It's a cloud-based service that scales on demand. There's no software for you to install and maintain.
 - It provides a visual interface to model custom CI/CD workflows quickly.
@@ -24,13 +24,13 @@ The key benefit of using Semaphore is increased team productivity. Since there i
 
 We'll learn about Semaphore's features as we go hands-on in this chapter.
 
-[^roi]: Whitepaper: The 41:1 ROI of Moving CI/CD to Semaphore (_[https://semaphoreci.com/resources/roi](https://semaphoreci.com/resources/roi)_)
+[^roi]: Whitepaper: The 41:1 ROI of Moving CI/CD to Semaphore (_[https://semaphoreci.com/resources/roi](https://semaphoreci.com/resources/roi?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_)
 
 ### 4.4.1 Creating a Semaphore Account
 
 To get started with Semaphore:
 
-- Go to _[https://semaphoreci.com](https://semaphoreci.com)_ and click to sign up with your GitHub account.
+- Go to _[https://semaphoreci.com](https://semaphoreci.com?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_ and click to sign up with your GitHub account.
 - GitHub will ask you to let Semaphore access your profile information. Allow this so that Semaphore can create an account for you.
 - Semaphore will walk you through the process of creating an organization. Since software development is a team sport, all Semaphore projects belong to an organization. Your organization will have its own domain, for example, `awesomecode.semaphoreci.com`.
 - Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. Since we're going to work with an open-source repository, you can choose the open-source option.
@@ -92,7 +92,7 @@ The agent is the combination of hardware and software that powers the pipeline. 
 
 The default machine is called `e1-standard-2` and has 2 CPUs, 4 GB RAM, and runs a custom Ubuntu 18.04 image.
 
-[^vm-types]: To see all the available machines, go to <https://docs.semaphoreci.com/ci-cd-environment/machine-types>
+[^vm-types]: To see all the available machines, go to [https://docs.semaphoreci.com/ci-cd-environment/machine-types](https://docs.semaphoreci.com/ci-cd-environment/machine-types/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 **Jobs and Blocks**
 
@@ -112,7 +112,7 @@ At this point, you should be seeing the Workflow Builder with the Docker Build s
 
 Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision[^sem-toolbox]. The next command, `docker build`, builds the image using our `Dockerfile`.
 
-[^sem-toolbox]: You can find the complete Semaphore toolbox at <https://docs.semaphoreci.com/reference/toolbox-reference>
+[^sem-toolbox]: You can find the complete Semaphore toolbox at [https://docs.semaphoreci.com/reference/toolbox-reference](https://docs.semaphoreci.com/reference/toolbox-reference/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 **Note**: Long commands have been broken down into two or more lines with backslash (\\) to fit on the page. Semaphore expects one command per line, so when typing them, remove the backslashes and newlines.
 
@@ -141,7 +141,7 @@ Each command has its purpose:
 
 The perceptive reader will note that we introduced special environment variables; these come predefined in every job[^environment]. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
 
-[^environment]: The full environment reference can be found at <https://docs.semaphoreci.com/ci-cd-environment/environment-variables>
+[^environment]: The full environment reference can be found at [https://docs.semaphoreci.com/ci-cd-environment/environment-variables](https://docs.semaphoreci.com/ci-cd-environment/environment-variables/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 ![Build block](./figures/05-sem-build-block-2.png){ width=95% }
 
@@ -190,7 +190,7 @@ docker run --net=host -it \
 
 This job tests two things: that the container connects to the database (`ping`) and that it can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command[^sem-service].
 
-[^sem-service]: For the complete list of services sem-service can manage check: <https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/>
+[^sem-service]: For the complete list of services sem-service can manage check: [https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/](https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 Finally, add a third job called “Integration test” and type these commands:
 
@@ -234,4 +234,3 @@ We’ve covered a lot of things in a few pages; here, we have the chance to paus
 Wait until the pipeline is complete then go to the top level of the project. Click on the *Docker Registry* button and open the repository to verify that the Docker image is there.
 
 ![Docker registry](./figures/05-sem-registry.png){ width=95% }
-

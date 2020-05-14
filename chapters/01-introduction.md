@@ -3,7 +3,7 @@
 © 2020 Rendered Text. All rights reserved.
 
 Published on the Semaphore website
-(_[https://semaphoreci.com](https://semaphoreci.com)_).
+(_[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_).
 
 May 2020: First edition (v1.0)
 
@@ -82,7 +82,7 @@ Find us on LinkedIn: <https://www.linkedin.com/company/rendered-text>
 
 ## About the Authors
 
-**Marko Anastasov** is a software engineer, author and entrepreneur. Marko co-founded Rendered Text, a software company behind the Semaphore CI/CD service. He worked on building and scaling Semaphore from an idea to a cloud-based platform used by some of the world's best engineering teams. He writes about architectures, practices and tools that support continuous delivery on [https://semaphoreci.com/blog](https://semaphoreci.com/blog). Follow Marko on Twitter at [\@markoa](https://twitter.com/markoa).
+**Marko Anastasov** is a software engineer, author and entrepreneur. Marko co-founded Rendered Text, a software company behind the Semaphore CI/CD service. He worked on building and scaling Semaphore from an idea to a cloud-based platform used by some of the world's best engineering teams. He writes about architectures, practices and tools that support continuous delivery on [semaphoreci.com/blog](https://semaphoreci.com/blog/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore). Follow Marko on Twitter at [\@markoa](https://twitter.com/markoa).
 
 **Jérôme Petazzoni** was part of the team that built, scaled, and operated the dotCloud PAAS, before that company became Docker. He worked seven years at the container startup, where he wore countless hats and ran containers in production before it was cool. He loves to share what he knows, which led him to give hundreds of talks and demos on containers, Docker, and Kubernetes. He has trained thousands of people to deploy their apps in confidence on these platforms, and continues to do so as an independent consultant. He values diversity, and strives to be a good ally, or at least a decent social justice sidekick. He also collects musical instruments and can arguably play the theme of Zelda on a dozen of them. Follow Jérôme on Twitter at [\@jpetazzo](https://twitter.com/jpetazzo).
 
