@@ -12,6 +12,5 @@ blocks:
           commands:
             - checkout
             - make pdf
-            - sudo apt-get install -y poppler-utils
-            - pdfunite cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - ./deps/cpdf cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o CICD_with_Docker_Kubernetes_Semaphore.pdf
             - artifact push workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
