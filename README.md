@@ -1,8 +1,16 @@
 # CI/CD with Docker and Kubernetes Book
 
-![Semaphore build](https://semaphore-oss.semaphoreci.com/badges/book-cicd-docker-kubernetes.svg)
+<a href="https://semaphoreci.com/resources/cicd-docker-kubernetes?utm_source=github&utm_medium=readme&utm_campaign=cicd-docker-kubernetes-semaphore&utm_content=cover">"<img src="cover/cover.jpg" width="300"></a>
 
-## PDF creation
+---
+
+**[Download ebook/PDF from Semaphore website](https://semaphoreci.com/resources/cicd-docker-kubernetes?utm_source=github&utm_medium=readme&utm_campaign=cicd-docker-kubernetes-semaphore&utm_content=link)**
+
+---
+
+## Production
+
+![Semaphore build](https://semaphore-oss.semaphoreci.com/badges/book-cicd-docker-kubernetes.svg)
 
 Content is written in Markdown, final PDF made with [Pandoc][pandoc].
 
@@ -22,7 +30,7 @@ Hemingway.
 
 Copyright © 2020 Rendered Text.
 
-<p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text">This work is licensed under CC BY-NC-ND 4.0<a href="https://creativecommons.org/licenses/by-nc-nd/4.0"><img style="height:11px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc_icon.svg" /><img  style="height:11px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-by_icon.svg" /><img  style="height:11px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nc_icon.svg" /><img  style="height:11px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nd_icon.svg" /></a></p>
+This work is licensed under CC BY-NC-ND 4.0 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0"><img height="11" style="margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc_icon.svg" /><img height="11" style="margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-by_icon.svg" /><img height="11" style="margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nc_icon.svg" /><img height="11" style="important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nd_icon.svg" /></a>
 
 [pandoc]: https://pandoc.org
 [pandoc-docker]: https://github.com/pandoc/dockerfiles
