@@ -8,6 +8,12 @@
 
 ---
 
+## Authors
+
+- [Marko Anastasov](https://github.com/markoa)
+- [Jerome Petazzoni](https://github.com/jpetazzo)
+- [Tomas Fernandez](https://github.com/TomFern)
+
 ## Production
 
 ![Semaphore build](https://semaphore-oss.semaphoreci.com/badges/book-cicd-docker-kubernetes.svg)
@@ -25,6 +31,11 @@ latest version of source text. See [project on Semaphore][semaphore-project].
 Markdown source intentionally doesn't include new lines at 80 characters. This
 is so that text is easy to paste and edit in editors like iA Writer and
 Hemingway.
+
+## Contributing
+
+Feel free to contribute to the quality of this book by opening issues or
+submitting PRs for improvements to explanations, code snippets, etc.
 
 ## Copyright & License
 
