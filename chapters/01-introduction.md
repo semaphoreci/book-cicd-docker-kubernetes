@@ -19,7 +19,7 @@ $MONTHYEAR: First edition v1.0 (revision $REVISION)
 
 Share this book:
 
-> _I just started reading "CI/CD with Docker and Kubernetes", a free ebook by @semaphoreci: BITLY ([Tweet this!](https://twitter.com))_
+> _I've just started reading "CI/CD with Docker and Kubernetes", a free ebook by @semaphoreci: https://bit.ly/3bJELLQ ([Tweet this!](https://ctt.ac/c5Ub9))_
 
 \newpage
 

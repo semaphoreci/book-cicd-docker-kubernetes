@@ -10,10 +10,11 @@ Please share this book with your colleagues, friends and anyone who you think mi
 
 Share the book on Twitter:
 
-> _Learn CI/CD with Docker and Kubernetes with this free ebook by @semaphoreci: BITLY ([Click to Tweet!](https://twitter.com))_
+> _Learn CI/CD with Docker and Kubernetes with this free ebook by @semaphoreci: https://bit.ly/3bJELLQ ([Click to Tweet!](https://ctt.ac/fL5xi))_
 
-You can also share it [on Facebook](https://google.com), share it [on
-LinkedIn](https://google.com) and star the repository
+You can also share it
+[on Facebook](https://www.facebook.com/sharer/sharer.php?u=https://bit.ly/3bJELLQ), share it [on
+LinkedIn](https://www.linkedin.com/shareArticle?mini=true&url=https://bit.ly/3bJELLQ) and star the repository
 [on GitHub](https://github.com/semaphoreci/book-cicd-docker-kubernetes).
 
 ## 5.2 Tell Us What You Think
