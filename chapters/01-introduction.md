@@ -5,10 +5,13 @@
 This work is licensed under Creative Commmons
 Attribution-NonCommercial-NoDerivatives 4.0 International.
 To view a copy of this license, visit
-<https://creativecommons.org/licenses/by-nc-nd/4.0>.
+<https://creativecommons.org/licenses/by-nc-nd/4.0>
 
-Published on the Semaphore website
-[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore).
+This book is open source:
+<https://github.com/semaphoreci/book-cicd-docker-kubernetes>
+
+Published on the Semaphore website:
+[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 May 2020: First edition (v1.0)
 

@@ -12,17 +12,20 @@ Share the book on Twitter:
 
 > _Learn CI/CD with Docker and Kubernetes with this free ebook by @semaphoreci: BITLY ([Click to Tweet!](https://twitter.com))_
 
-You can also share it [on Facebook](https://google.com) and [on
-LinkedIn](https://google.com).
+You can also share it [on Facebook](https://google.com), share it [on
+LinkedIn](https://google.com) and star the repository
+[on GitHub](https://github.com/semaphoreci/book-cicd-docker-kubernetes).
 
 ## 5.2 Tell Us What You Think
 
 We would absolutely love to hear your feedback. What did you get out of reading this book? How easy/hard was it to follow? Is there something that you'd like to see in a new edition?
 
-- Send comments and feedback by posting on [this GitHub
-  issue](https://github.com).
-- Ask questions, report problems and corrections by [opening a new
-  issue](https://github.com).
+This book is open source and available at
+<https://github.com/semaphoreci/book-cicd-docker-kubernetes>.
+
+- Send comments and feedback, ask questions, and report problems by
+[opening a new issue](https://github.com/semaphoreci/book-cicd-docker-kubernetes/issues).
+- Contribute to the quality of this book by submitting pull requests for improvements to explanations, code snippets, etc.
 - Write to us privately at <learn@semaphoreci.com>.
 
 ## 5.3 About Semaphore

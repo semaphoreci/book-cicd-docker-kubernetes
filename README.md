@@ -1,6 +1,6 @@
 # CI/CD with Docker and Kubernetes Book
 
-<a href="https://semaphoreci.com/resources/cicd-docker-kubernetes?utm_source=github&utm_medium=readme&utm_campaign=cicd-docker-kubernetes-semaphore&utm_content=cover">"<img src="cover/cover.jpg" width="300"></a>
+<a href="https://semaphoreci.com/resources/cicd-docker-kubernetes?utm_source=github&utm_medium=readme&utm_campaign=cicd-docker-kubernetes-semaphore&utm_content=cover"><img src="cover/cover.jpg" width="300"></a>
 
 ---
 
