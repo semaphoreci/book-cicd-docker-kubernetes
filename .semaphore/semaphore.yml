@@ -11,6 +11,8 @@ blocks:
         - name: 'Make PDF'
           commands:
             - checkout
+            - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction.md
+            - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
             - make pdf
             - ./deps/cpdf cover/cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o CICD_with_Docker_Kubernetes_Semaphore.pdf
             - artifact push workflow CICD_with_Docker_Kubernetes_Semaphore.pdf

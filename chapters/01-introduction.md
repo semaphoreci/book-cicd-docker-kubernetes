@@ -13,7 +13,7 @@ This book is open source:
 Published on the Semaphore website:
 [https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
-May 2020: First edition (v1.0)
+$MONTHYEAR: First edition v1.0 (revision $REVISION)
 
 \newpage
 
