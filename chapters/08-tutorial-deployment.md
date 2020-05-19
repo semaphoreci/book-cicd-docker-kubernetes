@@ -52,7 +52,9 @@ Create a new block called “Deploy” and enable secrets:
 
 Open the *Environment Variables* section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
 
-To connect with the DigitalOcean cluster, we can use the official `doctl` tool, which comes preinstalled in Semaphore. First, type these commands in the *prologue*:
+To connect with the DigitalOcean cluster, we can use the official `doctl` tool, which comes preinstalled in Semaphore.
+
+First, type these commands in the *prologue*:
 
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
