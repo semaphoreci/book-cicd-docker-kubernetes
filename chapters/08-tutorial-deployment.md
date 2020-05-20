@@ -52,21 +52,17 @@ Create a new block called “Deploy” and enable secrets:
 
 Open the *Environment Variables* section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
 
-Find the latest release of the doctl utility at _[https://github.com/digitalocean/doctl/releases](https://github.com/digitalocean/doctl/releases)_ and copy the path of the Linux amd64 tar.gz file. Next, use this path in the *prologue*:
+To connect with the DigitalOcean cluster, we can use the official `doctl` tool, which comes preinstalled in Semaphore.
+
+First, type these commands in the *prologue*:
 
 ```bash
-wget https://github.com/digitalocean/doctl/releases/download/<VERSION>/<FILENAME>
-tar xf doctl-*-linux-amd64.tar.gz
-sudo cp doctl /usr/local/bin
-
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
 checkout
 ```
 
-The first three lines install DigitalOcean’s `doctl` manager and the last two lines set up a connection with the cluster.
-
-Type the following commands in the job:
+Then, add the following commands to the *job*:
 
 ```bash
 kubectl apply -f manifests/service.yml
