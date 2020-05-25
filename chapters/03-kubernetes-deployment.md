@@ -2,16 +2,21 @@
 
 # 2 Deploying to Kubernetes
 
-When getting started with Kubernetes, one of the first commands
-that you learn and use is generally `kubectl run`. Folks who have
-experience with Docker tend to compare it to `docker run` and
-think: "Ah, this is how I can simply run a container!"
+When getting started with Kubernetes, one of the first commands that you learn and use is generally `kubectl run`. Folks who have experience with Docker tend to compare it to `docker run` and think: "Ah, this is how I can simply run a container!"
 
-As it turns out, when you use Kubernetes, you don't simply
-run a container.
+As it turns out, when you use Kubernetes, you don't simply run a container.
 
-Look at what happens after running a very basic `kubectl run`
-command:
+The way in which Kubernetes handles containers depends heavily on which version you are running [^book-versions]. You can check the server version with:
+
+```
+$ kubectl version
+```
+
+[^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.16 and 1.17. This book is based on and has been tested with those versions.
+
+**Kubernetes Containers on Versions 1.16 and 1.17**
+
+When using a version *lower* than 1.18, look at what happens after running a very basic `kubectl run` command:
 
 ```
 $ kubectl run web --image=nginx
@@ -35,23 +40,39 @@ NAME                             DESIRED   CURRENT   READY     AGE
 replicaset.apps/web-65899c769f   1         1         1         11s
 ```
 
+_"I just wanted a container! Why do I get three different objects?"_
+
 Instead of getting a container, you got a whole zoo of unknown beasts:
 
 - a *deployment* (called `web` in this example),
 - a *replicaset* (`web-65899c769f`),
 - a *pod* (`web-65899c769f-dhtdx`).
 
-Note: you can ignore the *service* named `kubernetes` in the example
-above; that one already existed before the `kubectl run` command.
+Note: you can ignore the *service* named `kubernetes` in the example above; that one already existed before the `kubectl run` command.
 
-_"I just wanted a container! Why do I get three different objects?"_
+**Kubernetes Containers in Versions 1.8 and Higher**
 
-Next, you'll learn the roles of these different objects and how they 
-are essential to zero-downtime deployments in Kubernetes.
+When you are running version 1.18 or higher, Kubernetes does indeed create a single pod. Look how different Kubernetes acts on newer versions:
 
-Continuous integration gives you confidence that your code works.
-To extend that confidence to the release process, your deployment operations
-need to come with a safety belt too.
+```
+$ kubectl run web --image=nginx
+pod/web created
+```
+
+As you can see, more recent Kubernetes versions behave pretty much in line with what seasoned Docker users would expect. Notice that no deployments or replicasets are created:
+
+```
+$ kubectl get all
+NAME      READY   STATUS    RESTARTS   AGE
+pod/web   1/1     Running   0          3m14s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   4m16s
+```
+
+Next, you'll learn the roles of these different objects and how they are essential to zero-downtime deployments in Kubernetes.
+
+Continuous integration gives you confidence that your code works. To extend that confidence to the release process, your deployment operations need to come with a safety belt too.
 
 ## 2.1 Containers and Pods
 
@@ -176,7 +197,7 @@ you still have the desired number.
 
 If a node goes down, taking one of the `web` pods with it, Kubernetes creates
 another pod to replace it. If it turns out that the
-node wasn't down, but merely unreachable or unresponsive for a while, you may have one extra pod 
+node wasn't down, but merely unreachable or unresponsive for a while, you may have one extra pod
 when it comes back. Kubernetes will then terminate a pod
 to make sure that you still have the exact requested number.
 
@@ -315,7 +336,7 @@ As an example, you might run version 1 of an application over 10
 replicas. Then you'd start rolling out version 2. At some point, you
 might have seven pods running version 1, and three pods running version 2.
 You might then decide to release version 3 without waiting for
-version 2 to be fully deployed (because it fixes an issue that wasn't noticed earlier). 
+version 2 to be fully deployed (because it fixes an issue that wasn't noticed earlier).
 And while version 3 is being deployed,
 you might decide, after all, to go back to version 1. Kubernetes
 will merely adjust the sizes of the replica sets (corresponding
