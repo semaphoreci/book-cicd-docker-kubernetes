@@ -14,7 +14,7 @@ $ kubectl version
 
 [^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.16 and 1.17. This book is based on and has been tested with those versions.
 
-**Kubernetes Containers on Versions 1.16 and 1.17**
+**Kubernetes containers on versions 1.17 and lower**
 
 When using a version *lower* than 1.18, look at what happens after running a very basic `kubectl run` command:
 
@@ -50,9 +50,9 @@ Instead of getting a container, you got a whole zoo of unknown beasts:
 
 Note: you can ignore the *service* named `kubernetes` in the example above; that one already existed before the `kubectl run` command.
 
-**Kubernetes Containers in Versions 1.8 and Higher**
+**Kubernetes containers in versions 1.18 and higher**
 
-When you are running version 1.18 or higher, Kubernetes does indeed create a single pod. Look how different Kubernetes acts on newer versions:
+When you are running version 1.18 or *higher*, Kubernetes does indeed create a single pod. Look how different Kubernetes acts on newer versions:
 
 ```
 $ kubectl run web --image=nginx
@@ -69,6 +69,15 @@ pod/web   1/1     Running   0          3m14s
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   4m16s
 ```
+
+So, if we want to create a deployment we must be more explicit. This command works as expected on all Kubernetes versions:
+
+```
+$ kubectl create deployment web --image=nginx
+deployment.apps/web created
+```
+
+The bottom line is that we should always use the most explicit command available in order to future proof our deployments.
 
 Next, you'll learn the roles of these different objects and how they are essential to zero-downtime deployments in Kubernetes.
 
@@ -406,7 +415,7 @@ in different terminals to watch what is going to happen:
 Then, create, scale, and update a deployment with the following commands:
 
 ```
-kubectl run deployment web --image=nginx
+kubectl create deployment web --image=nginx
 kubectl scale deployment web --replicas=10
 kubectl set image deployment web nginx=that-image-does-not-exist
 ```
