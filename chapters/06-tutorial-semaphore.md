@@ -33,7 +33,7 @@ To get started with Semaphore:
 - Go to _[https://semaphoreci.com](https://semaphoreci.com?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_ and click to sign up with your GitHub account.
 - GitHub will ask you to let Semaphore access your profile information. Allow this so that Semaphore can create an account for you.
 - Semaphore will walk you through the process of creating an organization. Since software development is a team sport, all Semaphore projects belong to an organization. Your organization will have its own domain, for example, `awesomecode.semaphoreci.com`.
-- Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. Since we're going to work with an open-source repository, you can choose the open-source option.
+- Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. This chapter will demonstrate a workflow using Semaphore's Docker Registry, which is available within a free trial or a paid account. However you can easily replace it with a free public registry like Docker Hub and implement the same workflow with an open source account.
 - Finally, you'll be greeted with a quick product tour.
 
 ### 4.4.2 Creating a Semaphore Project For The Demo Repository
@@ -134,13 +134,14 @@ docker push \
 Each command has its purpose:
 
 1. Clones the repository with `checkout`.
-2. Logs in the Semaphore private Docker registry.
+2. Logs in the Semaphore private Docker registry[^docker-registry].
 3. Pulls the Docker image tagged as `latest`.
 4. Builds a newer version of the image using the latest code.
 5. Pushes the new image to the registry.
 
 The perceptive reader will note that we introduced special environment variables; these come predefined in every job[^environment]. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
 
+[^docker-registry]: Semaphore's built-in Docker registry is available under a paid plan or free trial. If you're using a free or open source plan, use an external service like Docker Hub instead. The pipeline will be slower but the workflow will be the same.
 [^environment]: The full environment reference can be found at [https://docs.semaphoreci.com/ci-cd-environment/environment-variables](https://docs.semaphoreci.com/ci-cd-environment/environment-variables/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 ![Build block](./figures/05-sem-build-block-2.png){ width=95% }
