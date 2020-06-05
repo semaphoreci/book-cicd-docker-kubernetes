@@ -9,6 +9,8 @@ blocks:
             - checkout
             - echo "gcloud connect -f ~/tokens.json"
             - echo "kubectl apply -f stg/stg.yaml"
+      secrets:
+        - name: k8s-stg
 agent:
   machine:
     type: e1-standard-2
