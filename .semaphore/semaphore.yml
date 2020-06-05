@@ -8,7 +8,7 @@ blocks:
   - name: make
     task:
       jobs:
-        - name: 'Make PDF'
+        - name: Make PDF
           commands:
             - checkout
             - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction.md
@@ -16,3 +16,9 @@ blocks:
             - make pdf
             - ./deps/cpdf cover/cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o CICD_with_Docker_Kubernetes_Semaphore.pdf
             - artifact push workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
+        - name: Lint
+          commands:
+            - ls
+        - name: Security
+          commands:
+            - ls
