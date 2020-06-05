@@ -1,5 +1,5 @@
 version: v1.0
-name: CI pipeline
+name: Pack a relase
 agent:
   machine:
     type: e1-standard-2
@@ -22,3 +22,34 @@ blocks:
         - name: Security
           commands:
             - ls
+    dependencies: []
+  - name: Unit
+    dependencies:
+      - make
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - ls
+        - name: 'Job #2'
+          commands: []
+  - name: Inter
+    dependencies:
+      - make
+    task:
+      jobs:
+        - name: Integ
+          commands:
+            - lsls
+          parallelism: 6
+  - name: Pack a relase
+    dependencies:
+      - Inter
+      - Unit
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands: []
+promotions:
+  - name: Deploy to Stg
+    pipeline_file: pipeline_2.yml
