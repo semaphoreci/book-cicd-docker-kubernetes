@@ -40,7 +40,7 @@ blocks:
       jobs:
         - name: Integ
           commands:
-            - lsls
+            - ls
           parallelism: 6
   - name: Pack a relase
     dependencies:
@@ -53,3 +53,5 @@ blocks:
 promotions:
   - name: Deploy to Stg
     pipeline_file: pipeline_2.yml
+    auto_promote:
+      when: result = 'passed'
