@@ -1,6 +1,7 @@
 BUILD = build
 BOOKNAME = CICD_with_Docker_Kubernetes_Semaphore
 TITLE = title.txt
+COVER_IMAGE = cover/cover.jpg
 CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 	chapters/03-kubernetes-deployment.md chapters/04-cicd-best-practices.md \
 	chapters/05-tutorial-intro.md chapters/06-tutorial-semaphore.md \
@@ -9,7 +10,7 @@ CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 
 all: book
 
-book: pdf html #epub
+book: pdf html epub
 
 clean:
 	rm -r $(BUILD)
@@ -17,6 +18,8 @@ clean:
 pdf: $(BUILD)/pdf/$(BOOKNAME).pdf
 
 html: $(BUILD)/html/$(BOOKNAME).html
+
+epub: $(BUILD)/epub/$(BOOKNAME).epub
 
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
@@ -26,4 +29,9 @@ $(BUILD)/html/$(BOOKNAME).html: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/html
 	docker run --rm --volume `pwd`:/data $(TOC) pandoc/latex:2.6 --standalone --to=html5 -o /data/$@ $^
 
-.PHONY: all book clean pdf html #epub
+
+$(BUILD)/epub/$(BOOKNAME).epub: $(TITLE) $(CHAPTERS)
+	mkdir -p $(BUILD)/epub
+	docker run --rm --volume `pwd`:/data $(TOC) pandoc/latex:2.6 -s --epub-cover-image=$(COVER_IMAGE) -o $@ $^
+
+.PHONY: all book clean pdf html epub
