@@ -9,12 +9,13 @@ CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 
 all: book
 
-book: pdf html #epub
+book: epub pdf html
 
 clean:
 	rm -r $(BUILD)
 
 pdf: $(BUILD)/pdf/$(BOOKNAME).pdf
+epub: $(BUILD)/epub/$(BOOKNAME).epub
 
 html: $(BUILD)/html/$(BOOKNAME).html
 
@@ -26,4 +27,8 @@ $(BUILD)/html/$(BOOKNAME).html: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/html
 	docker run --rm --volume `pwd`:/data $(TOC) pandoc/latex:2.6 --standalone --to=html5 -o /data/$@ $^
 
-.PHONY: all book clean pdf html #epub
+$(BUILD)/epub/$(BOOKNAME).epub: $(TITLE) $(CHAPTERS)
+	mkdir -p $(BUILD)/epub
+	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in --epub-cover-image cover/cover.jpg --css epub.css -o /data/$@ $^
+
+.PHONY: all book clean pdf html epub
