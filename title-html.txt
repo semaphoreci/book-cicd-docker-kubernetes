@@ -1,0 +1,14 @@
+---
+title: BOOK TEST HTML CALIBRE
+subtitle: CALIBRE CMICHEL CSS MANUAL
+author: Semaphore
+language: en-US
+toc: true
+fontsize: 12pt
+colorlinks: true
+urlcolor: blue
+include-before:
+- '`\newpage{}`{=latex}'
+...
+
+
