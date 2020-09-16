@@ -30,10 +30,11 @@ $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
 	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
-# intermediate format for epub
+# intermediate format for epub, override small figures
 $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EPUB)
-	mkdir -p $(BUILD)/html
-	ln -sf ../../figures/ build/html
+	mkdir -p $(BUILD)/html $(BUILD)/html/figures
+	cp figures/* $(BUILD)/html/figures
+	cp figures-small/* $(BUILD)/html/figures
 	docker run --rm --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
 	
 # issues:
