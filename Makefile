@@ -16,6 +16,7 @@ CHAPTERS_EPUB = chapters/01-introduction.md chapters/02-using-docker.md \
 all: book 
 
 book: pdf epub azw3 mobi
+ebook: epub azw3 mobi
 
 clean:
 	rm -fr $(BUILD)
