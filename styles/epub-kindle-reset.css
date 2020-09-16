@@ -372,24 +372,13 @@ body {
 
 pre,
 code {
-  /* font-size: small; */
-    /* font-family: "Source Code Pro"; */
-    font-size: 60%;
+  font-size: 90%;
+  line-height: 50%;
 }
 
-pre 
-{  
-    background: #cccccc;
-    /* border: thin solid #ccccff; */
-    clear: both;
-    color: black;
-    /* font-family: monospace; */
-    line-height: 100%;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-    word-wrap: normal;
-    overflow: hidden
+pre {
+  border-left: 1px #000 solid;
+  padding-left: 10px;
 }
 
 blockquote {

@@ -7,9 +7,9 @@ CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 	chapters/07-tutorial-clouds.md chapters/08-tutorial-deployment.md \
 	chapters/09-final-words.md
 
-all: book html mobi
+all: book 
 
-book: epub pdf html mobi
+book: pdf epub azw3 mobi
 
 clean:
 	rm -fr $(BUILD)
@@ -17,43 +17,53 @@ clean:
 pdf: $(BUILD)/pdf/$(BOOKNAME).pdf
 epub: $(BUILD)/epub/$(BOOKNAME).epub
 mobi: $(BUILD)/mobi/$(BOOKNAME).mobi
+azw3: $(BUILD)/azw3/$(BOOKNAME).azw3
 html: $(BUILD)/html/$(BOOKNAME).html
 
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
 	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
+# intermediate format for epub
 $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS)
 	mkdir -p $(BUILD)/html
 	ln -sf ../../figures/ build/html
 	docker run --rm --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
 	
-# mv -f build/html/* tests/html-css.html
-
 # issues:
 # embed fonts
 # footnotes show a 'V15' char on kindle device
 # style: line-height, pre left-margin
-#
+ 
+# --embed-all-fonts \
+# --subset-embedded-fonts \
+# --authors "Marko Anastasov&Jérôme Petazzoni&Tomas Fernandez"
 # kindle-optimized epub
 $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 	mkdir -p $(BUILD)/epub
-	ebook-convert $^ $@ \
-		--authors "Marko Anastasov&Jérôme Petazzoni&Tomas Fernandez" \
-		--book-producer Semaphore \
-		--publisher Semaphore \
-		--title "TEST CALIBRE 2" \
-		--language en-US \
-		--comments "How to Deliver Cloud Native Applications at High Velocity" \
-		--epub-version 3 \
-		--extra-css styles/epub-kindle.css \
-		--cover cover/cover.jpg \
+	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ \
 		--output-profile kindle \
-		--chapter "//*[name()='h1' or name()='h2']"
+		--epub-version 3 \
+		--extra-css styles/epub-kindle2.css \
+		--chapter "//*[name()='h1' or name()='h2']" \
+		--language en-US \
+		--publisher Semaphore \
+		--book-producer Semaphore \
+		--cover cover/cover.jpg \
+		--title "$(shell egrep '^title:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
+		--comments "$(shell egrep '^subtitle:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
+		--authors "$(shell egrep '^author:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')"
 
-# mobipocket format, also compatible with kindle
+
+# amazon kindle format
+$(BUILD)/azw3/$(BOOKNAME).azw3: $(BUILD)/epub/$(BOOKNAME).epub
+	mkdir -p $(BUILD)/azw3
+	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ 
+
+
+# mobipocket format, compatible with kindle
 $(BUILD)/mobi/$(BOOKNAME).mobi: $(BUILD)/epub/$(BOOKNAME).epub
 	mkdir -p $(BUILD)/mobi
-	ebook-convert $^ $@
+	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ 
 
-.PHONY: all book clean pdf html epub
+.PHONY: all book clean pdf html epub azw3 mobi
