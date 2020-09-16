@@ -7,6 +7,12 @@ CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 	chapters/07-tutorial-clouds.md chapters/08-tutorial-deployment.md \
 	chapters/09-final-words.md
 
+CHAPTERS_EPUB = chapters/01-introduction.md chapters/02-using-docker.md \
+	chapters/03-kubernetes-deployment.md chapters/04-cicd-best-practices.md \
+	chapters/05-tutorial-intro.md chapters/06-tutorial-semaphore.md \
+	chapters/07-tutorial-clouds.md chapters/08-tutorial-deployment.md \
+	chapters/09-final-words-epub.md
+
 all: book 
 
 book: pdf epub azw3 mobi
@@ -25,7 +31,7 @@ $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
 # intermediate format for epub
-$(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS)
+$(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EPUB)
 	mkdir -p $(BUILD)/html
 	ln -sf ../../figures/ build/html
 	docker run --rm --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
@@ -46,10 +52,10 @@ $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 		--epub-version 3 \
 		--extra-css styles/epub-kindle2.css \
 		--chapter "//*[name()='h1' or name()='h2']" \
-		--language en-US \
-		--publisher Semaphore \
-		--book-producer Semaphore \
+		--publisher "Semaphore" \
+		--book-producer "Semaphore" \
 		--cover cover/cover.jpg \
+		--language "$(shell egrep '^language:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--title "$(shell egrep '^title:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--comments "$(shell egrep '^subtitle:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--authors "$(shell egrep '^author:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')"
