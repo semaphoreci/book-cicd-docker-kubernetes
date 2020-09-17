@@ -52,7 +52,7 @@ $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ \
 		--output-profile kindle \
 		--epub-version 3 \
-		--extra-css styles/epub-kindle2.css \
+		--extra-css /data/styles/epub-kindle.css \
 		--chapter "//*[name()='h1' or name()='h2']" \
 		--publisher "Semaphore" \
 		--book-producer "Semaphore" \

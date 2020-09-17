@@ -372,21 +372,22 @@ body {
 
 pre,
 code {
-  /* font-size: small; */
+    /* font-size: small; */
     /* font-family: "Source Code Pro"; */
     font-size: 60%;
 }
 
 pre 
 {  
-    background: #cccccc;
+    background: #dddddd;
     /* border: thin solid #ccccff; */
     clear: both;
     color: black;
     /* font-family: monospace; */
     line-height: 100%;
     margin: 0;
-    padding: 0;
+    /* padding: 0 0 0 3px; */
+    padding-left: 5px;
     text-align: left;
     word-wrap: normal;
     overflow: hidden
