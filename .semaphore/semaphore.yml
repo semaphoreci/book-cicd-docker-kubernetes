@@ -29,6 +29,6 @@ blocks:
         - name: epubcheck
           commands:
             - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.epub
-            - curl -L https://github.com/w3c/epubcheck/releases/download/v4.2.4/epubcheck-4.2.4.zip -o epubcheck.zip
+            - 'curl -L https://github.com/w3c/epubcheck/releases/download/v4.2.4/epubcheck-4.2.4.zip -o epubcheck.zip'
             - unzip epubcheck.zip
-            - java -jar epubcheck/epubcheck.jar CICD_with_Docker_Kubernetes_Semaphore.epub
+            - java -jar epubcheck-4.2.4/epubcheck.jar CICD_with_Docker_Kubernetes_Semaphore.epub
