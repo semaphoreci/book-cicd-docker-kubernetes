@@ -23,3 +23,12 @@ blocks:
             - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
             - make ebook
             - 'for ext in epub mobi azw3; do artifact push workflow build/$ext/CICD_with_Docker_Kubernetes_Semaphore.${ext}; done'
+  - name: test ebook
+    task:
+      jobs:
+        - name: epubcheck
+          commands:
+            - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.epub
+            - curl -L https://github.com/w3c/epubcheck/releases/download/v4.2.4/epubcheck-4.2.4.zip -o epubcheck.zip
+            - unzip epubcheck.zip
+            - java -jar epubcheck/epubcheck.jar CICD_with_Docker_Kubernetes_Semaphore.epub
