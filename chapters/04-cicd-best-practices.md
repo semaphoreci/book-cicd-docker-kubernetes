@@ -208,7 +208,7 @@ There are additional tactics that you can use with your CI system to get fast fe
 
 **Conditional stage execution** lets you defer running certain parts of your build for the right moment. For example, you can configure your CI to run a subset of end-to-end tests only if a related component has changed.
 
-![Conditional pipeline execution](figures/04-pipeline-deps.png){ width=95% }
+![](figures/04-pipeline-deps.png){ width=95% }
 
 In the pipeline above, backend and frontend tests run if code changed in the corresponding directories. End-to-end tests run if any of the two has passed and none has failed.
 
