@@ -120,15 +120,21 @@ Replace the contents of the job with the following commands:
 
 ```bash
 checkout
-docker login -u $SEMAPHORE_REGISTRY_USERNAME \
-   -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+
+docker login \
+  -u $SEMAPHORE_REGISTRY_USERNAME \
+  -p $SEMAPHORE_REGISTRY_PASSWORD \
+  $SEMAPHORE_REGISTRY_URL
+
 docker pull \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest || true
+  $SEMAPHORE_REGISTRY_URL/demo:latest || true
+
 docker build \
-   --cache-from $SEMAPHORE_REGISTRY_URL/seamphore-demo-cicd-kubernetes:latest \
-   -t $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID .
+  --cache-from $SEMAPHORE_REGISTRY_URL/demo:latest \
+  -t $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID .
+
 docker push \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
 ```
 
 Each command has its purpose:
@@ -163,30 +169,34 @@ The general sequence is the same for all tests:
 Blocks can have a *prologue* in which we can place shared initialization commands. Open the prologue section on the right side of the block and type the following commands, which will be executed before each job:
 
 ``` bash
-docker login -u $SEMAPHORE_REGISTRY_USERNAME \
-   -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker login \
+  -u $SEMAPHORE_REGISTRY_USERNAME \
+  -p $SEMAPHORE_REGISTRY_PASSWORD \
+  $SEMAPHORE_REGISTRY_URL
+
 docker pull \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
 ```
 
 Next, rename the first job as “Unit test” and type the following command, which runs JSHint, a static code analysis tool:
 
 ``` bash
 docker run -it \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   npm run lint
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  npm run lint
 ```
 
 Next, click on the *+Add another job* link below the job to create a new one called “Functional test”. Type these commands:
 
 ``` bash
 sem-service start postgres
+
 docker run --net=host -it \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   npm run ping
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  npm run ping
 docker run --net=host -it \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   npm run migrate
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  npm run migrate
 ```
 
 This job tests two things: that the container connects to the database (`ping`) and that it can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command[^sem-service].
@@ -197,9 +207,10 @@ Finally, add a third job called “Integration test” and type these commands:
 
 ``` bash
 sem-service start postgres
+
 docker run --net=host -it \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   npm run test
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  npm run test
 ```
 
 This last test runs the code in `src/database.test.js`, which checks if the application can write and delete rows in the database.
@@ -209,15 +220,19 @@ This last test runs the code in `src/database.test.js`, which checks if the appl
 Create the third block in the pipeline and call it “Push”. This last job will tag the current Docker image as `latest`. Type these commands in the job:
 
 ``` bash
-docker login -u $SEMAPHORE_REGISTRY_USERNAME \
-   -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+docker login \
+  -u $SEMAPHORE_REGISTRY_USERNAME \
+  -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
+
 docker pull \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
+
 docker tag \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  $SEMAPHORE_REGISTRY_URL/demo:latest
+
 docker push \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:latest
+  $SEMAPHORE_REGISTRY_URL/demo:latest
 ```
 
 ![Push block](./figures/05-sem-push-block.png){ width=95% }

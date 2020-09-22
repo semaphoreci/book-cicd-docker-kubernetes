@@ -104,7 +104,7 @@ You will see the following directories and files:
 Use `docker-compose` to start a development environment:
 
 ``` bash
-$ docker-compose up --build
+docker-compose up --build
 ```
 
 Docker Compose builds and runs the container image as required. It also downloads and starts a PostgreSQL database for you.
@@ -117,7 +117,8 @@ FROM node:12.16.1-alpine3.10
 ENV APP_USER node
 ENV APP_HOME /app
 
-RUN mkdir -p $APP_HOME && chown -R $APP_USER:$APP_USER $APP_HOME
+RUN mkdir -p $APP_HOME
+RUN chown -R $APP_USER $APP_HOME
 
 USER $APP_USER
 WORKDIR $APP_HOME
@@ -141,19 +142,33 @@ Based on this configuration, Docker performs the following steps:
 To verify that the microservice is running correctly, run the following command to create a new record:
 
 ``` bash
-$ curl -w "\n" -X PUT -d "firstName=al&lastName=pacino" localhost:3000/person
-{"id":1,"firstName":"al","lastName":"pacino", \
-  "updatedAt":"2020-03-27T10:59:09.987Z", \
-  "createdAt":"2020-03-27T10:59:09.987Z"}
+curl -w "\n" -X PUT \
+  -d "firstName=al&lastName=pacino" \
+  localhost:3000/person
+
+{
+  "id":1,
+  "firstName":"al",
+  "lastName":"pacino",
+  "updatedAt":"2020-03-27T10:59:09.987Z",
+  "createdAt":"2020-03-27T10:59:09.987Z"
+}
 ```
 
 To list all records:
 
 ``` bash
 $ curl -w "\n" localhost:3000/all
-[{"id":1,"firstName":"al","lastName":"pacino", \
-  "createdAt":"2020-03-27T10:59:09.987Z", \
-  "updatedAt":"2020-03-27T10:59:09.987Z"}]
+
+[
+ {
+  "id":1,
+  "firstName":"al",
+  "lastName":"pacino",
+  "createdAt":"2020-03-27T10:59:09.987Z",
+  "updatedAt":"2020-03-27T10:59:09.987Z"
+ }
+]
 ```
 
 
