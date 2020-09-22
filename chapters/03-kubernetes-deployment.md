@@ -495,7 +495,7 @@ receiving traffic only once it's actually ready for it.
 Sometimes, you might want even more control when you roll out a new version.
 
 Two popular techniques are
-**blue/green deployment*** and **canary deployment**.
+**blue/green deployment** and **canary deployment**.
 
 ### 2.10.1 Blue / Green Deployment
 
