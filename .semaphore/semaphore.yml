@@ -21,8 +21,9 @@ blocks:
             - checkout
             - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction-ebook.md
             - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction-ebook.md
-            - make epub
+            - make ebook
             - artifact push workflow build/epub/CICD_with_Docker_Kubernetes_Semaphore.epub
+            - artifact push workflow build/mobi/CICD_with_Docker_Kubernetes_Semaphore.mobi
   - name: test ebook
     task:
       jobs:

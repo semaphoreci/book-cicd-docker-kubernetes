@@ -15,36 +15,30 @@ CHAPTERS_EBOOK = chapters/01-introduction-ebook.md chapters/02-using-docker.md \
 
 all: book 
 
-book: pdf epub azw3 mobi
-ebook: epub azw3 mobi
-
-clean:
-	rm -fr $(BUILD)
-
+book: pdf ebook
+ebook: epub mobi
 pdf: $(BUILD)/pdf/$(BOOKNAME).pdf
 epub: $(BUILD)/epub/$(BOOKNAME).epub
 mobi: $(BUILD)/mobi/$(BOOKNAME).mobi
 azw3: $(BUILD)/azw3/$(BOOKNAME).azw3
 html: $(BUILD)/html/$(BOOKNAME).html
 
+clean:
+	rm -r $(BUILD)
+
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
 	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
-# intermediate format for epub, override small figures
+# intermediate format for epub, uses small figures
 $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EBOOK)
 	mkdir -p $(BUILD)/html $(BUILD)/html/figures
 	cp figures/* $(BUILD)/html/figures
 	cp figures-small/* $(BUILD)/html/figures
 	docker run --rm --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
-	
-# issues:
-# embed fonts
-# footnotes show a 'V15' char on kindle device
-# style: line-height, pre left-margin
  
 # kindle-optimized epub
-# output-profile=tablet converts best to kindle
+# note: output-profile=tablet converts best to kindle
 $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 	mkdir -p $(BUILD)/epub
 	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ \
@@ -60,20 +54,14 @@ $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 		--comments "$(shell egrep '^subtitle:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--authors "$(shell egrep '^author:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')"
 
-# --embed-all-fonts \
-# --subset-embedded-fonts \
-# --authors "Marko Anastasov&Jérôme Petazzoni&Tomas Fernandez"
-# --extra-css /data/styles/epub-kindle.css \
-
-# amazon kindle format
-$(BUILD)/azw3/$(BOOKNAME).azw3: $(BUILD)/epub/$(BOOKNAME).epub
-	mkdir -p $(BUILD)/azw3
-	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ 
-
-
-# mobipocket format, compatible with kindle
+# mobipocket format
 $(BUILD)/mobi/$(BOOKNAME).mobi: $(BUILD)/epub/$(BOOKNAME).epub
 	mkdir -p $(BUILD)/mobi
+	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ 
+
+# amazon kindle format (for testing)
+$(BUILD)/azw3/$(BOOKNAME).azw3: $(BUILD)/epub/$(BOOKNAME).epub
+	mkdir -p $(BUILD)/azw3
 	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ 
 
 .PHONY: all book clean pdf html epub azw3 mobi
