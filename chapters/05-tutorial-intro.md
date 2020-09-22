@@ -6,7 +6,7 @@ Going to a restaurant and looking at the menu with all those delicious dishes is
 
 Our goal is to get an application running on Kubernetes using CI/CD best practices.
 
-![High Level Flow](./figures/05-high-level-steps.png){ width=95% }
+![](./figures/05-high-level-steps.png){ width=95% }
 
 Our process will include the following steps:
 
