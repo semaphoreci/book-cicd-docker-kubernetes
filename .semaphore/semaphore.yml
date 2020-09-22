@@ -19,10 +19,10 @@ blocks:
         - name: Make ebook
           commands:
             - checkout
-            - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction.md
-            - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
-            - make ebook
-            - 'for ext in epub mobi azw3; do artifact push workflow build/$ext/CICD_with_Docker_Kubernetes_Semaphore.${ext}; done'
+            - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction-ebook.md
+            - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction-ebook.md
+            - make epub
+            - artifact push workflow build/epub/CICD_with_Docker_Kubernetes_Semaphore.epub
   - name: test ebook
     task:
       jobs:
