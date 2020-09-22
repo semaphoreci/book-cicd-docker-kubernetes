@@ -34,7 +34,7 @@ $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EBOOK)
 	mkdir -p $(BUILD)/html $(BUILD)/html/figures
 	cp figures/* $(BUILD)/html/figures
-	cp figures-small/* $(BUILD)/html/figures
+	cp figures-ebook/* $(BUILD)/html/figures
 	docker run --rm --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
  
 # kindle-optimized epub
