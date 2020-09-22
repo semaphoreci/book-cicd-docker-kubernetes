@@ -44,10 +44,11 @@ $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EBOOK)
 # style: line-height, pre left-margin
  
 # kindle-optimized epub
+# output-profile=tablet converts best to kindle
 $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 	mkdir -p $(BUILD)/epub
 	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ \
-		--output-profile kindle \
+		--output-profile tablet \
 		--chapter "//*[name()='h1' or name()='h2']" \
 		--publisher "Semaphore" \
 		--book-producer "Semaphore" \

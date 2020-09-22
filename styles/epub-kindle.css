@@ -307,6 +307,16 @@ span.ipadcenterfix {
 /*==IMAGES==*/
 img {
   max-width: 100%;
+  width: 99%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+figure {
+  text-align: center;
+  font-style: italic;
+  font-size: smaller;
 }
 
 /*==TABLES==*/
@@ -376,17 +386,16 @@ pre,
 code {
     /* font-size: small; */
     /* font-family: "Source Code Pro"; */
-    font-size: 60%;
+    font-family: monospace;
 }
 
 pre 
 {  
-    background: #dddddd;
-    /* border: thin solid #ccccff; */
+    /* background: #dddddd; */
     clear: both;
     color: black;
-    /* font-family: monospace; */
     line-height: 100%;
+    font-size: 92%;
     margin: 0;
     /* padding: 0 0 0 3px; */
     padding-left: 5px;
