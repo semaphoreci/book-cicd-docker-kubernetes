@@ -269,9 +269,9 @@ if kubectl get deployment addressbook-canary; then \
 fi
 ```
 
-![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
-
 The first four lines print out information about the cluster. The last two, undoes the changes by scaling up the stable deployment and removing the canary.
+
+![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
 
 Run the workflow once more and make a canary release, but this time try rollback pipeline by clicking on its promote button:
 
