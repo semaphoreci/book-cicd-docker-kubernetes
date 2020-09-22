@@ -172,6 +172,7 @@ h6 {
 
 /* Hyphen and pagination Fixer */
 /* Note: Do not try on the Kindle, it does not recognize the hyphens property */
+/*
 h1,
 h2,
 h3,
@@ -183,20 +184,22 @@ h6 {
   page-break-after: avoid;
   page-break-inside: avoid;
 }
+*/
 
 /*===Paragraph Elements===*/
 /* Margins are usually added on the top, left, and right, but not on the bottom to prevent certain eReaders not collapsing white space properly */
 
 /*first-line indent paragraph for fiction*/
+/*
 p {
-  /* text-indent: 1.25em; */
+  text-indent: 1.25em; 
   margin: 0;
   widows: 2;
   orphans: 2;
 }
+*/
 
-/* block type paragraph for non-fiction* /
-/*
+/* block type paragraph for non-fiction*/
 p
 {
 text-indent: 0;
@@ -204,7 +207,6 @@ margin: 1.0em 0 0 0;
 widows: 2;
 orphans: 2;
 }
-*/
 
 /* for centered text and wrappers on images */
 p.centered {
@@ -245,12 +247,12 @@ p.toctext2 {
 
 /*==LISTS==*/
 ul {
-  margin: 1em 0 0 2em;
+  margin: 0 0 0 2em;
   text-align: left;
 }
 
 ol {
-  margin: 1em 0 0 2em;
+  margin: 0 0 0 2em;
   text-align: left;
 }
 

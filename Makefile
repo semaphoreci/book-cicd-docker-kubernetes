@@ -43,25 +43,26 @@ $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EPUB)
 # footnotes show a 'V15' char on kindle device
 # style: line-height, pre left-margin
  
-# --embed-all-fonts \
-# --subset-embedded-fonts \
-# --authors "Marko Anastasov&Jérôme Petazzoni&Tomas Fernandez"
 # kindle-optimized epub
 $(BUILD)/epub/$(BOOKNAME).epub: $(BUILD)/html/$(BOOKNAME).html
 	mkdir -p $(BUILD)/epub
 	docker run --rm --volume `pwd`:/data --entrypoint ebook-convert -w /data linuxserver/calibre $^ /data/$@ \
 		--output-profile kindle \
-		--epub-version 3 \
-		--extra-css /data/styles/epub-kindle.css \
 		--chapter "//*[name()='h1' or name()='h2']" \
 		--publisher "Semaphore" \
 		--book-producer "Semaphore" \
 		--cover cover/cover.jpg \
+		--epub-version 3 \
+		--extra-css /data/styles/epub-kindle.css \
 		--language "$(shell egrep '^language:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--title "$(shell egrep '^title:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--comments "$(shell egrep '^subtitle:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')" \
 		--authors "$(shell egrep '^author:' title.txt | cut -d: -f2 | sed -e 's/^[[:space:]]*//')"
 
+# --embed-all-fonts \
+# --subset-embedded-fonts \
+# --authors "Marko Anastasov&Jérôme Petazzoni&Tomas Fernandez"
+# --extra-css /data/styles/epub-kindle.css \
 
 # amazon kindle format
 $(BUILD)/azw3/$(BOOKNAME).azw3: $(BUILD)/epub/$(BOOKNAME).epub
