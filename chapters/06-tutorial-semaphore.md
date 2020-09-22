@@ -194,6 +194,7 @@ sem-service start postgres
 docker run --net=host -it \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
   npm run ping
+
 docker run --net=host -it \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
   npm run migrate

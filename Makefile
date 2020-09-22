@@ -7,11 +7,11 @@ CHAPTERS = chapters/01-introduction.md chapters/02-using-docker.md \
 	chapters/07-tutorial-clouds.md chapters/08-tutorial-deployment.md \
 	chapters/09-final-words.md
 
-CHAPTERS_EPUB = chapters/01-introduction.md chapters/02-using-docker.md \
+CHAPTERS_EBOOK = chapters/01-introduction-ebook.md chapters/02-using-docker.md \
 	chapters/03-kubernetes-deployment.md chapters/04-cicd-best-practices.md \
 	chapters/05-tutorial-intro.md chapters/06-tutorial-semaphore.md \
 	chapters/07-tutorial-clouds.md chapters/08-tutorial-deployment.md \
-	chapters/09-final-words-epub.md
+	chapters/09-final-words-ebook.md
 
 all: book 
 
@@ -32,7 +32,7 @@ $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	docker run --rm --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
 # intermediate format for epub, override small figures
-$(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EPUB)
+$(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EBOOK)
 	mkdir -p $(BUILD)/html $(BUILD)/html/figures
 	cp figures/* $(BUILD)/html/figures
 	cp figures-small/* $(BUILD)/html/figures

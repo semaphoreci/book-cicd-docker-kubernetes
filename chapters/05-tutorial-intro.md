@@ -104,7 +104,7 @@ You will see the following directories and files:
 Use `docker-compose` to start a development environment:
 
 ``` bash
-docker-compose up --build
+$ docker-compose up --build
 ```
 
 Docker Compose builds and runs the container image as required. It also downloads and starts a PostgreSQL database for you.
@@ -142,7 +142,7 @@ Based on this configuration, Docker performs the following steps:
 To verify that the microservice is running correctly, run the following command to create a new record:
 
 ``` bash
-curl -w "\n" -X PUT \
+$ curl -w "\n" -X PUT \
   -d "firstName=al&lastName=pacino" \
   localhost:3000/person
 
@@ -181,6 +181,7 @@ The `manifests` directory contains all the Kubernetes manifest files.
 `service.yml` describes the LoadBalancer service. Forwards traffic from port 80 (HTTP) to port 3000.
 
 ``` yaml
+# service.yml
 apiVersion: v1
 kind: Service
 metadata:
@@ -197,6 +198,7 @@ spec:
 `deployment.yml` describes deployment. The directory also contains some AWS-specific manifests.
 
 ``` yaml
+# deployment.yml
 apiVersion: apps/v1
 kind: Deployment
 metadata:

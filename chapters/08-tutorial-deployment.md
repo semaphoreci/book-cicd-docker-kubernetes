@@ -93,13 +93,12 @@ Create a third block called “Functional test and migration” and enable the `
 Type the following commands in the job:
 
 ```bash
-kubectl exec -it \
-  $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-  -- npm run ping
+POD=$(kubectl get pod \
+      -l deployment=addressbook-canary \
+      -o name \ | head -n 1)
 
-kubectl exec -it \
-  $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-  -- npm run migrate
+kubectl exec -it "$POD" -- npm run ping
+kubectl exec -it "$POD" -- npm run migrate
 ```
 
 ![Test block](./figures/05-sem-canary-test-block.png){ width=95% }
@@ -125,7 +124,8 @@ In the job command box, type the following lines to make the rolling deployment 
    $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 if kubectl get deployment addressbook-canary; then \
-   kubectl delete deployment/addressbook-canary; fi
+   kubectl delete deployment/addressbook-canary; \
+fi
 ```
 
 ![Deploy block](./figures/05-sem-stable-deploy-block.png){ width=95% }
@@ -146,10 +146,10 @@ Wait until the CI pipeline is done an click on *Promote* to start the canary pip
 Once it completes, we can check how the canary is doing.
 
 ``` bash
-kubectl get deployment
+$ kubectl get deployment
 
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           8m40s
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         8m40s
 ```
 
 ### 4.8.3 Releasing the Stable
@@ -163,46 +163,46 @@ Let’s say we decide to go ahead. So go on and hit the *Promote* button next to
 While the block runs, you should see both the existing canary and a new “addressbook-stable” deployment:
 
 ``` bash
-kubectl get deployment
+$ kubectl get deployment
 
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           110s
-addressbook-stable   0/3     3            0           1s
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         110s
+addressbook-stable  0/3   3          0         1s
 ```
 
 One at a time, the numbers of replicas should increase until reaching the target of three:
 
 ``` bash
-kubectl get deployment
+$ kubectl get deployment
 
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           114s
-addressbook-stable   2/3     3            2           5s
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         114s
+addressbook-stable  2/3   3          2         5s
 ```
 
 With that completed, the canary is no longer needed, so it goes away:
 
 ``` bash
-kubectl get deployment
+$ kubectl get deployment
 
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-stable   3/3     3            3           12s
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-stable  3/3   3          3         12s
 ```
 
 Check the service status to see the external IP:
 
 ``` bash
-kubectl get service
+$ kubectl get service
 
-NAME             TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
-addressbook-lb   LoadBalancer   10.120.14.50   35.225.210.248   80:30479/TCP   2m47s
-kubernetes       ClusterIP      10.120.0.1     <none>           443/TCP        49m
+NAME            TYPE         EXTERNAL-IP    PORT(S)
+addressbook-lb  LoadBalancer 35.225.210.248 80:30479/TCP
+kubernetes      ClusterIP    <none>         443/TCP
 ```
 
 We can use curl to test the API endpoint directly. For example, to create a person in the addressbook:
 
 ``` bash
-curl -w "\n" -X PUT \
+$ curl -w "\n" -X PUT \
   -d "firstName=Sammy&lastName=David Jr" \
   34.68.150.168/person
 
@@ -218,7 +218,7 @@ curl -w "\n" -X PUT \
 To retrieve all persons, try:
 
 ``` bash
-curl -w "\n" 34.68.150.168/all
+$ curl -w "\n" 34.68.150.168/all
 
 [
     {
@@ -254,10 +254,11 @@ kubectl get all -o wide
 kubectl get events
 kubectl describe deployment addressbook-canary || true
 
-kubectl logs \
-  $(kubectl get pod \
-     -l deployment=addressbook-canary \
-     -o name | head -n 1) || true
+POD=$(kubectl get pod \
+      -l deployment=addressbook-canary \
+      -o name \ | head -n 1)
+
+kubectl logs "$POD" || true
 
 if kubectl get deployment addressbook-stable; then \
    kubectl scale --replicas=3 deployment/addressbook-stable; \
@@ -289,51 +290,51 @@ Even the best plans can fail; failure is certainly an option in the software dev
 Kubectl can give us a lot of insights into what is happening. First, get an overall picture of the resources on the cluster.
 
 ``` bash
-kubectl get all -o wide
+$ kubectl get all -o wide
 ```
 
 Describe can show detailed information of any or all your pods:
 
 ``` bash
-kubectl describe <pod-name>
+$ kubectl describe <pod-name>
 ```
 
 It also works with deployments:
 
 ``` bash
-kubectl describe deployment addressbook-stable
-kubectl describe deployment addressbook-canary
+$ kubectl describe deployment addressbook-stable
+$ kubectl describe deployment addressbook-canary
 ```
 
 And services:
 
 ``` bash
-kubectl describe service addressbook-lb
+$ kubectl describe service addressbook-lb
 ```
 
 We also see the events logged on the cluster with:
 
 ``` bash
-kubectl get events
+$ kubectl get events
 ```
 
 And the log output of the pods using:
 
 ``` bash
-kubectl logs <pod-name>
-kubectl logs --previous <pod-name>
+$ kubectl logs <pod-name>
+$ kubectl logs --previous <pod-name>
 ```
 
 If you need to jump in one of the containers, you can start a shell as long as the pod is running with:
 
 ``` bash
-kubectl exec -it <pod-name> -- bash
+$ kubectl exec -it <pod-name> -- bash
 ```
 
 To access a pod network from your machine, forward a port with `port-forward`, for instance:
 
 ``` bash
-kubectl port-forward <pod-name> 8080:80
+$ kubectl port-forward <pod-name> 8080:80
 ```
 
 These are some common error messages that you might run into:
