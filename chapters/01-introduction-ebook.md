@@ -10,9 +10,6 @@ To view a copy of this license, visit
 This book is open source:
 <https://github.com/semaphoreci/book-cicd-docker-kubernetes>
 
-Published on the Semaphore website:
-[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
-
 $MONTHYEAR: First edition v1.1 (revision $REVISION)
 
 \newpage
