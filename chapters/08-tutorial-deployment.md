@@ -29,17 +29,22 @@ Open the *Secrets* section and check the `dockerhub` secret.
 Type the following commands in the job:
 
 ```bash
-docker login -u $SEMAPHORE_REGISTRY_USERNAME \
-   -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
-docker pull \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+docker login \
+  -u $SEMAPHORE_REGISTRY_USERNAME \
+  -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
 
-echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+docker pull \
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
+
+echo "${DOCKER_PASSWORD}" | \
+  docker login -u "${DOCKER_USERNAME}" --password-stdin
+
 docker tag \
-   $SEMAPHORE_REGISTRY_URL/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID \
-   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
+  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+
 docker push \
-   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
 ```
 
 ![Push block](./figures/05-sem-canary-push-block.png){ width=95% }
@@ -66,10 +71,13 @@ Then, add the following commands to the *job*:
 
 ```bash
 kubectl apply -f manifests/service.yml
+
 ./apply.sh manifests/deployment.yml addressbook-canary 1 \
-   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+
 if kubectl get deployment addressbook-stable; then \
-   kubectl scale --replicas=2 deployment/addressbook-stable; fi
+  kubectl scale --replicas=2 deployment/addressbook-stable; \
+fi
 ```
 
 This is the canary job sequence:
@@ -85,12 +93,12 @@ Create a third block called “Functional test and migration” and enable the `
 Type the following commands in the job:
 
 ```bash
-kubectl exec -it \
-   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-   -- npm run ping
-kubectl exec -it \
-   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) \
-   -- npm run migrate
+POD=$(kubectl get pod \
+      -l deployment=addressbook-canary \
+      -o name \ | head -n 1)
+
+kubectl exec -it "$POD" -- npm run ping
+kubectl exec -it "$POD" -- npm run migrate
 ```
 
 ![Test block](./figures/05-sem-canary-test-block.png){ width=95% }
@@ -113,9 +121,11 @@ In the job command box, type the following lines to make the rolling deployment 
 
 ```bash
 ./apply.sh manifests/deployment.yml addressbook-stable 3 \
-   $DOCKER_USERNAME/semaphore-demo-cicd-kubernetes:$SEMAPHORE_WORKFLOW_ID
+   $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+
 if kubectl get deployment addressbook-canary; then \
-   kubectl delete deployment/addressbook-canary; fi
+   kubectl delete deployment/addressbook-canary; \
+fi
 ```
 
 ![Deploy block](./figures/05-sem-stable-deploy-block.png){ width=95% }
@@ -137,8 +147,9 @@ Once it completes, we can check how the canary is doing.
 
 ``` bash
 $ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           8m40s
+
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         8m40s
 ```
 
 ### 4.8.3 Releasing the Stable
@@ -153,41 +164,48 @@ While the block runs, you should see both the existing canary and a new “addre
 
 ``` bash
 $ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           110s
-addressbook-stable   0/3     3            0           1s
+
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         110s
+addressbook-stable  0/3   3          0         1s
 ```
 
 One at a time, the numbers of replicas should increase until reaching the target of three:
 
 ``` bash
 $ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-canary   1/1     1            1           114s
-addressbook-stable   2/3     3            2           5s
+
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-canary  1/1   1          1         114s
+addressbook-stable  2/3   3          2         5s
 ```
 
 With that completed, the canary is no longer needed, so it goes away:
 
 ``` bash
 $ kubectl get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-addressbook-stable   3/3     3            3           12s
+
+NAME                READY UP-TO-DATE AVAILABLE AGE
+addressbook-stable  3/3   3          3         12s
 ```
 
 Check the service status to see the external IP:
 
 ``` bash
 $ kubectl get service
-NAME             TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
-addressbook-lb   LoadBalancer   10.120.14.50   35.225.210.248   80:30479/TCP   2m47s
-kubernetes       ClusterIP      10.120.0.1     <none>           443/TCP        49m
+
+NAME            TYPE         EXTERNAL-IP    PORT(S)
+addressbook-lb  LoadBalancer 35.225.210.248 80:30479/TCP
+kubernetes      ClusterIP    <none>         443/TCP
 ```
 
 We can use curl to test the API endpoint directly. For example, to create a person in the addressbook:
 
 ``` bash
-$ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/person
+$ curl -w "\n" -X PUT \
+  -d "firstName=Sammy&lastName=David Jr" \
+  34.68.150.168/person
+
 {
     "id": 1,
     "firstName": "Sammy",
@@ -195,13 +213,13 @@ $ curl -w "\n" -X PUT -d "firstName=Sammy&lastName=David Jr" 34.68.150.168/perso
     "updatedAt": "2019-11-10T16:48:15.900Z",
     "createdAt": "2019-11-10T16:48:15.900Z"
 }
-
 ```
 
 To retrieve all persons, try:
 
 ``` bash
 $ curl -w "\n" 34.68.150.168/all
+
 [
     {
         "id": 1,
@@ -235,17 +253,25 @@ The rollback job collects information to help diagnose the problem. Create a new
 kubectl get all -o wide
 kubectl get events
 kubectl describe deployment addressbook-canary || true
-kubectl logs \
-   $(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1) || true
+
+POD=$(kubectl get pod \
+      -l deployment=addressbook-canary \
+      -o name \ | head -n 1)
+
+kubectl logs "$POD" || true
+
 if kubectl get deployment addressbook-stable; then \
-   kubectl scale --replicas=3 deployment/addressbook-stable; fi
+   kubectl scale --replicas=3 deployment/addressbook-stable; \
+fi
+
 if kubectl get deployment addressbook-canary; then \
-   kubectl delete deployment/addressbook-canary; fi
+   kubectl delete deployment/addressbook-canary; \
+fi
 ```
 
-![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
-
 The first four lines print out information about the cluster. The last two, undoes the changes by scaling up the stable deployment and removing the canary.
+
+![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
 
 Run the workflow once more and make a canary release, but this time try rollback pipeline by clicking on its promote button:
 

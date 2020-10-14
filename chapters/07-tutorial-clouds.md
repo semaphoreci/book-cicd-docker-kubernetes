@@ -71,6 +71,7 @@ Open a terminal and sign in to AWS:
 
 ``` bash
 $ aws configure
+
 AWS Access Key ID: TYPE YOUR ACCESS KEY ID
 AWS Secret Access Key: TYPE YOUR SECRET ACCESS KEY
 Default region name: TYPE A REGION
@@ -80,9 +81,9 @@ To create a three-node cluster of the most inexpensive machine type use:
 
 ``` bash
 $ eksctl create cluster \
-    -t t2.nano -N 3 \
-    --region YOUR_REGION \
-    --name semaphore-demo-cicd-kubernetes
+  -t t2.nano -N 3 \
+  --region YOUR_REGION \
+  --name semaphore-demo-cicd-kubernetes
 ```
 
 **Note**: Select the same region for all AWS services.

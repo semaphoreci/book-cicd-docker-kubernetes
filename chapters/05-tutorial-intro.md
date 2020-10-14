@@ -6,7 +6,7 @@ Going to a restaurant and looking at the menu with all those delicious dishes is
 
 Our goal is to get an application running on Kubernetes using CI/CD best practices.
 
-![High Level Flow](./figures/05-high-level-steps.png){ width=95% }
+![](./figures/05-high-level-steps.png){ width=95% }
 
 Our process will include the following steps:
 
@@ -117,7 +117,8 @@ FROM node:12.16.1-alpine3.10
 ENV APP_USER node
 ENV APP_HOME /app
 
-RUN mkdir -p $APP_HOME && chown -R $APP_USER:$APP_USER $APP_HOME
+RUN mkdir -p $APP_HOME
+RUN chown -R $APP_USER $APP_HOME
 
 USER $APP_USER
 WORKDIR $APP_HOME
@@ -141,19 +142,33 @@ Based on this configuration, Docker performs the following steps:
 To verify that the microservice is running correctly, run the following command to create a new record:
 
 ``` bash
-$ curl -w "\n" -X PUT -d "firstName=al&lastName=pacino" localhost:3000/person
-{"id":1,"firstName":"al","lastName":"pacino", \
-  "updatedAt":"2020-03-27T10:59:09.987Z", \
-  "createdAt":"2020-03-27T10:59:09.987Z"}
+$ curl -w "\n" -X PUT \
+  -d "firstName=al&lastName=pacino" \
+  localhost:3000/person
+
+{
+  "id":1,
+  "firstName":"al",
+  "lastName":"pacino",
+  "updatedAt":"2020-03-27T10:59:09.987Z",
+  "createdAt":"2020-03-27T10:59:09.987Z"
+}
 ```
 
 To list all records:
 
 ``` bash
 $ curl -w "\n" localhost:3000/all
-[{"id":1,"firstName":"al","lastName":"pacino", \
-  "createdAt":"2020-03-27T10:59:09.987Z", \
-  "updatedAt":"2020-03-27T10:59:09.987Z"}]
+
+[
+ {
+  "id":1,
+  "firstName":"al",
+  "lastName":"pacino",
+  "createdAt":"2020-03-27T10:59:09.987Z",
+  "updatedAt":"2020-03-27T10:59:09.987Z"
+ }
+]
 ```
 
 
@@ -166,6 +181,7 @@ The `manifests` directory contains all the Kubernetes manifest files.
 `service.yml` describes the LoadBalancer service. Forwards traffic from port 80 (HTTP) to port 3000.
 
 ``` yaml
+# service.yml
 apiVersion: v1
 kind: Service
 metadata:
@@ -182,6 +198,7 @@ spec:
 `deployment.yml` describes deployment. The directory also contains some AWS-specific manifests.
 
 ``` yaml
+# deployment.yml
 apiVersion: apps/v1
 kind: Deployment
 metadata:

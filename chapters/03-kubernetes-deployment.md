@@ -27,17 +27,17 @@ Alright! Then you check what was created on the cluster, and ...
 
 ```
 $ kubectl get all
-NAME                       READY     STATUS    RESTARTS   AGE
-pod/web-65899c769f-dhtdx   1/1       Running   0          11s
+NAME                      READY STATUS  RESTARTS AGE
+pod/web-65899c769f-dhtdx  1/1   Running 0        11s
 
-NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   46s
+NAME                TYPE      CLUSTER-IP  PORT(S) AGE
+service/kubernetes  ClusterIP 10.96.0.1   443/TCP 46s
 
-NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/web   1         1         1            1           11s
+NAME                 DESIRED CURRENT UP-TO-DATE AVAILABLE AGE
+deployment.apps/web  1       1       1          1         11s
 
-NAME                             DESIRED   CURRENT   READY     AGE
-replicaset.apps/web-65899c769f   1         1         1         11s
+NAME                            DESIRED CURRENT READY AGE
+replicaset.apps/web-65899c769f  1       1       1     11s
 ```
 
 _"I just wanted a container! Why do I get three different objects?"_
@@ -63,11 +63,11 @@ As you can see, more recent Kubernetes versions behave pretty much in line with 
 
 ```
 $ kubectl get all
-NAME      READY   STATUS    RESTARTS   AGE
-pod/web   1/1     Running   0          3m14s
+NAME      READY STATUS  RESTARTS AGE
+pod/web   1/1   Running 0        3m14s
 
-NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   4m16s
+NAME                 TYPE      CLUSTER-IP PORT(S) AGE
+service/kubernetes   ClusterIP 10.96.0.1  443/TCP 4m16s
 ```
 
 So, if we want to create a deployment we must be more explicit. This command works as expected on all Kubernetes versions:
@@ -415,9 +415,9 @@ in different terminals to watch what is going to happen:
 Then, create, scale, and update a deployment with the following commands:
 
 ```
-kubectl create deployment web --image=nginx
-kubectl scale deployment web --replicas=10
-kubectl set image deployment web nginx=that-image-does-not-exist
+$ kubectl create deployment web --image=nginx
+$ kubectl scale deployment web --replicas=10
+$ kubectl set image deployment web nginx=invalid-image
 ```
 
 You can see that the deployment is stuck, but 80% of the application's capacity
@@ -463,7 +463,7 @@ of Kubernetes traffic, internal and external. You can create a service
 for the `web` deployment with the following command:
 
 ```
-kubectl expose deployment web --port=80
+$ kubectl expose deployment web --port=80
 ```
 
 The service will have its own internal IP address
@@ -495,7 +495,7 @@ receiving traffic only once it's actually ready for it.
 Sometimes, you might want even more control when you roll out a new version.
 
 Two popular techniques are
-**blue/green deployment*** and **canary deployment**.
+**blue/green deployment** and **canary deployment**.
 
 ### 2.10.1 Blue / Green Deployment
 
@@ -527,15 +527,15 @@ The following commands will create two deployments `blue` and
 images:
 
 ```
-kubectl create deployment blue --image=nginx
-kubectl create deployment green --image=httpd
+$ kubectl create deployment blue --image=nginx
+$ kubectl create deployment green --image=httpd
 ```
 
 Then, you create a service called `web`, which initially won't
 send traffic anywhere:
 
 ```
-kubectl create service clusterip web --tcp=80
+$ kubectl create service clusterip web --tcp=80
 ```
 
 Now, you can update the selector of service `web` by
@@ -562,7 +562,8 @@ done entirely from the command line, using for instance
 `kubectl patch` as follows:
 
 ```
-kubectl patch service web -p '{"spec": {"selector": {"app": "green"}}}'
+$ kubectl patch service web \
+  -p '{"spec": {"selector": {"app": "green"}}}'
 ```
 
 The advantage of blue/green deployment is that the traffic
@@ -607,19 +608,19 @@ with the label `status=enabled`, you can apply such a label
 to a specific pod with:
 
 ```
-kubectl label pod fronted-aabbccdd-xyz status=enabled
+$ kubectl label pod fronted-aabbccdd-xyz status=enabled
 ```
 
 You can apply labels *en masse* as well, for instance:
 
 ```
-kubectl label pods -l app=blue,version=v1.5 status=enabled
+$ kubectl label pods -l app=blue,version=v1.5 status=enabled
 ```
 
 And you can remove them just as easily:
 
 ```
-kubectl label pods -l app=blue,version=v1.4 status-
+$ kubectl label pods -l app=blue,version=v1.4 status-
 ```
 
 
