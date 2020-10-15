@@ -2,11 +2,6 @@
 
 © 2020 Rendered Text. All rights reserved.
 
-This work is licensed under Creative Commmons
-Attribution-NonCommercial-NoDerivatives 4.0 International.
-To view a copy of this license, visit
-<https://creativecommons.org/licenses/by-nc-nd/4.0>
-
 This book is open source:
 <https://github.com/semaphoreci/book-cicd-docker-kubernetes>
 
