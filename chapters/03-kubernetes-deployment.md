@@ -125,7 +125,7 @@ deployment?
 
 Kubernetes is a **declarative system** (which is the opposite of an imperative systems).
 This means that you can't give it orders.
-You can't say, "Run this container." All youe can do is describe
+You can't say, "Run this container." All you can do is describe
 what you want to have and wait for Kubernetes to take action to reconcile
 what you have, with what you want to have.
 
