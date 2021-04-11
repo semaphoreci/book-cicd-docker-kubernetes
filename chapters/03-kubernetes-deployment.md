@@ -603,7 +603,7 @@ It's worth noting that in the previous example, we changed
 the service's selector, but it is also possible to change the pods'
 labels.
 
-For instance, is a service's selector is set to look for pods
+For instance, if a service's selector is set to look for pods
 with the label `status=enabled`, you can apply such a label
 to a specific pod with:
 
