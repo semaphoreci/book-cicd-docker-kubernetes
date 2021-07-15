@@ -12,7 +12,7 @@ The way in which Kubernetes handles containers depends heavily on which version 
 $ kubectl version
 ```
 
-[^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.16 and 1.17. This book is based on and has been tested with those versions.
+[^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.19 and 1.20. This book is based on and has been tested with those versions.
 
 **Kubernetes containers on versions 1.17 and lower**
 
@@ -30,8 +30,8 @@ $ kubectl get all
 NAME                      READY STATUS  RESTARTS AGE
 pod/web-65899c769f-dhtdx  1/1   Running 0        11s
 
-NAME                TYPE      CLUSTER-IP  PORT(S) AGE
-service/kubernetes  ClusterIP 10.96.0.1   443/TCP 46s
+NAME                TYPE      CLUSTER-IP  EXTERNAL-IP PORT(S) AGE
+service/kubernetes  ClusterIP 10.96.0.1   1.2.3.4     443/TCP 46s
 
 NAME                 DESIRED CURRENT UP-TO-DATE AVAILABLE AGE
 deployment.apps/web  1       1       1          1         11s
@@ -66,8 +66,8 @@ $ kubectl get all
 NAME      READY STATUS  RESTARTS AGE
 pod/web   1/1   Running 0        3m14s
 
-NAME                 TYPE      CLUSTER-IP PORT(S) AGE
-service/kubernetes   ClusterIP 10.96.0.1  443/TCP 4m16s
+NAME                 TYPE      CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+service/kubernetes   ClusterIP 10.96.0.1  1.2.3.4     443/TCP 4m16s
 ```
 
 So, if we want to create a deployment we must be more explicit. This command works as expected on all Kubernetes versions:
@@ -467,8 +467,8 @@ $ kubectl expose deployment web --port=80
 ```
 
 The service will have its own internal IP address
-(denoted by the name `ClusterIP`),
-and connections to this IP address on port 80 will be load-balanced
+(denoted by the name `ClusterIP`) and an optional external IP,
+and connections to these IP address on port 80 will be load-balanced
 across all the pods of this deployment.
 
 In fact, these connections will be load-balanced across all the pods

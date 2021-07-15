@@ -1,6 +1,6 @@
 \newpage
 
-© 2020 Rendered Text. All rights reserved.
+© 2021 Rendered Text. All rights reserved.
 
 This work is licensed under Creative Commmons
 Attribution-NonCommercial-NoDerivatives 4.0 International.
@@ -13,7 +13,7 @@ This book is open source:
 Published on the Semaphore website:
 [https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
-$MONTHYEAR: First edition v1.0 (revision $REVISION)
+$MONTHYEAR: Second edition v1.1 (revision $REVISION)
 
 \newpage
 
@@ -29,7 +29,7 @@ To maximize the rate of learning, we must minimize the time to try things.
 
 In software development, the cloud has been a critical factor in increasing the speed of building innovative products.
 
-Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft, who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
+Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft[^cockroft], who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
 
 Doing so successfully, however, requires our applications to adapt. They need to be disposable and horizontally scalable. They should have a minimal divergence between development and production so that we can continuously deploy them multiple times per day.
 
@@ -38,6 +38,9 @@ A new generation of tools has democratized the way of building such *cloud nativ
 The great opportunity comes potentially at a high cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
 
 This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline, which automatically configures, builds, tests, and deploys code. This book shows you how to do that in a cloud native way — so you can focus on building great products and solutions.
+
+[^cockroft]: Currently VP Amazon Sustainability Architecture at Amazon
+  _https://twitter.com/adrianco_
 
 \newpage
 
