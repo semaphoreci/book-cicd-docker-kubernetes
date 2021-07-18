@@ -40,13 +40,7 @@ To get started with Semaphore:
 
 We assume that you have previously forked the demo project from _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_ to your GitHub account.
 
-On Semaphore, follow the prompts to create a project. The first time you do this, you will see a screen which asks you to choose between connecting Semaphore to either your public, or both public and private repositories on GitHub:
-
-![Authorizing Semaphore to access your GitHub repositories](./figures/05-github-repo-auth.png){ width=95% }
-
-To keep things simple, select the "Public repositories" option. If you later decide that you want to use Semaphore with your private projects as well, you can extend the permission at any time.
-
-Next, Semaphore will present you a list of repositories to choose from as the source of your project:
+On Semaphore, click on *New Project* at the top of the screen. Then, click on *Choose a repository*. Next, Semaphore will present you a list of repositories to choose from as the source of your project:
 
 ![Choosing a repository to set up CI/CD for](./figures/05-choose-repo.png){ width=95% }
 
@@ -56,9 +50,7 @@ Semaphore will quickly initialize the project. Behind the scenes, it will set up
 
 The next screen lets you invite collaborators to your project. Semaphore mirrors access permissions of GitHub, so if you add some people to the GitHub repository later, you can "sync" them inside project settings on Semaphore.
 
-![Add collaborators](./figures/05-sem-add-collaborators.png){ width=95% }
-
-Click on *Go to Workflow Builder*. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the existing configuration to get directly to the final workflow. In this chapter, however, we want to learn how to create the pipelines so we’ll make a fresh start.
+Click on *Continue to Workflow Setup*. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the existing configuration to get directly to the final workflow. In this chapter, however, we want to learn how to create the pipelines so we’ll make a fresh start.
 
 ![Start from scratch or use existing pipeline](./figures/05-sem-existing-pipeline.png){ width=95% }
 
@@ -246,8 +238,7 @@ We’ve covered a lot of things in a few pages; here, we have the chance to paus
 
 ![Run this workflow](./figures/05-sem-run-workflow.png){ width=95% }
 
+After a few seconds the pipeline will start building and testing the container.
+
 ![CI pipeline done](./figures/05-sem-ci-pipeline.png){ width=95% }
 
-Wait until the pipeline is complete then go to the top level of the project. Click on the *Docker Registry* button and open the repository to verify that the Docker image is there.
-
-![Docker registry](./figures/05-sem-registry.png){ width=95% }

@@ -39,10 +39,12 @@ For example, it’s not uncommon to have the pipeline run only the build and tes
 Today a service like Semaphore provides features like:
 
 - Secret management
-- Multi-stage pipelines
+- Multi-stage, parametrized pipelines
+- Change detection
 - Container registry
 - Connections to multiple environments (staging, production, etc.)
 - Audit log
+- Test results
 
 There is no longer a reason not to automate the entire software delivery process.
 
@@ -154,6 +156,7 @@ There are a couple of tactics which you can employ to reduce CI build time:
 - **Caching**: Project dependencies should be independently reused across builds. When building Docker containers, use the layer caching feature to reuse known layers from the registry.
 - **Built-in Docker registry**: A container-native CI solution should include a built-in registry. This saves a lot of money comparing to using the registry provided by your cloud provider. It also speeds up CI, often by several minutes.
 - **Test parallelization**: A large test suite is the most common reason why CI is slow. The solution is to distribute tests across as many parallel jobs as needed.
+- **Change detection**: Large test suites can be dramatically sped up by only testing code that has changed since the last commit.
 
 ### 3.2.3 Build Only Once and Promote the Result Through the Pipeline
 
@@ -211,6 +214,10 @@ There are additional tactics that you can use with your CI system to get fast fe
 ![](figures/04-pipeline-deps.png){ width=95% }
 
 In the pipeline above, backend and frontend tests run if code changed in the corresponding directories. End-to-end tests run if any of the two has passed and none has failed.
+
+**Change detection** lets you skip steps in the pipeline when the underlying code has not changed. By running only the relevant tests for a given commit, you can speed up the pipeline and cut down costs.
+
+![](./figures/04-change-detection.png){ width=80% }
 
 **A fail-fast strategy** gives you instant feedback when a job fails. CI stops all currently running jobs in the pipeline as soon as one of the jobs has failed. This approach is particularly useful when running parallel jobs with variable duration.
 

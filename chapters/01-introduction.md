@@ -70,6 +70,15 @@ Chapter 3, "Best Practices for Cloud Native Applications", describes how both ou
 
 Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing a CI/CD pipeline with Semaphore that builds, tests, and deploys a Dockerized microservice to Kubernetes.
 
+## Changes in the Second Edition
+
+A few changes were introduced in this second edition:
+
+- Moved to Kubernetes version v1.20. All commands and actions were tested with this version.
+- Added note about accessing services in local development Kubernetes clusters.
+- Added mentions of: parametrized pipelines, test results, code change detection.
+- Minor fixes.
+
 ## How to Contact Us
 
 We would very much love to hear your feedback after reading this book. What did you like and learn? What could be improved? Is there something we could explain further?

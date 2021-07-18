@@ -156,7 +156,7 @@ This is rather inconvenient, because it is now your job to keep track of
 all these pods, and to make sure that they are all in sync, using the
 same specification.
 
-To make things simpler, Kubernetes gives you a higher level construct--
+To make things simpler, Kubernetes gives you a higher level construct:
 the **replica set**. The specification of a replica set looks very much like
 the specification of a pod, except that it carries a number indicating how
 many *replicas*—i.e. pods with that particular specification—you want.
@@ -320,7 +320,7 @@ failing, Kubernetes will never move on to the next. The deployment stops,
 and your application keeps running with the old version until you address
 the issue.
 
-Note: if there is no readiness probe, then the container is
+**Note**: if there is no readiness probe, then the container is
 considered as ready, as long as it could be started. So make sure
 that you define a readiness probe if you want to leverage that feature!
 
@@ -538,6 +538,8 @@ send traffic anywhere:
 $ kubectl create service clusterip web --tcp=80
 ```
 
+**Note**: when running a local development Kubernetes cluster, such as MiniKube[^minikube] or the one bundled with Docker Desktop, you'll wish to change the previous command to: `kubectl create service nodeport web --tcp=80`. The NodePort type of service is easier to access locally as the service ports are forwared to `localhost` automatically. To see this port mapping run `kubectl get services`.
+
 Now, you can update the selector of service `web` by
 running `kubectl edit service web`. This will retrieve the
 definition of service `web` from the Kubernetes API, and open
@@ -570,6 +572,9 @@ The advantage of blue/green deployment is that the traffic
 switch is almost instantaneous, and you can roll back to the
 previous version just as fast by updating the service
 definition again.
+
+[^minikube]: The official local Kubernetes cluster for macOS, Linux, and Windows for testing and development.
+  _https://minikube.sigs.k8s.io/docs/_
 
 
 ### 2.10.2 Canary Deployment
