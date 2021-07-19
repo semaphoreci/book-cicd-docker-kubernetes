@@ -22,58 +22,59 @@ result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
 
-In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice. For DigitalOcean, we’ll use Docker Hub as a repository:
+In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice.
 
-Open the *Secrets* section and check the `dockerhub` secret.
+Open the *Secrets* section and check the `do-key` secret.
 
 Type the following commands in the job:
 
 ```bash
 docker login \
   -u $SEMAPHORE_REGISTRY_USERNAME \
-  -p $SEMAPHORE_REGISTRY_PASSWORD $SEMAPHORE_REGISTRY_URL
-
+  -p $SEMAPHORE_REGISTRY_PASSWORD \
+  $SEMAPHORE_REGISTRY_URL
+  
 docker pull \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
-
-echo "${DOCKER_PASSWORD}" | \
-  docker login -u "${DOCKER_USERNAME}" --password-stdin
-
+  
 docker tag \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
-  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+  registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
+
+doctl auth init -t $DO_ACCESS_TOKEN
+
+doctl registry login
 
 docker push \
-  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+  registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 ```
 
 ![Push block](./figures/05-sem-canary-push-block.png){ width=95% }
 
 Create a new block called “Deploy” and enable secrets:
 
-- `dockerhub` to communicate with Docker Hub;
 - `db-params` to use the cloud database;
 - `do-key` which is the cloud-specific access token.
 
-Open the *Environment Variables* section and create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`).
+Open the *Environment Variables* section:
+
+- Create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`)
+- Create a variable called `REGISTRY_NAME` with the name of the DigitalOcean container registry name.
 
 To connect with the DigitalOcean cluster, we can use the official `doctl` tool, which comes preinstalled in Semaphore.
 
-First, type these commands in the *prologue*:
+Add the following commands to the *job*:
 
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
 checkout
-```
-
-Then, add the following commands to the *job*:
-
-```bash
 kubectl apply -f manifests/service.yml
 
-./apply.sh manifests/deployment.yml addressbook-canary 1 \
-  $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+./apply.sh \
+  manifests/deployment.yml \
+  addressbook-canary 1 \
+  registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 if kubectl get deployment addressbook-stable; then \
   kubectl scale --replicas=2 deployment/addressbook-stable; \
@@ -88,15 +89,15 @@ This is the canary job sequence:
 
 ![Deploy block](./figures/05-sem-canary-deploy-block.png){ width=95% }
 
-Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables and prologue steps from the previous block. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
+Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
 
 Type the following commands in the job:
 
 ```bash
-POD=$(kubectl get pod \
-      -l deployment=addressbook-canary \
-      -o name \ | head -n 1)
-
+doctl auth init --access-token $DO_ACCESS_TOKEN
+doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+checkout
+POD=$(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1)
 kubectl exec -it "$POD" -- npm run ping
 kubectl exec -it "$POD" -- npm run migrate
 ```
@@ -115,16 +116,23 @@ Create a new pipeline (using the *Add promotion* button) branching out from the 
 
 ![Stable promotion](./figures/05-sem-stable-promotion.png){ width=95% }
 
-Create the “Deploy to Kubernetes” block with the `do-key`, `db-params`, and `dockerhub` secrets. Also, create the `CLUSTER_NAME` variable and repeat the same commands in the prologue as we did in the previous step.
+Create the “Deploy to Kubernetes” block with the `do-key` and `db-params` secrets. Also, create the `CLUSTER_NAME` and `REGISTRY_NAME` variables as we did in the previous step.
 
 In the job command box, type the following lines to make the rolling deployment and delete the canary pods:
 
 ```bash
-./apply.sh manifests/deployment.yml addressbook-stable 3 \
-   $DOCKER_USERNAME/demo:$SEMAPHORE_WORKFLOW_ID
+doctl auth init --access-token $DO_ACCESS_TOKEN
+doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+checkout
+kubectl apply -f manifests/service.yml
+
+./apply.sh \
+  manifests/deployment.yml \
+  addressbook-stable 3 \
+  registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 if kubectl get deployment addressbook-canary; then \
-   kubectl delete deployment/addressbook-canary; \
+  kubectl delete deployment/addressbook-canary; \
 fi
 ```
 
@@ -247,25 +255,24 @@ result = 'failed'
 
 ![Rollback promotion](./figures/05-sem-rollback-promotion.png){ width=95% }
 
-The rollback job collects information to help diagnose the problem. Create a new block called “Rollback Canary”, import the `do-ctl` secret, and create `CLUSTER_NAME`. Repeat the prologue commands like we did before and type these lines in the job:
+The rollback job collects information to help diagnose the problem. Create a new block called “Rollback Canary”, import the `do-ctl` secret, and create `CLUSTER_NAME` and `REGISTRY_NAME`.  Type these lines in the job:
 
 ```bash
+doctl auth init --access-token $DO_ACCESS_TOKEN
+doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
 kubectl get all -o wide
 kubectl get events
 kubectl describe deployment addressbook-canary || true
-
-POD=$(kubectl get pod \
-      -l deployment=addressbook-canary \
-      -o name \ | head -n 1)
-
+POD=$(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1)
 kubectl logs "$POD" || true
 
 if kubectl get deployment addressbook-stable; then \
-   kubectl scale --replicas=3 deployment/addressbook-stable; \
+  kubectl scale --replicas=3 \
+  deployment/addressbook-stable; \
 fi
 
 if kubectl get deployment addressbook-canary; then \
-   kubectl delete deployment/addressbook-canary; \
+  kubectl delete deployment/addressbook-canary;  \
 fi
 ```
 
