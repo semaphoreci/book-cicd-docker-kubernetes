@@ -22,7 +22,7 @@ result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
 
-In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to Docker Hub. The secrets and the login command will vary depending on the cloud of choice.
+In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to the private Container Registry. The secrets and the login command will vary depending on the cloud of choice.
 
 Open the *Secrets* section and check the `do-key` secret.
 
@@ -42,7 +42,6 @@ docker tag \
   registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 doctl auth init -t $DO_ACCESS_TOKEN
-
 doctl registry login
 
 docker push \
@@ -335,13 +334,13 @@ $ kubectl logs --previous <pod-name>
 If you need to jump in one of the containers, you can start a shell as long as the pod is running with:
 
 ``` bash
-$ kubectl exec -it <pod-name> -- bash
+$ kubectl exec -it <pod-name> -- sh
 ```
 
 To access a pod network from your machine, forward a port with `port-forward`, for instance:
 
 ``` bash
-$ kubectl port-forward <pod-name> 8080:80
+  $ kubectl port-forward <pod-name> 8080:80
 ```
 
 These are some common error messages that you might run into:

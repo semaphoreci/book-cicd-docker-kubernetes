@@ -76,7 +76,10 @@ A few changes were introduced in this second edition:
 
 - Moved to Kubernetes version v1.20. All commands and actions were tested with this version.
 - Added note about accessing services in local development Kubernetes clusters.
-- Added mentions of: parametrized pipelines, test results, code change detection.
+- Added mentions of new CI/CD features: parametrized pipelines, test results, code change detection.
+- DigitalOcean deployment now uses their Private Container Registry service instead of GitHub.
+- Updated setup steps for DigitalOcean, Google Cloud, and AWS.
+- Updated UI screenshots using higher resolution.
 - Minor fixes.
 
 ## How to Contact Us
