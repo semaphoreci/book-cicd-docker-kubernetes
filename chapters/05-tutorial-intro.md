@@ -262,7 +262,7 @@ A good CI/CD workflow takes planning as there are many moving parts: building, t
 
 Our CI/CD workflow begins with the mandatory continuous integration pipeline:
 
-![Continuous Integration Flow](./figures/05-flow-docker-build.png)
+![Continuous Integration Flow](./figures/05-flow-docker-build.png){ width=95% }
 
 The CI pipeline performs the following steps:
 
@@ -286,7 +286,7 @@ A canary deployment is a limited release of a new version. We’ll call it _cana
 
 We can do a canary deployment by connecting the canary pods to the same load balancer as the rest of the pods. As a result, a set fraction of user traffic goes to the canary. For example, if we have nine stable pods and one canary pod, 10% of the users would get the canary release.
 
-![Canary release flow](./figures/05-flow-canary-deployment.png)
+![Canary release flow](./figures/05-flow-canary-deployment.png){ width=95% }
 
 The canary release performs the following steps:
 
@@ -299,10 +299,10 @@ Let’s take a closer look at how the stable release works.
 
 Imagine that this is your initial state: you have three pods running version **v1**.
 
-![Stable release via rolling update](./figures/05-transition-canary.png)
+![Stable release via rolling update](./figures/05-transition-canary.png){ width=95% }
 
 When you deploy **v2** as a canary, you scale down the number of **v1** pods to 2, to keep the total amount of pods to 3.
 
 Then, you can start a rolling update to version **v2** on the stable deployment. One at a time, all its pods are updated and restarted, until they are all running on **v2** and you can get rid of the canary.
 
-![Completing a stable release](./figures/05-transition-stable.png)
+![Completing a stable release](./figures/05-transition-stable.png){ width=95% }

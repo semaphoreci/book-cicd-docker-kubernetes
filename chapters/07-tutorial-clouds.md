@@ -65,7 +65,7 @@ Creating a cluster on AWS is, unequivocally, a complex affair. So complex that t
 
   - Sign up or log in to your AWS account at [aws.amazon.com](https://aws.amazon.com).
   - Select one of the available regions.
-  - Find and go to the *ECR* service. Create a new repository called “semaphore-demo-cicd-kubernetes” and copy its address.
+  - Find and go to the *ECR* service. Create a new private repository called “semaphore-demo-cicd-kubernetes” and copy its address.
   - Install *eksctl* from `eksctl.io` and *awscli* from `aws.amazon.com/cli` in your machine.
   - Find the *IAM* console in AWS and create a user with Administrator permissions. Get its *Access Key Id* and *Secret Access Key* values.
 

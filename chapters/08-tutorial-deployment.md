@@ -16,11 +16,21 @@ Create a new promotion using the *+Add First Promotion* button. Promotions conne
 
 Check the *Enable automatic promotion* box. Now we can define the following auto-starting conditions for the new pipeline:
 
-```
+```text
 result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 ```
 
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
+
+Below the promotion options, click on *+ Add Environment Variables* to create a parameter for a pipeline. Parametrization let us set runtime values and reuse a pipeline for similar tasks.
+
+The parameter we're going to add is going to let us specify the number of Canary pods to deploy. Set the variable name to `CANARY_PODS`, ensure that "This is a required parameter" is checked and type "1" in default value.
+
+![](./figures/08-param1.png){ width=60% }
+
+Create a second parameter called `STABLE_PODS`. Set the default value to "2".
+
+![](./figures/08-param2.png){ width=60% }
 
 In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to the private Container Registry. The secrets and the login command will vary depending on the cloud of choice.
 
@@ -33,10 +43,10 @@ docker login \
   -u $SEMAPHORE_REGISTRY_USERNAME \
   -p $SEMAPHORE_REGISTRY_PASSWORD \
   $SEMAPHORE_REGISTRY_URL
-  
+
 docker pull \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID
-  
+
 docker tag \
   $SEMAPHORE_REGISTRY_URL/demo:$SEMAPHORE_WORKFLOW_ID \
   registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
@@ -67,34 +77,39 @@ Add the following commands to the *job*:
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+doctl registry kubernetes-manifest | kubectl apply -f -
 checkout
 kubectl apply -f manifests/service.yml
 
 ./apply.sh \
   manifests/deployment.yml \
-  addressbook-canary 1 \
+  addressbook-canary $CANARY_PODS \
   registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 if kubectl get deployment addressbook-stable; then \
-  kubectl scale --replicas=2 deployment/addressbook-stable; \
+  kubectl scale --replicas=$STABLE_PODS deployment/addressbook-stable; \
 fi
 ```
 
 This is the canary job sequence:
 
+  - Initialize the cluster config.
+  - Generate the Container Service credentials and import them into the cluster.
+  - Clone the GitHub repository with `checkout`.
   - Create a load balancer service with `kubectl apply`.
-  - Execute `apply.sh`, which creates the canary deployment.
-  - Reduce the size of the stable deployment with `kubectl scale`.
+  - Execute `apply.sh`, which creates the canary deployment. The number of pods in the deployment is held  `$CANARY_PODS`.
+  - Reduce the size of the stable deployment with `kubectl scale` to `$STABLE_PODS`.
 
 ![Deploy block](./figures/05-sem-canary-deploy-block.png){ width=95% }
 
-Create a third block called “Functional test and migration” and enable the `do-key` secret. Repeat the environment variables. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
+Create a third block called “Functional test” and enable the `do-key` secret. Repeat the environment variables. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
 
 Type the following commands in the job:
 
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+doctl registry kubernetes-manifest | kubectl apply -f -
 checkout
 POD=$(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1)
 kubectl exec -it "$POD" -- npm run ping
@@ -115,6 +130,10 @@ Create a new pipeline (using the *Add promotion* button) branching out from the 
 
 ![Stable promotion](./figures/05-sem-stable-promotion.png){ width=95% }
 
+Add a parameter called `$STABLE_PODS` with default value "3".
+
+![](./figures/08-param3.png){ width=60% }
+
 Create the “Deploy to Kubernetes” block with the `do-key` and `db-params` secrets. Also, create the `CLUSTER_NAME` and `REGISTRY_NAME` variables as we did in the previous step.
 
 In the job command box, type the following lines to make the rolling deployment and delete the canary pods:
@@ -122,12 +141,13 @@ In the job command box, type the following lines to make the rolling deployment 
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+doctl registry kubernetes-manifest | kubectl apply -f -
 checkout
 kubectl apply -f manifests/service.yml
 
 ./apply.sh \
   manifests/deployment.yml \
-  addressbook-stable 3 \
+  addressbook-stable $STABLE_PODS \
   registry.digitalocean.com/$REGISTRY_NAME/demo:$SEMAPHORE_WORKFLOW_ID
 
 if kubectl get deployment addressbook-canary; then \
@@ -143,12 +163,17 @@ Good! We’re done with the release pipeline.
 
 Here is the moment of truth. Will the canary work? Click on *Run the workflow* and then *Start*.
 
-Wait until the CI pipeline is done an click on *Promote* to start the canary pipeline[^no-autopromotion].
+Wait until the CI pipeline is done an click on *Promote* to start the canary pipeline[^no-autopromotion]. As you can see on the screenshot below, manually starting a promotion lets you customize the parameters.
+
+
 
 [^no-autopromotion]: You might be wondering why the automatic promotion hasn’t kicked in for the canary pipeline. The reason is that we set it to trigger only for the master branch, and the Workflow Builder by default saves all its changes on a separate branch called `setup-semaphore`.
 
-![Canary Promote](./figures/05-sem-promote-canary.png)
-![Canary Pipeline](./figures/05-sem-canary-pipeline.png)
+![Canary Promote](./figures/08-promote1.png){ width=60% }
+
+Press *Start Promotion* to run the canary pipeline.
+
+![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=60% }
 
 Once it completes, we can check how the canary is doing.
 
@@ -163,11 +188,15 @@ addressbook-canary  1/1   1          1         8m40s
 
 In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
 
-Let’s say we decide to go ahead. So go on and hit the *Promote* button next to the stable pipeline.
+Let’s say we decide to go ahead. So go on and hit the *Promote* button, you can tweak the number of final pods to deploy.
+
+![](./figures/08-promote-stable.png){ width=95% }
+
+The stable pipeline should be done in a few seconds.
 
 ![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=60% }
 
-While the block runs, you should see both the existing canary and a new “addressbook-stable” deployment:
+If you're fast enough, while the block runs you can see both the existing canary and a new “addressbook-stable” deployment.
 
 ``` bash
 $ kubectl get deployment
@@ -254,11 +283,14 @@ result = 'failed'
 
 ![Rollback promotion](./figures/05-sem-rollback-promotion.png){ width=95% }
 
+Create the `STABLE_PODS` parameter with default value "3" to finalize the promotion configuration.
+
 The rollback job collects information to help diagnose the problem. Create a new block called “Rollback Canary”, import the `do-ctl` secret, and create `CLUSTER_NAME` and `REGISTRY_NAME`.  Type these lines in the job:
 
 ```bash
 doctl auth init --access-token $DO_ACCESS_TOKEN
 doctl kubernetes cluster kubeconfig save "${CLUSTER_NAME}"
+doctl registry kubernetes-manifest | kubectl apply -f -
 kubectl get all -o wide
 kubectl get events
 kubectl describe deployment addressbook-canary || true
@@ -266,7 +298,7 @@ POD=$(kubectl get pod -l deployment=addressbook-canary -o name | head -n 1)
 kubectl logs "$POD" || true
 
 if kubectl get deployment addressbook-stable; then \
-  kubectl scale --replicas=3 \
+  kubectl scale --replicas=$STABLE_PODS \
   deployment/addressbook-stable; \
 fi
 
