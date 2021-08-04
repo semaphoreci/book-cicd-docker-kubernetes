@@ -8,12 +8,7 @@ We’ll deploy the application in a three-node Kubernetes cluster. You can pick 
 
 #### 4.5.1 DigitalOcean Cluster
 
-**DigitalOcean provides a managed Kubernetes service but lacks a private Docker registry[^do-private-reg], so we’ll use Docker Hub for the images.**
-
-[^do-private-reg]: At the time of writing, DigitalOcean announced a beta for a private registry offering. For more information, consult the available documentation: _<https://www.digitalocean.com/docs/kubernetes/how-to/set-up-registry>_
-
-  - **Sign up for a free account on [hub.docker.com](https://hub.docker.com).**
-  - **Create a public repository called “semaphore-demo-cicd-kubernetes”.**
+DigitalOcean provides everything needed to deploy the application: a managed Kubernetes, a Container Registry, and Postgres databases. 
 
 To create the Kubernetes cluster:
 
@@ -23,6 +18,13 @@ To create the Kubernetes cluster:
   -  While DigitalOcean is working on the cluster, go to *API* menu and generate a *Personal Access Token* with Read & Write permissions.
   - To finalize, go to *Container Registry* and create a starter repository. Set the repository name, which is globally unique, and remember it for the next chapter.
 
+Next, create a Container Registry with the following actions:
+
+- Go to *Container Registry*.
+- Click *Create*.
+- Set the registry name. Names are unique across all DigitalOcean customers.
+- Select the *Starter* free plan.
+
 On Semaphore, store the DigitalOcean Access Token as a secret:
 
 1.  Log in to your organization on [id.semaphoreci.com](https://id.semaphoreci.com).
@@ -30,11 +32,6 @@ On Semaphore, store the DigitalOcean Access Token as a secret:
 3.  The name of the secret is “do-key”.
 4.  Add the `DO_ACCESS_TOKEN` variable and set its value with your personal token.
 5.  Click on *Save Secret*.
-
-**Repeat the last steps to add the second secret, call it “dockerhub” and add the following variables:**
-
-  - **`DOCKER_USERNAME` for your DockerHub user name.**
-  - **`DOCKER_PASSWORD` with the corresponding password.**
 
 #### 4.5.2 Google Cloud Cluster
 

@@ -208,7 +208,7 @@ docker run --net=host -it \
 
 This last test runs the code in `src/database.test.js`, which checks if the application can write and delete rows in the database.
 
-![Test block](./figures/05-sem-test-block.png){ width=95% }
+![Test block](./figures/05-sem-test-block.png){ width=80% }
 
 Create the third block in the pipeline and call it “Push”. This last job will tag the current Docker image as `latest`. Type these commands in the job:
 
@@ -236,7 +236,7 @@ This completes the setup of the CI pipeline.
 
 We’ve covered a lot of things in a few pages; here, we have the chance to pause for a little bit and try the CI pipeline. Click on the *Run the workflow* button on the top-right corner and then click on *Start*.
 
-![Run this workflow](./figures/05-sem-run-workflow.png){ width=95% }
+![Run this workflow](./figures/05-sem-run-workflow.png){ width=80% }
 
 After a few seconds the pipeline will start building and testing the container.
 

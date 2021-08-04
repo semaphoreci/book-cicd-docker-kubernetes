@@ -20,6 +20,7 @@ Check the *Enable automatic promotion* box. Now we can define the following auto
 result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 ```
 
+
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
 
 Below the promotion options, click on *+ Add Environment Variables* to create a parameter for a pipeline. Parametrization let us set runtime values and reuse a pipeline for similar tasks.
@@ -166,14 +167,13 @@ Here is the moment of truth. Will the canary work? Click on *Run the workflow* a
 Wait until the CI pipeline is done an click on *Promote* to start the canary pipeline[^no-autopromotion]. As you can see on the screenshot below, manually starting a promotion lets you customize the parameters.
 
 
-
 [^no-autopromotion]: You might be wondering why the automatic promotion hasn’t kicked in for the canary pipeline. The reason is that we set it to trigger only for the master branch, and the Workflow Builder by default saves all its changes on a separate branch called `setup-semaphore`.
 
-![Canary Promote](./figures/08-promote1.png){ width=60% }
+![Canary Promote](./figures/08-promote1.png){ width=95% }
 
 Press *Start Promotion* to run the canary pipeline.
 
-![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=60% }
+![Canary Pipeline](./figures/05-sem-canary-pipeline.png){ width=95% }
 
 Once it completes, we can check how the canary is doing.
 
@@ -194,7 +194,7 @@ Let’s say we decide to go ahead. So go on and hit the *Promote* button, you ca
 
 The stable pipeline should be done in a few seconds.
 
-![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=60% }
+![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=95% }
 
 If you're fast enough, while the block runs you can see both the existing canary and a new “addressbook-stable” deployment.
 

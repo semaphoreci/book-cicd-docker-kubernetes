@@ -75,12 +75,13 @@ Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing 
 A few changes were introduced in this second edition:
 
 - Moved to Kubernetes version v1.20. All commands and actions were tested with this version.
-- Added note about accessing services in local development Kubernetes clusters.
-- Added mentions of new CI/CD features: parametrized pipelines, test results, code change detection.
-- DigitalOcean deployment now uses their Private Container Registry service instead of GitHub.
+- Added comments about accessing services in local development Kubernetes clusters.
+- Added mention of new CI/CD features in Semaphore: parametrized pipelines, test results, code change detection.
+- DigitalOcean deployment now uses their Private Container Registry service instead of Docker Hub.
 - Updated setup steps for DigitalOcean, Google Cloud, and AWS.
 - Updated UI screenshots using higher resolution.
-- Minor fixes.
+- Modified deployment tutorial to use parametrized promotions.
+- Other minor fixes.
 
 ## How to Contact Us
 
