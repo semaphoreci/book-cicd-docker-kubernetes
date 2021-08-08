@@ -1,12 +1,14 @@
 \newpage
 
-### 4.5 Provisioning a Kubernetes Cluster
+## 4.5 Provisioning Kubernetes
+
+
 
 In this book we will show you how to deploy to Kubernetes hosted on three public cloud providers: Amazon AWS, Google Cloud Platform, and DigitalOcean. With small modifications, the process will work with any other cloud or Kubernetes instance.
 
 We’ll deploy the application in a three-node Kubernetes cluster. You can pick a different size based on your needs, but you’ll need at least three nodes to run an effective canary deployment with rolling updates.
 
-#### 4.5.1 DigitalOcean Cluster
+### 4.5.1 DigitalOcean Cluster
 
 DigitalOcean provides everything needed to deploy the application: a managed Kubernetes, a Container Registry, and Postgres databases. 
 
@@ -33,7 +35,7 @@ On Semaphore, store the DigitalOcean Access Token as a secret:
 4.  Add the `DO_ACCESS_TOKEN` variable and set its value with your personal token.
 5.  Click on *Save Secret*.
 
-#### 4.5.2 Google Cloud Cluster
+### 4.5.2 Google Cloud Cluster
 
 Google Cloud calls its service *Kubernetes Engine*. To create the services:
 
@@ -54,7 +56,7 @@ On Semaphore, create a secret for your Google Cloud Access Key file:
 4.  Add this file: `/home/semaphore/gcp-key.json` and upload the Google Cloud Access JSON from your computer.
 5.  Click on *Save Secret*.
 
-#### 4.5.3 AWS Cluster
+### 4.5.3 AWS Cluster
 
 AWS calls its service *Elastic Kubernetes Service* (EKS). The Docker private registry is called *Elastic Container Registry* (ECR).
 
@@ -101,18 +103,18 @@ On Semaphore, create a secret to store the AWS Secret Access Key and the kubecon
       - `/home/semaphore/aws-key.yml` and upload the Kubeconfig file created by eksctl earlier.
 6.  Click on *Save Secret*.
 
-### 4.6 Provisioning a Database
+## 4.6 Provisioning a Database
 
 We’ll need a database to store data. For that, we’ll use a managed PostgreSQL service.
 
-#### 4.6.1 DigitalOcean Database
+### 4.6.1 DigitalOcean Database
 
   - Go to *Databases*.
   - Create a PostgreSQL database. Select the same region where the cluster is running.
   - Once the database is ready, go to the *Users & Databases* tab and create a database called “demo” and a user named “demouser”.
   - In the *Overview* tab, take note of the PostgreSQL IP address and port.
 
-#### 4.6.2 Google Cloud Database
+### 4.6.2 Google Cloud Database
 
   - Select *SQL* on the console menu.
   - Create a new **PostgreSQL** database instance.
@@ -127,7 +129,7 @@ Once the cloud database is running:
   - Go to the *Databases* and create a new DB called “demo”.
   - In the *Overview* tab (you can skip the getting started part), take note of the database IP address and port.
 
-#### 4.6.3 AWS Database
+### 4.6.3 AWS Database
 
   - Find the service called *RDS*.
   - Create a PostgreSQL database called “demo” and type in a secure password.
@@ -136,7 +138,7 @@ Once the cloud database is running:
   - Under *Connectivity & Security* take note of the endpoint address
     and port.
 
-#### 4.6.4 Creating the Database Secret on Semaphore
+### 4.6.4 Creating the Database Secret on Semaphore
 
 The database secret is the same for all clouds. Create a secret to store the database credentials:
 
