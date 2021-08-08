@@ -26,7 +26,7 @@ We'll learn about Semaphore's features as we go hands-on in this chapter.
 
 [^roi]: Whitepaper: The 41:1 ROI of Moving CI/CD to Semaphore (_[https://semaphoreci.com/resources/roi](https://semaphoreci.com/resources/roi?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_)
 
-### 4.4.1 Creating a Semaphore Account
+### 4.4.2 Creating a Semaphore Account
 
 To get started with Semaphore:
 
@@ -36,7 +36,7 @@ To get started with Semaphore:
 - Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. This chapter will demonstrate a workflow using Semaphore's Docker Registry, which is available within a free trial or a paid account. However you can easily replace it with a free public registry like Docker Hub and implement the same workflow with an open source account.
 - Finally, you'll be greeted with a quick product tour.
 
-### 4.4.2 Creating a Semaphore Project For The Demo Repository
+### 4.4.3 Creating a Semaphore Project For The Demo Repository
 
 We assume that you have previously forked the demo project from _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_ to your GitHub account.
 
@@ -56,7 +56,7 @@ Click on *Continue to Workflow Setup*. Semaphore will ask you if you want to use
 
 Click on the option to configure the project from scratch.
 
-### 4.4.3 The Semaphore Workflow Builder
+### 4.4.4 The Semaphore Workflow Builder
 
 To make the process of creating projects easier, Semaphore provides starter workflows for popular frameworks and languages. Choose the "Build Docker" workflow and click on *Run this workflow*.
 
@@ -94,7 +94,7 @@ Jobs inherit their configuration from their parent block. All the jobs in a bloc
 
 Blocks run sequentially, once all the jobs in the block complete, the next block starts.
 
-### 4.4.4 The Continous Integration Pipeline
+### 4.4.5 The Continous Integration Pipeline
 
 We talked about the benefits of CI/CD in chapter 3. In the previous section, we created our very first pipeline. In this section, we’ll extend it with tests and a place to store the images.
 
@@ -232,7 +232,7 @@ docker push \
 
 This completes the setup of the CI pipeline.
 
-### 4.4.5 Your First Build
+### 4.4.6 Your First Build
 
 We’ve covered a lot of things in a few pages; here, we have the chance to pause for a little bit and try the CI pipeline. Click on the *Run the workflow* button on the top-right corner and then click on *Start*.
 
