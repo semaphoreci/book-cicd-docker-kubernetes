@@ -27,11 +27,11 @@ Below the promotion options, click on *+ Add Environment Variables* to create a 
 
 The parameter we're going to add is going to let us specify the number of Canary pods to deploy. Set the variable name to `CANARY_PODS`, ensure that "This is a required parameter" is checked and type "1" in default value.
 
-![](./figures/08-param1.png){ width=60% }
+![](./figures/08-param1.png){ width=70% }
 
 Create a second parameter called `STABLE_PODS`. Set the default value to "2".
 
-![](./figures/08-param2.png){ width=60% }
+![](./figures/08-param2.png){ width=70% }
 
 In the new pipeline, click on the first block. Let's call it “Push”. The push block takes the Docker image that we built earlier and uploads it to the private Container Registry. The secrets and the login command will vary depending on the cloud of choice.
 
@@ -133,7 +133,7 @@ Create a new pipeline (using the *Add promotion* button) branching out from the 
 
 Add a parameter called `$STABLE_PODS` with default value "3".
 
-![](./figures/08-param3.png){ width=60% }
+![](./figures/08-param3.png){ width=70% }
 
 Create the “Deploy to Kubernetes” block with the `do-key` and `db-params` secrets. Also, create the `CLUSTER_NAME` and `REGISTRY_NAME` variables as we did in the previous step.
 
@@ -169,7 +169,7 @@ Wait until the CI pipeline is done an click on *Promote* to start the canary pip
 
 [^no-autopromotion]: You might be wondering why the automatic promotion hasn’t kicked in for the canary pipeline. The reason is that we set it to trigger only for the master branch, and the Workflow Builder by default saves all its changes on a separate branch called `setup-semaphore`.
 
-![Canary Promote](./figures/08-promote1.png){ width=95% }
+![Canary Promote](./figures/08-promote1.png){ width=70% }
 
 Press *Start Promotion* to run the canary pipeline.
 
@@ -309,7 +309,7 @@ The first four lines print out information about the cluster. The last two, undo
 
 Run the workflow once more and make a canary release, but this time try rollback pipeline by clicking on its promote button:
 
-![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=60% }
+![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=95% }
 
 And we’re back to normal, phew\! Now its time to check the job logs to see what went wrong and fix it before merging to master again.
 

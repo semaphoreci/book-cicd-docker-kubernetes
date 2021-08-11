@@ -10,7 +10,7 @@ We’ll deploy the application in a three-node Kubernetes cluster. You can pick 
 
 ### 4.5.1 DigitalOcean Cluster
 
-DigitalOcean provides everything needed to deploy the application: a managed Kubernetes, a Container Registry, and Postgres databases. 
+DigitalOcean provides everything needed to deploy the application: a managed Kubernetes, a Container Registry, and Postgres databases.
 
 To create the Kubernetes cluster:
 
@@ -18,7 +18,6 @@ To create the Kubernetes cluster:
   - Create a *New Project*.
   - Create a *Kubernetes* cluster: select the latest version and choose one of the available regions. Name your cluster “semaphore-demo-cicd-kubernetes”.
   -  While DigitalOcean is working on the cluster, go to *API* menu and generate a *Personal Access Token* with Read & Write permissions.
-  - To finalize, go to *Container Registry* and create a starter repository. Set the repository name, which is globally unique, and remember it for the next chapter.
 
 Next, create a Container Registry with the following actions:
 
@@ -45,7 +44,7 @@ Google Cloud calls its service *Kubernetes Engine*. To create the services:
   - Name your cluster “semaphore-demo-cicd-kubernetes”.
   - Go to *IAM* \> *Service Accounts*.
   - Generate an account Basic > Owner role.
-  - Click on the menu for the new roles, select *Manage Keys* > *Add Keys*. 
+  - Click on the menu for the new roles, select *Manage Keys* > *Add Keys*.
   - Generate and download a **JSON** Access Key file.
 
 On Semaphore, create a secret for your Google Cloud Access Key file:
@@ -132,9 +131,9 @@ Once the cloud database is running:
 ### 4.6.3 AWS Database
 
   - Find the service called *RDS*.
-  - Create a PostgreSQL database called “demo” and type in a secure password.
-  - Choose the same region where the cluster is running.
-  - Select one of the available *templates*. The free tier is perfect for demoing the application. Under *Connectivity* select all the VPCs and subnets where the cluster is running (they should have appeared in eksctl’s output).
+  - Create a PostgreSQL database (choose Standard Create) and call it “demo”. Type in a secure password for the `postgres` account.
+  - Select one of the available *templates*. The dev/test option is perfect for demoing the application. Under *Connectivity* select all the VPCs and subnets where the cluster is running (they should have appeared in eksctl’s output).
+  - In Availability Zone, select the same region the Kubernetes cluster is running.
   - Under *Connectivity & Security* take note of the endpoint address
     and port.
 
