@@ -188,11 +188,7 @@ addressbook-canary  1/1   1          1         8m40s
 
 In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
 
-Let’s say we decide to go ahead. So go on and hit the *Promote* button, you can tweak the number of final pods to deploy.
-
-![](./figures/08-promote-stable.png){ width=95% }
-
-The stable pipeline should be done in a few seconds.
+Let’s say we decide to go ahead. So go on and hit the *Promote* button, you can tweak the number of final pods to deploy. The stable pipeline should be done in a few seconds.
 
 ![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=95% }
 
