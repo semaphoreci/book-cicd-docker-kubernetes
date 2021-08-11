@@ -23,9 +23,9 @@ result = 'passed' and (branch = 'master' or tag =~ '^hotfix*')
 
 ![Automatic promotion](./figures/05-sem-canary-auto-promotion.png){ width=95% }
 
-Below the promotion options, click on *+ Add Environment Variables* to create a parameter for a pipeline. Parametrization let us set runtime values and reuse a pipeline for similar tasks.
+Below the promotion options, click on *+ Add Environment Variables* to create a parameter for a pipeline. Parametrization lets us set runtime values and reuse a pipeline for similar tasks.
 
-The parameter we're going to add is going to let us specify the number of Canary pods to deploy. Set the variable name to `CANARY_PODS`, ensure that "This is a required parameter" is checked and type "1" in default value.
+The parameter we're going to add will let us specify the number of Canary pods to deploy. Set the variable name to `CANARY_PODS`, ensure that "This is a required parameter" is checked, and type "1" in the default value.
 
 ![](./figures/08-param1.png){ width=70% }
 
@@ -64,14 +64,14 @@ docker push \
 Create a new block called “Deploy” and enable secrets:
 
 - `db-params` to use the cloud database;
-- `do-key` which is the cloud-specific access token.
+- `do-key` is the cloud-specific access token.
 
 Open the *Environment Variables* section:
 
 - Create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`)
 - Create a variable called `REGISTRY_NAME` with the name of the DigitalOcean container registry name.
 
-To connect with the DigitalOcean cluster, we can use the official `doctl` tool, which comes preinstalled in Semaphore.
+To connect with the DigitalOcean cluster, we can use preinstalled the official `doctl` tool.
 
 Add the following commands to the *job*:
 
@@ -103,7 +103,7 @@ This is the canary job sequence:
 
 ![Deploy block](./figures/05-sem-canary-deploy-block.png){ width=95% }
 
-Create a third block called “Functional test” and enable the `do-key` secret. Repeat the environment variables. This is the last block in the pipeline and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
+Create a third block called “Functional Test” and enable the `do-key` secret. Repeat the environment variables. This is the last block in the pipeline, and it runs some automated tests on the canary. By combining `kubectl get pod` and `kubectl exec`, we can run commands inside the pod.
 
 Type the following commands in the job:
 
@@ -121,7 +121,7 @@ kubectl exec -it "$POD" -- npm run migrate
 
 ## 4.8 Your First Release
 
-So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve setup the one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
+So far, so good. Let's see where we are: we built the Docker image, and, after testing it, we’ve set up the one-pod canary deployment pipeline. In this section, we’ll extend the workflow with a stable deployment pipeline.
 
 ### 4.8.1 The Stable Deployment Pipeline
 
@@ -186,13 +186,13 @@ addressbook-canary  1/1   1          1         8m40s
 
 ### 4.8.3 Releasing the Stable
 
-In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we rollback and regroup.
+In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we roll back and regroup.
 
-Let’s say we decide to go ahead. So go on and hit the *Promote* button, you can tweak the number of final pods to deploy. The stable pipeline should be done in a few seconds.
+Let’s say we decide to go ahead. So go on and hit the *Promote* button. You can tweak the number of final pods to deploy. The stable pipeline should be done in a few seconds.
 
 ![Stable Pipeline](./figures/05-sem-stable-pipeline.png){ width=95% }
 
-If you're fast enough, while the block runs you can see both the existing canary and a new “addressbook-stable” deployment.
+If you're fast enough, you can see both the existing canary and a new “addressbook-stable” deployment while the block runs.
 
 ``` bash
 $ kubectl get deployment
@@ -263,13 +263,13 @@ $ curl -w "\n" 34.68.150.168/all
 ]
 ```
 
-The deployment was a success, that was no small feat. Congratulations\!
+The deployment was a success; that was no small feat. Congratulations\!
 
 ### 4.8.4 The Rollback Pipeline
 
-Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fails. In that case, wouldn’t be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we are going to create in this step, a rollback pipeline [^no-db-rollback].
+Fortunately, Kubernetes and CI/CD make an exceptional team when it comes to recovering from errors. Let’s say that we don’t like how the canary performs or, even worse, the functional tests at the end of the canary deployment pipeline fail. In that case, wouldn’t it be great to have the system go back to the previous state automatically? What about being able to undo the change with a click of a button? This is exactly what we will configure at this point, a rollback pipeline [^no-db-rollback].
 
-[^no-db-rollback]: This isn’t technically true for applications that use databases, changes to the database are not automatically rolled back. We should use database backups and migration scripts to manage upgrades.
+[^no-db-rollback]: This isn’t technically true for applications that use databases. Changes to the database are not automatically rolled back. We should use database backups and migration scripts to manage upgrades.
 
 Open the Workflow Builder once more and go to the end of the canary pipeline. Create a new promotion branching out of it, check the *Enable automatic promotion* box, and set this condition:
 
@@ -307,19 +307,19 @@ The first four lines print out information about the cluster. The last two, undo
 
 ![Rollback block](./figures/05-sem-rollback-block.png){ width=95% }
 
-Run the workflow once more and make a canary release, but this time try rollback pipeline by clicking on its promote button:
+Run the workflow once more and make a canary release, but this time try rolling back by clicking on its promote button:
 
 ![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=95% }
 
 And we’re back to normal, phew\! Now its time to check the job logs to see what went wrong and fix it before merging to master again.
 
-**But what if we discover a problem after we deploy a stable release?** Let’s imagine that a defect sneaked its way into production. It can happen, maybe there was some subtle bug that no one found out hours or days in. Or perhaps some error not picked up by the functional test. Is it too late? Can we go back to the previous version?
+**But what if we discover a problem after we deploy a stable release?** Let’s imagine that a defect sneaked its way into production. It can happen, maybe there was some subtle bug that no one found hours or days in. Or perhaps some error was not picked up by the functional test. Is it too late? Can we go back to the previous version?
 
-The answer is yes, we can go to the previous version, but a manual intervention is required. Remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline from the last good version in Semaphore. If the Docker image is no longer in the registry, we can just regenerate it using the *Rerun* button in the top right corner.
+The answer is yes, we can go to the previous version, but manual intervention is required. Remember that we tagged each Docker image with a unique ID (the `SEMAPHORE_WORKFLOW_ID`)? We can re-promote the stable deployment pipeline from the last good version in Semaphore. If the Docker image is no longer in the registry, we can regenerate it using the *Rerun* button in the top right corner.
 
 ### 4.8.5 Troubleshooting and Tips
 
-Even the best plans can fail; failure is certainly an option in the software development. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them, and (2) know how to go back to solid ground.
+Even the best plans can fail; a failure is certainly an option in software development. Maybe the canary is presented with some unexpected errors, perhaps it has performance problems, or we merged the wrong branch into master. The important thing is (1) learn something from them and (2) know how to go back to solid ground.
 
 Kubectl can give us a lot of insights into what is happening. First, get an overall picture of the resources on the cluster.
 
@@ -376,17 +376,18 @@ These are some common error messages that you might run into:
   - Manifest is invalid: it usually means that the manifest YAML syntax is incorrect. Use `kubectl --dry-run` or `--validate` options verify the manifest.
   - `ImagePullBackOff` or `ErrImagePull`: the requested image is invalid or was not found. Check that the image is in the registry and that the reference in the manifest is correct.
   - `CrashLoopBackOff`: the application is crashing, and the pod is shutting down. Check the logs for application errors.
-  - Pod never leaves `Pending` status: this could mean that one of the Kubernetes secrets are missing.
+  - Pod never leaves `Pending` status: this could mean that one of the Kubernetes secrets is missing.
   - Log message says that “container is unhealthy”: this message may show that the pod is not passing a probe. Check that the probe definitions are correct.
   - Log message says that there are “insufficient resources”: this may happen when the cluster is running low on memory or CPU.
 
 ## 4.9 Summary
 
-You have learned how to put together the puzzle of CI/CD, Docker, and Kubernetes into a practical application. In this chapter, you have put in practice all that you’ve learned in this book:
+You have learned how to put together the puzzle of CI/CD, Docker, and Kubernetes into a practical application. In this chapter, you have put into practice all that you’ve learned in this book:
 
-  - How to setup pipelines in Semaphore CI/CD and use them to deploy to the cloud.
+  - How to set up pipelines in Semaphore CI/CD and use them to deploy to the cloud.
   - How to build Docker images and start a dev environment with the help of Docker Compose.
   - How to do canary deployments and rolling updates in Kubernetes.
   - How to scale deployments and how to recover when things don’t go as planned.
 
-Each of the pieces had its role: Docker brings portability, Kubernetes adds orchestration, and Semaphore CI/CD drives the test and deployment process.
+Each piece had its role: Docker brings portability, Kubernetes adds orchestration, and Semaphore CI/CD drives the test and deployment process.
+
