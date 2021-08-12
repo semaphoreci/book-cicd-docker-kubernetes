@@ -16,7 +16,7 @@ Our process will include the following steps:
 
 - **Canary deploy**: Deploy the image as a canary to a fraction of the users.
 
-- **Run functional tests**: Verify the canary in production to decide if we should go ahead.
+- **Run functional tests**: Verify the canary in production to decide if we should proceed.
 
 - **Deploy**: If the canary passes the test, deploy the image to all users.
 
@@ -24,7 +24,7 @@ Our process will include the following steps:
 
 ## 4.1 Docker and Kubernetes Commands
 
-In previous chapters we’ve learned most of the Docker and Kubernetes commands that we’ll need in this chapter. Here are a few that we haven’t seen yet.
+In previous chapters, we’ve learned most of the Docker and Kubernetes commands that we’ll need in this chapter. Here are a few that we haven’t seen yet.
 
 ### 4.1.1 Docker Commands
 
@@ -38,7 +38,7 @@ A Docker *registry* stores Docker images. Docker CLI provides the following comm
 
 - `tag`: renames an image or changes its tag.
 
-- `exec`: starts a process in an already-running container. Compare it with `docker run` which starts a new container instead.
+- `exec`: starts a process in an already-running container. Compare it with `docker run`, which creates a new container instead.
 
 ### 4.1.2 Kubectl Commands
 
@@ -66,7 +66,7 @@ It’s time to put the book down and get our hands busy for a few minutes. In th
 
 ### 4.2.1 Install Prerequisites
 
-You’ll need to the following tools installed on your computer:
+You’ll need to have the following tools installed on your computer:
 
 - **git** (_[https://git-scm.com](https://git-scm.com)_) to manage the code.
 
@@ -280,9 +280,9 @@ In this process, we'll use Semaphore’s built-in Docker registry. This is faste
 
 ### 4.3.2 CD Pipelines: Canary and Stable Deployments
 
-In chapter 3, we have talked about Continuous Delivery and Continuous Deployment. In chapter 2, we learned about canaries and rolling deployments. Our CI/CD workflow combines these two practices.
+In chapter 2, we learned about canaries and rolling deployments. In chapter 3, we have talked about Continuous Delivery and Continuous Deployment. Our CI/CD workflow combines these two practices.
 
-A canary deployment is a limited release of a new version. We’ll call it _canary release_, and the previous version that is still used by a majority of users the _stable release_.
+A canary deployment is a limited release of a new version. We’ll call it _canary release_, and the previous version still used by most users is the _stable release_.
 
 We can do a canary deployment by connecting the canary pods to the same load balancer as the rest of the pods. As a result, a set fraction of user traffic goes to the canary. For example, if we have nine stable pods and one canary pod, 10% of the users would get the canary release.
 
@@ -303,6 +303,7 @@ Imagine that this is your initial state: you have three pods running version **v
 
 When you deploy **v2** as a canary, you scale down the number of **v1** pods to 2, to keep the total amount of pods to 3.
 
-Then, you can start a rolling update to version **v2** on the stable deployment. One at a time, all its pods are updated and restarted, until they are all running on **v2** and you can get rid of the canary.
+Then, you can start a rolling update to version **v2** on the stable deployment. One at a time, all its pods are updated and restarted until they are all running on **v2**, and you can get rid of the canary.
 
 ![Completing a stable release](./figures/05-transition-stable.png){ width=95% }
+

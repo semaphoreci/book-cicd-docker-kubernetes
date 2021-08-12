@@ -2,7 +2,7 @@
 
 # 2 Deploying to Kubernetes
 
-When getting started with Kubernetes, one of the first commands that you learn and use is generally `kubectl run`. Folks who have experience with Docker tend to compare it to `docker run` and think: "Ah, this is how I can simply run a container!"
+When getting started with Kubernetes, one of the first commands you learn and use is generally `kubectl run`. Folks who have experience with Docker tend to compare it to `docker run` and think: "Ah, this is how I can simply run a container!"
 
 As it turns out, when you use Kubernetes, you don't simply run a container.
 
@@ -77,7 +77,7 @@ $ kubectl create deployment web --image=nginx
 deployment.apps/web created
 ```
 
-The bottom line is that we should always use the most explicit command available in order to future proof our deployments.
+The bottom line is that we should always use the most explicit command available to future-proof our deployments.
 
 Next, you'll learn the roles of these different objects and how they are essential to zero-downtime deployments in Kubernetes.
 
@@ -654,3 +654,4 @@ The end result is a higher development velocity, lower time-to-market
 for fixes and new features, as well as better availability of your
 applications. Which is the whole point of implementing containers
 in the first place.
+

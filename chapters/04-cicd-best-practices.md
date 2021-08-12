@@ -1,12 +1,12 @@
 \newpage
 
-# 3 CI/CD Best Practices for Cloud Native Applications
+# 3 CI/CD Best Practices for Cloud-Native Applications
 
 Engineering leaders strive to deliver bug-free products to customers as productively as possible. Today’s cloud-native technology empowers teams to iterate, at scale, faster than ever. But to experience the promised agility, we need to change how we deliver software.
 
 “CI/CD” stands for the combined practices of Continuous Integration (CI) and Continuous Delivery (CD). It is a timeless way of developing software in which you’re able to release updates at any time in a sustainable way. When changing code is routine, development cycles are faster. Work is more fulfilling. Companies can improve their products many times per day and delight their customers.
 
-In this chapter, we’ll review the principles of CI/CD and see how we can apply them to developing cloud native applications.
+In this chapter, we’ll review the principles of CI/CD and see how we can apply them to developing cloud-native applications.
 
 ## 3.1 What Makes a Good CI/CD Pipeline
 
@@ -28,7 +28,7 @@ For this to happen, the CI/CD tool of choice should fit into the existing develo
 
 A reliable pipeline always produces the same output for a given input. And with consistent runtime. Intermittent failures cause intense frustration among developers.
 
-Engineers like to do things on their own, and often they opt to maintain their CI/CD system. But operating CI/CD that provides on-demand, clean, stable, and fast resources is a complicated job. What seems to work well for one project or a few developers usually breaks down later. The team and the number of projects grow the technology stack changes. Then someone from management realizes that by delegating that task, the team could spend more time on the actual product. At that point, if not earlier, the engineering team moves from a self-hosted to a cloud-based CI/CD solution.
+Engineers like to do things independently, and they often opt to maintain their CI/CD system. But operating CI/CD that provides on-demand, clean, stable, and fast resources is a complicated job. What seems to work well for one project or a few developers usually breaks down later. The team and the number of projects grow the technology stack changes. Then someone from management realizes that by delegating that task, the team could spend more time on the actual product. At that point, if not earlier, the engineering team moves from a self-hosted to a cloud-based CI/CD solution.
 
 ### 3.1.3 Completeness
 
@@ -297,3 +297,4 @@ Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 des
 
 [^jez]: What is Proper Continuous Integration, Semaphore
   [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
+

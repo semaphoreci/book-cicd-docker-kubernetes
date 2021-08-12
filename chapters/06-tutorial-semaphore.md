@@ -1,4 +1,3 @@
-
 \newpage
 
 ## 4.4 Implementing a CI/CD Pipeline With Semaphore
@@ -9,15 +8,15 @@ In this section, we’ll learn about Semaphore and how to use it to build cloud-
 
 For a long time, developers looking for a CI/CD tool had to choose between power and ease of use.
 
-On one hand, there was Jenkins which can do just about anything, but is difficult to use and requires dedicated ops teams to configure, maintain and scale.
+On the one hand, there was Jenkins, which can do just about anything but is challenging to use and requires dedicated ops teams to configure, maintain and scale.
 
-On the other hand, there were several hosted services that let developers just push their code and not worry about the rest of the process. However, these services are usually limited to running simple build and test steps, and would often fall short in need of more elaborate continuous delivery workflows, which is often the case with containers.
+On the other hand, several hosted services let developers push their code and not worry about the rest of the process. However, these services are usually limited to running simple build and test steps. They would often fall short and need more elaborate continuous delivery workflows, which is often the case with containers.
 
 Semaphore (_[https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_) started as one of the simple hosted CI services, but eventually evolved to support custom continuous delivery pipelines with containers, while retaining a way of being easy to use by any developer, not just dedicated ops teams. As such, it removes all technical barriers to adopting continuous delivery at scale:
 
-- It's a cloud-based service that scales on demand. There's no software for you to install and maintain.
+- It's a cloud-based service that scales on-demand. There's no software for you to install and maintain.
 - It provides a visual interface to model custom CI/CD workflows quickly.
-- It's the fastest CI/CD service, due to being based on dedicated hardware instead of common cloud computing services.
+- It's the fastest CI/CD service due to being based on dedicated hardware instead of common cloud computing services.
 - It's free for open source and small private projects.
 
 The key benefit of using Semaphore is increased team productivity. Since there is no need to hire supporting staff or expensive infrastructure, and it runs CI/CD workflows faster than any other solution, companies that adopt Semaphore report a very large, 41x ROI comparing to their previous solution [^roi].
@@ -33,12 +32,12 @@ To get started with Semaphore:
 - Go to _[https://semaphoreci.com](https://semaphoreci.com?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)_ and click to sign up with your GitHub account.
 - GitHub will ask you to let Semaphore access your profile information. Allow this so that Semaphore can create an account for you.
 - Semaphore will walk you through the process of creating an organization. Since software development is a team sport, all Semaphore projects belong to an organization. Your organization will have its own domain, for example, `awesomecode.semaphoreci.com`.
-- Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. This chapter will demonstrate a workflow using Semaphore's Docker Registry, which is available within a free trial or a paid account. However you can easily replace it with a free public registry like Docker Hub and implement the same workflow with an open source account.
+- Semaphore will ask you to choose between a time-limited free trial with unlimited capacity, a free plan, and an open-source plan. This chapter will demonstrate a workflow using Semaphore's Docker Registry, available within a free trial or a paid account. However, you can easily replace it with a free public registry like Docker Hub and implement the same workflow with an open-source account.
 - Finally, you'll be greeted with a quick product tour.
 
 ### 4.4.3 Creating a Semaphore Project For The Demo Repository
 
-We assume that you have previously forked the demo project from _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_ to your GitHub account.
+We assume you have previously forked the demo project from _[https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes](https://github.com/semaphoreci-demos/semaphore-demo-cicd-kubernetes)_ to your GitHub account.
 
 On Semaphore, click on *New Project* at the top of the screen. Then, click on *Choose a repository*. Next, Semaphore will present you a list of repositories to choose from as the source of your project:
 
@@ -50,7 +49,7 @@ Semaphore will quickly initialize the project. Behind the scenes, it will set up
 
 The next screen lets you invite collaborators to your project. Semaphore mirrors access permissions of GitHub, so if you add some people to the GitHub repository later, you can "sync" them inside project settings on Semaphore.
 
-Click on *Continue to Workflow Setup*. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the existing configuration to get directly to the final workflow. In this chapter, however, we want to learn how to create the pipelines so we’ll make a fresh start.
+Click on *Continue to Workflow Setup*. Semaphore will ask you if you want to use the existing pipelines or create one from scratch. At this point, you can choose to use the current configuration to get directly to the final workflow. In this chapter, however, we want to learn how to create the pipelines so we’ll make a fresh start.
 
 ![Start from scratch or use existing pipeline](./figures/05-sem-existing-pipeline.png){ width=95% }
 
@@ -62,7 +61,7 @@ To make the process of creating projects easier, Semaphore provides starter work
 
 ![Choosing a starter workflow](./figures/05-sem-starter-workflow.png){ width=95% }
 
-Semaphore will immediately start the workflow. Wait a few seconds and your first Docker image is ready, congratulations!
+Semaphore will immediately start the workflow. Wait a few seconds, and your first Docker image is ready. Congratulations!
 
 ![Starter run](./figures/05-sem-starter-run.png){ width=95% }
 
@@ -92,7 +91,7 @@ Blocks and jobs define what to do at each step. Jobs define the commands that do
 
 Jobs inherit their configuration from their parent block. All the jobs in a block run in parallel, each in its isolated environment. If any of the jobs fails, the pipeline stops with an error.
 
-Blocks run sequentially, once all the jobs in the block complete, the next block starts.
+Blocks run sequentially. Once all the jobs in the block are complete, the next one starts.
 
 ### 4.4.5 The Continous Integration Pipeline
 
@@ -102,7 +101,7 @@ At this point, you should be seeing the Workflow Builder with the Docker Build s
 
 ![Build block](./figures/05-sem-build-block.png){ width=95% }
 
-Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision[^sem-toolbox]. The next command, `docker build`, builds the image using our `Dockerfile`.
+Each line on the job is a command to execute. The first command in the job is `checkout`, which is a built-in script that clones the repository at the correct revision[^sem-toolbox]. The following command, `docker build`, builds the image using our `Dockerfile`.
 
 [^sem-toolbox]: You can find the complete Semaphore toolbox at [https://docs.semaphoreci.com/reference/toolbox-reference](https://docs.semaphoreci.com/reference/toolbox-reference/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
@@ -137,9 +136,9 @@ Each command has its purpose:
 4. Builds a newer version of the image using the latest code.
 5. Pushes the new image to the registry.
 
-The perceptive reader will note that we introduced special environment variables; these come predefined in every job[^environment]. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
+The discerning reader will note that we introduced special environment variables; these come predefined in every job[^environment]. The variables starting with `SEMAPHORE_REGISTRY_*` are used to access the private registry. Also, we’re using `SEMAPHORE_WORKFLOW_ID`, which is guaranteed to be unique for each run, to tag the image.
 
-[^docker-registry]: Semaphore's built-in Docker registry is available under a paid plan or free trial. If you're using a free or open source plan, use an external service like Docker Hub instead. The pipeline will be slower but the workflow will be the same.
+[^docker-registry]: Semaphore's built-in Docker registry is available under a paid plan or free trial. If you're using a free or open-source plan, use an external service like Docker Hub instead. The pipeline will be slower, but the workflow will be the same.
 [^environment]: The full environment reference can be found at [https://docs.semaphoreci.com/ci-cd-environment/environment-variables](https://docs.semaphoreci.com/ci-cd-environment/environment-variables/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 ![Build block](./figures/05-sem-build-block-2.png){ width=95% }
@@ -178,7 +177,7 @@ docker run -it \
   npm run lint
 ```
 
-Next, click on the *+Add another job* link below the job to create a new one called “Functional test”. Type these commands:
+Next, click on the *+Add another job* link below to create a new one called “Functional test”. Type these commands:
 
 ``` bash
 sem-service start postgres
@@ -192,9 +191,9 @@ docker run --net=host -it \
   npm run migrate
 ```
 
-This job tests two things: that the container connects to the database (`ping`) and that it can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command[^sem-service].
+This job tests two things: that the container connects to the database (`ping`) and can create the tables (`migrate`). Obviously, we’ll need a database for this to work; fortunately, we have `sem-service`, which lets us start database engines like MySQL, Postgres, or MongoDB with a single command[^sem-service].
 
-[^sem-service]: For the complete list of services sem-service can manage check: [https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/](https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
+[^sem-service]: For the complete list of services, sem-service can manage check: [https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/](https://docs.semaphoreci.com/ci-cd-environment/sem-service-managing-databases-and-services-on-linux/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
 Finally, add a third job called “Integration test” and type these commands:
 
@@ -206,7 +205,7 @@ docker run --net=host -it \
   npm run test
 ```
 
-This last test runs the code in `src/database.test.js`, which checks if the application can write and delete rows in the database.
+This last test runs the code in `src/database.test.js`, checking if the application can write and delete rows in the database.
 
 ![Test block](./figures/05-sem-test-block.png){ width=80% }
 
@@ -234,11 +233,12 @@ This completes the setup of the CI pipeline.
 
 ### 4.4.6 Your First Build
 
-We’ve covered a lot of things in a few pages; here, we have the chance to pause for a little bit and try the CI pipeline. Click on the *Run the workflow* button on the top-right corner and then click on *Start*.
+We’ve covered many things in a few pages; here, we have the chance to pause for a little bit and try the CI pipeline. Click on the *Run the workflow* button on the top-right corner and click on *Start*.
 
 ![Run this workflow](./figures/05-sem-run-workflow.png){ width=80% }
 
-After a few seconds the pipeline will start building and testing the container.
+After a few seconds, the pipeline will start building and testing the container.
 
 ![CI pipeline done](./figures/05-sem-ci-pipeline.png){ width=95% }
+
 

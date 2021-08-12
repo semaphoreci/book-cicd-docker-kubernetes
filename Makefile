@@ -24,6 +24,7 @@ all: book
 
 book: pdf ebook
 ebook: epub mobi
+docx: $(BUILD)/docx/$(BOOKNAME).docx
 pdf: $(BUILD)/pdf/$(BOOKNAME).pdf
 epub: $(BUILD)/epub/$(BOOKNAME).epub
 mobi: $(BUILD)/mobi/$(BOOKNAME).mobi
@@ -32,6 +33,10 @@ html: $(BUILD)/html/$(BOOKNAME).html
 
 clean:
 	rm -r $(BUILD)
+
+$(BUILD)/docx/$(BOOKNAME).docx: $(TITLE) $(CHAPTERS)
+	mkdir -p $(BUILD)/docx
+	docker run --rm $(EXTRA_OPTS) --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
 
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf

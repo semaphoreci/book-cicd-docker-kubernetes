@@ -4,7 +4,7 @@
 
 
 
-In this book we will show you how to deploy to Kubernetes hosted on three public cloud providers: Amazon AWS, Google Cloud Platform, and DigitalOcean. With small modifications, the process will work with any other cloud or Kubernetes instance.
+This book will show you how to deploy to Kubernetes hosted on three public cloud providers: Amazon AWS, Google Cloud Platform, and DigitalOcean. With slight modifications, the process will work with any other cloud or Kubernetes instance.
 
 We’ll deploy the application in a three-node Kubernetes cluster. You can pick a different size based on your needs, but you’ll need at least three nodes to run an effective canary deployment with rolling updates.
 
@@ -17,7 +17,7 @@ To create the Kubernetes cluster:
   - Sign up or log in to your account on [digitalocean.com](https://www.digitalocean.com).
   - Create a *New Project*.
   - Create a *Kubernetes* cluster: select the latest version and choose one of the available regions. Name your cluster “semaphore-demo-cicd-kubernetes”.
-  -  While DigitalOcean is working on the cluster, go to *API* menu and generate a *Personal Access Token* with Read & Write permissions.
+  -  While DigitalOcean is working on the cluster, go to the *API* menu and generate a *Personal Access Token* with Read & Write permissions.
 
 Next, create a Container Registry with the following actions:
 
@@ -59,7 +59,7 @@ On Semaphore, create a secret for your Google Cloud Access Key file:
 
 AWS calls its service *Elastic Kubernetes Service* (EKS). The Docker private registry is called *Elastic Container Registry* (ECR).
 
-Creating a cluster on AWS is, unequivocally, a complex affair. So complex that there is a specialized tool for it:
+Creating a cluster on AWS is, unequivocally, a complex affair. So tough that there is a specialized tool for it:
 
   - Sign up or log in to your AWS account at [aws.amazon.com](https://aws.amazon.com).
   - Select one of the available regions.
@@ -134,7 +134,7 @@ Once the cloud database is running:
   - Create a PostgreSQL database (choose Standard Create) and call it “demo”. Type in a secure password for the `postgres` account.
   - Select one of the available *templates*. The dev/test option is perfect for demoing the application. Under *Connectivity* select all the VPCs and subnets where the cluster is running (they should have appeared in eksctl’s output).
   - In Availability Zone, select the same region the Kubernetes cluster is running.
-  - Under *Connectivity & Security* take note of the endpoint address
+  - Under *Connectivity & Security*, take note of the endpoint address
     and port.
 
 ### 4.6.4 Creating the Database Secret on Semaphore
@@ -147,9 +147,10 @@ The database secret is the same for all clouds. Create a secret to store the dat
 4.  Add the following variables:
       - `DB_HOST` with the database hostname or private IP.
       - `DB_PORT` points to the database port (default is 5432).
-      - `DB_SCHEMA` for AWS should be called “postgres”, for the other clouds its value should be “demo”.
+      - `DB_SCHEMA` for AWS should be called “postgres”. For the other clouds, its value should be “demo”.
       - `DB_USER` for the database user.
       - `DB_PASSWORD` with the password.
-      - `DB_SSL` should be “true” for DigitalOcean, it can be left empty for the rest.
+      - `DB_SSL` should be “true” for DigitalOcean. It can be left empty for the rest.
 5.  Click on *Save Secret*.
+
 
