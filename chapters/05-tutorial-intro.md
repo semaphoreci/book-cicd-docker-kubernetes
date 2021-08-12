@@ -274,7 +274,7 @@ The CI pipeline performs the following steps:
 
 - **Test**: Start the container and run tests inside.
 
-- **Docker push**: If all test pass, push the accepted image to the production registry.
+- **Docker push**: If all tests pass, push the accepted image to the production registry.
 
 In this process, we'll use Semaphore’s built-in Docker registry. This is faster and cheaper than using a registry from a cloud vendor to work with containers in the CI/CD context.
 
@@ -282,7 +282,7 @@ In this process, we'll use Semaphore’s built-in Docker registry. This is faste
 
 In chapter 2, we learned about canaries and rolling deployments. In chapter 3, we have talked about Continuous Delivery and Continuous Deployment. Our CI/CD workflow combines these two practices.
 
-A canary deployment is a limited release of a new version. We’ll call it _canary release_, and the previous version still used by most users is the _stable release_.
+A canary deployment is a limited release of a new version. We’ll call it: the _canary release_, and the previous version still used by most users is the _stable release_.
 
 We can do a canary deployment by connecting the canary pods to the same load balancer as the rest of the pods. As a result, a set fraction of user traffic goes to the canary. For example, if we have nine stable pods and one canary pod, 10% of the users would get the canary release.
 
@@ -292,7 +292,7 @@ The canary release performs the following steps:
 
 - **Copy** the image from the Semaphore registry to the production registry.
 - **Canary deploy** a canary pod.
-- **Test** the canary pod to ensure it’s working by running automate functional tests. We may optionally also perform manual QA.
+- **Test** the canary pod to ensure it’s working by running automated functional tests. We may optionally also perform manual QA.
 - **Stable release**: if test passes, update the rest of the pods.
 
 Let’s take a closer look at how the stable release works.

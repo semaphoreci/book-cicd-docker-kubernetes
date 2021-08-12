@@ -4,7 +4,7 @@ Now that we have our cloud services, we’re ready to prepare the canary deploym
 
 Our project on GitHub includes three ready-to-use reference pipelines for deployment. They should work out-of-the-box in combination with the secrets as described earlier. For further details, check the `.semaphore` folder in the project.
 
-In this section, you'll learn how to create deployment pipelines on Semaphore from scratch. We'll use DigitalOcean and Docker Hub registry as an example, but the process is essentially the same for other clouds.
+In this section, you'll learn how to create deployment pipelines on Semaphore from scratch. We'll use DigitalOcean as an example, but the process is essentially the same for other clouds.
 
 ### 4.7.1 Creating a Promotion and Deployment Pipeline
 
@@ -71,7 +71,7 @@ Open the *Environment Variables* section:
 - Create a variable called `CLUSTER_NAME` with the DigitalOcean cluster name (`semaphore-demo-cicd-kubernetes`)
 - Create a variable called `REGISTRY_NAME` with the name of the DigitalOcean container registry name.
 
-To connect with the DigitalOcean cluster, we can use preinstalled the official `doctl` tool.
+To connect with the DigitalOcean cluster, we can use the preinstalled official `doctl` tool.
 
 Add the following commands to the *job*:
 
@@ -186,7 +186,7 @@ addressbook-canary  1/1   1          1         8m40s
 
 ### 4.8.3 Releasing the Stable
 
-In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some pre-determined amount of time, we would reach a go vs. no-go decision. Is the canary version is good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we roll back and regroup.
+In tandem with the canary deployment, we should have a dashboard to monitor errors, user reports, and performance metrics to compare against the baseline. After some predetermined amount of time, we would reach a go vs. no-go decision. Is the canary version good enough to be promoted to stable? If so, the deployment continues. If not, after collecting the necessary error reports and stack traces, we roll back and regroup.
 
 Let’s say we decide to go ahead. So go on and hit the *Promote* button. You can tweak the number of final pods to deploy. The stable pipeline should be done in a few seconds.
 
@@ -311,7 +311,7 @@ Run the workflow once more and make a canary release, but this time try rolling 
 
 ![Rollback Pipeline](./figures/05-sem-rollback-canary.png){ width=95% }
 
-And we’re back to normal, phew\! Now its time to check the job logs to see what went wrong and fix it before merging to master again.
+And we’re back to normal, phew\! Now it’s time to check the job logs to see what went wrong and fix it before merging to master again.
 
 **But what if we discover a problem after we deploy a stable release?** Let’s imagine that a defect sneaked its way into production. It can happen, maybe there was some subtle bug that no one found hours or days in. Or perhaps some error was not picked up by the functional test. Is it too late? Can we go back to the previous version?
 
@@ -373,7 +373,7 @@ To access a pod network from your machine, forward a port with `port-forward`, f
 
 These are some common error messages that you might run into:
 
-  - Manifest is invalid: it usually means that the manifest YAML syntax is incorrect. Use `kubectl --dry-run` or `--validate` options verify the manifest.
+  - Manifest is invalid: it usually means that the manifest YAML syntax is incorrect. Use `kubectl --dry-run` or `--validate` options to verify the manifest.
   - `ImagePullBackOff` or `ErrImagePull`: the requested image is invalid or was not found. Check that the image is in the registry and that the reference in the manifest is correct.
   - `CrashLoopBackOff`: the application is crashing, and the pod is shutting down. Check the logs for application errors.
   - Pod never leaves `Pending` status: this could mean that one of the Kubernetes secrets is missing.

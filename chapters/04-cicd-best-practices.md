@@ -28,13 +28,13 @@ For this to happen, the CI/CD tool of choice should fit into the existing develo
 
 A reliable pipeline always produces the same output for a given input. And with consistent runtime. Intermittent failures cause intense frustration among developers.
 
-Engineers like to do things independently, and they often opt to maintain their CI/CD system. But operating CI/CD that provides on-demand, clean, stable, and fast resources is a complicated job. What seems to work well for one project or a few developers usually breaks down later. The team and the number of projects grow the technology stack changes. Then someone from management realizes that by delegating that task, the team could spend more time on the actual product. At that point, if not earlier, the engineering team moves from a self-hosted to a cloud-based CI/CD solution.
+Engineers like to do things independently, and they often opt to maintain their CI/CD system. But operating CI/CD that provides on-demand, clean, stable, and fast resources is a complicated job. What seems to work well for one project or a few developers usually breaks down later. The team and the number of projects grow as the technology stack changes. Then someone from management realizes that by delegating that task, the team could spend more time on the actual product. At that point, if not earlier, the engineering team moves from a self-hosted to a cloud-based CI/CD solution.
 
 ### 3.1.3 Completeness
 
 Any increase in automation is a positive change. However, a CI/CD pipeline needs to run and visualize everything that happens to a code change — from the moment it enters the repository until it runs in production. This requires the CI/CD tool to be able to model both simple and, when needed, complex workflows. That way, manual errors are all but impossible.
 
-For example, it’s not uncommon to have the pipeline run only the build and test steps. Deployment remains a manual operation, often performed by a single person. This is a relic of the past when CI tools unable to model delivery workflows.
+For example, it’s not uncommon to have the pipeline run only the build and test steps. Deployment remains a manual operation, often performed by a single person. This is a relic of the past when CI tools were unable to model delivery workflows.
 
 Today a service like Semaphore provides features like:
 
@@ -101,7 +101,7 @@ There are cases when complete automation is not possible. You may have customers
 
 But if these conditions do not apply and you still think that your pipeline can’t be fully automated — you’re almost certainly wrong.
 
-Take a good look at your end-to-end process and uncover where you’re doing things manually out of habit. Make a plan to make any changes that may be needed, are automate it.
+Take a good look at your end-to-end process and uncover where you’re doing things manually out of habit. Make a plan to make any changes that may be needed, and automate it.
 
 ## 3.3 Continuous Integration Best Practices
 
@@ -133,7 +133,7 @@ If a CI build takes a long time, we approach our work defensively. We tend to ke
 
 With a slow build, every “git push” leads to a huge distraction. We either wait or look for something else to do to avoid being completely idle. And if we context-switch to something else, we know that we’ll need to switch back again when the build is finished. The catch is that every task switch in programming is hard, and it sucks up our energy.
 
-The point of continuous in continuous integration is speed. Speed drives high productivity: we want feedback as soon as possible. Fast feedback loops keep us in a state of flow, which is the source of our happiness at work.
+The point of *continuous* in continuous integration is speed. Speed drives high productivity: we want feedback as soon as possible. Fast feedback loops keep us in a state of flow, which is the source of our happiness at work.
 
 So, it’s helpful to establish criteria for how fast should a CI process be:
 
@@ -154,7 +154,7 @@ With that last question, only a few hands remain. Those are the people who pass 
 There are a couple of tactics which you can employ to reduce CI build time:
 
 - **Caching**: Project dependencies should be independently reused across builds. When building Docker containers, use the layer caching feature to reuse known layers from the registry.
-- **Built-in Docker registry**: A container-native CI solution should include a built-in registry. This saves a lot of money comparing to using the registry provided by your cloud provider. It also speeds up CI, often by several minutes.
+- **Built-in Docker registry**: A container-native CI solution should include a built-in registry. This saves a lot of money compared to using the registry provided by your cloud provider. It also speeds up CI, often by several minutes.
 - **Test parallelization**: A large test suite is the most common reason why CI is slow. The solution is to distribute tests across as many parallel jobs as needed.
 - **Change detection**: Large test suites can be dramatically sped up by only testing code that has changed since the last commit.
 
@@ -197,7 +197,7 @@ According to this strategy, a test suite has:
 
 - The most unit tests.
 - Somewhat less service-level tests, which include calls to the database and any other core external resource.
-- Few user interface, or end-to-end tests. These serve to verify the behavior of the system as a whole, usually from the user's perspective.
+- Few user interfaces, or end-to-end tests. These serve to verify the behavior of the system as a whole, usually from the user's perspective.
 
 If a team follows this strategy, a failing unit test is a signal of a fundamental problem. The remaining high-level and long-running tests are irrelevant until we resolve the problem.
 
@@ -271,7 +271,7 @@ It’s crucial to maintain the discipline of having every single change go throu
 
 It can be tempting to break this rule in cases of seemingly exceptional circumstances and revert to manual procedures that circumvent the pipeline. On the contrary, the times of crisis are exactly when the pipeline delivers value by making sure that the system doesn’t degrade even further. When timing is critical, the pipeline should roll back to the previous release.
 
-Once it happens that the configuration and history of the CI/CD pipeline diverge from what teams do in reality, it’s difficult to re-establish the automation and the culture of quality. For this reason, it’s important to invest time in making the pipeline fast so that no one feels encouraged to skip it.
+Once it happens that the configuration and history of the CI/CD pipeline diverge from what teams do in reality, it’s difficult to re-establish automation and the culture of quality. For this reason, it’s important to invest time in making the pipeline fast so that no one feels encouraged to skip it.
 
 ### 3.4.2 Developers Can Deploy to Production-Like Staging Environments at a Push of a Button
 
@@ -293,7 +293,7 @@ Today containers guarantee that your code always runs in the same environment. Y
 
 Other environments are still not the same as production, since reproducing the same infrastructure and load is expensive. However, the differences are manageable, and we get to avoid most of the errors that would have occurred with non-identical environments.
 
-Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can use with Kubernetes. Strategies like blue-green and canary deployment reduce the risk of bad deploys. Now that we know what a proper CI/CD pipeline should look like, it’s time to start implementing it.
+Chapter 1 includes a roadmap for adopting Docker for this purpose. Chapter 2 described some of the advanced deployment strategies that you can use with Kubernetes. Strategies like blue-green and canary deployment reduce the risk of bad deployments. Now that we know what a proper CI/CD pipeline should look like, it’s time to start implementing it.
 
 [^jez]: What is Proper Continuous Integration, Semaphore
   [https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html](https://semaphoreci.com/blog/2017/03/02/what-is-proper-continuous-integration.html?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)

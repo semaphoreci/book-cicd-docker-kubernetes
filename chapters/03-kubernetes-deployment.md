@@ -123,7 +123,7 @@ deployment?
 
 ## 2.2 Declarative vs Imperative Systems
 
-Kubernetes is a **declarative system** (which is the opposite of an imperative systems).
+Kubernetes is a **declarative system** (which is the opposite of an imperative system).
 This means that you can't give it orders.
 You can't say, "Run this container." All you can do is describe
 what you want to have and wait for Kubernetes to take action to reconcile
@@ -354,7 +354,7 @@ to versions 1, 2, and 3 of the application) accordingly.
 ## 2.7 MaxSurge and MaxUnavailable
 
 Kubernetes doesn't exactly update deployments one pod at a time.
-Earlier, you learned that that deployments had "a few extra parameters": these
+Earlier, you learned that deployments had "a few extra parameters": these
 parameters include `MaxSurge` and `MaxUnavailable`, and they
 indicate the pace at which the update should proceed.
 
@@ -390,7 +390,7 @@ The default values for both parameters are 25%,
 meaning that when updating a deployment of size 100, 25 new pods
 are immediately created, while 25 old pods are shutdown. Each time
 a new pod comes up and is marked ready, another old pod can
-be shutdown. Each time an old pod has completed its shutdown
+be shutdown. Each time an old pod has completed its shut down
 and its resources have been freed, another new pod can be created.
 
 ## 2.8 Quick Demo
@@ -468,7 +468,7 @@ $ kubectl expose deployment web --port=80
 
 The service will have its own internal IP address
 (denoted by the name `ClusterIP`) and an optional external IP,
-and connections to these IP address on port 80 will be load-balanced
+and connections to these IP addresses on port 80 will be load-balanced
 across all the pods of this deployment.
 
 In fact, these connections will be load-balanced across all the pods
@@ -483,9 +483,9 @@ will receive connections automatically.
 This means that during a rollout, the deployment doesn't reconfigure
 or inform the load balancer that pods are started and stopped.
 It happens automatically through the selector of the service
-associated to the load balancer.
+associated with the load balancer.
 
-If you're wondering how probes and healthchecks play into this,
+If you're wondering how probes and health checks play into this,
 a pod is added as a valid endpoint for a service only if all its
 containers pass their readiness check. In other words, a pod starts
 receiving traffic only once it's actually ready for it.
@@ -538,9 +538,9 @@ send traffic anywhere:
 $ kubectl create service clusterip web --tcp=80
 ```
 
-**Note**: when running a local development Kubernetes cluster, such as MiniKube[^minikube] or the one bundled with Docker Desktop, you'll wish to change the previous command to: `kubectl create service nodeport web --tcp=80`. The NodePort type of service is easier to access locally as the service ports are forwared to `localhost` automatically. To see this port mapping run `kubectl get services`.
+**Note**: when running a local development Kubernetes cluster, such as MiniKube[^minikube] or the one bundled with Docker Desktop, you'll wish to change the previous command to: `kubectl create service nodeport web --tcp=80`. The NodePort type of service is easier to access locally as the service ports are forwarded to `localhost` automatically. To see this port mapping run `kubectl get services`.
 
-Now, you can update the selector of service `web` by
+Now, you can update the selector of the service `web` by
 running `kubectl edit service web`. This will retrieve the
 definition of service `web` from the Kubernetes API, and open
 it in a text editor. Look for the section that says:

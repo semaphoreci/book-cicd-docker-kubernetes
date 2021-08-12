@@ -43,11 +43,11 @@ We will see how to get there.
 
 After we build container images, we can run them consistently on any server environment. Automating server installation would usually require steps (and domain knowledge) specific to our infrastructure. For instance, if we are using AWS EC2, we may use AMI (Amazon Machine Images), but these images are different (and built differently) from the ones used on Azure, Google Cloud, or a private OpenStack cluster.
 
-Configuration management systems (like Ansible, Chef, Puppet, or Salt) help us by describing our servers and their configuration as manifests that live in version-controlled source repositories. This helps, but writing these manifests is no easy task, and they don’t guarantee reproducible execution. These manifests have to be adapted when switching distributions, distribution versions, and sometimes even from a cloud provider to another, because they would use different network interface or disk naming, for instance.
+Configuration management systems (like Ansible, Chef, Puppet, or Salt) help us by describing our servers and their configuration as manifests that live in version-controlled source repositories. This helps, but writing these manifests is no easy task, and they don’t guarantee reproducible execution. These manifests have to be adapted when switching distributions, distribution versions, and sometimes even from a cloud provider to another, because they would use different network interfaces or disk naming, for instance.
 
 Once we have installed the Docker Engine (the most popular option), it can run any container image and effectively abstract these environment discrepancies.
 
-The ability to stage up new environments easily and reliably gives us exactly what we need to set up CI/CD (continuous integration and continuous delivery). We will see how to get there. Ultimately, it means that advanced techniques, such as blue/green deployments, or immutable infrastructure, become accessible to us, instead of being a privilege of larger organizations able to spend a lot of time to build their perfect custom tooling.
+The ability to stage new environments easily and reliably gives us exactly what we need to set up CI/CD (continuous integration and continuous delivery). We will see how to get there. Ultimately, it means that advanced techniques, such as blue/green deployments, or immutable infrastructure, become accessible to us, instead of being a privilege of larger organizations able to spend a lot of time to build their perfect custom tooling.
 
 ### 1.1.3 Less Risky Releases
 
@@ -63,7 +63,7 @@ As a result, we can deploy with more confidence, because we know that if somethi
 
 ## 1.2 A Roadmap to Adopting Docker
 
-The following roadmap works for organizations and teams of all size, regardless of their existing knowledge of containers. Even better, this roadmap will give you tangible benefits at each step, so that the gains realized give you more confidence into the whole process.
+The following roadmap works for organizations and teams of all sizes, regardless of their existing knowledge of containers. Even better, this roadmap will give you tangible benefits at each step, so that the gains realized give you more confidence in the whole process.
 
 Sounds too good to be true?
 
@@ -89,7 +89,7 @@ If we have a component that is tricky enough to require a tool like Vagrant to r
 
 ### 1.2.2 Writing the First Dockerfile
 
-There are various ways to write your first Dockerfile, and none of them is inherently right or wrong. Some people prefer to follow the existing environment as close as possible. For example, if you're currently using PHP 7.2 with Apache 2.4, and have some very specific Apache configuration and `.htaccess` files? Sure, makes sense to put that in containers. But if you prefer to start anew from your `.php` files, serve them with PHP FPM, and host the static assets from a separate NGINX container, that’s fine too. Either way, the [official PHP images](https://hub.docker.com/r/_/php/) got us covered.
+There are various ways to write your first Dockerfile, and none of them is inherently right or wrong. Some people prefer to follow the existing environment as closely as possible. For example, if you're currently using PHP 7.2 with Apache 2.4, and have some very specific Apache configuration and `.htaccess` files? Sure, it makes sense to put that in containers. But if you prefer to start anew from your `.php` files, serve them with PHP FPM, and host the static assets from a separate NGINX container, that’s fine too. Either way, the [official PHP images](https://hub.docker.com/r/_/php/) got us covered.
 
 During this phase, we’ll want to make sure that the team working on that service has Docker installed on their machine, but only a few people will have to meddle with Docker at this point. They will be leveling the field for everyone else.
 
@@ -104,7 +104,7 @@ CMD ["ruby", "hasher.rb"]
 EXPOSE 80
 ```
 
-Once we have a working Dockerfile for an app, we can start using this container image as the official development environment for this specific service or component. If we picked a fast-moving one, we will see the benefits very quickly, since Docker makes library and other dependency upgrades completely seamless. Rebuilding the entire environment with a different language version now becomes effortless. And if we realize after a difficult upgrade that the new version doesn’t work as well, rolling back is just as easy and instantaneous, because Docker keeps a cache of previous image builds around.
+Once we have a working Dockerfile for an app, we can start using this container image as the official development environment for this specific service or component. If we pick a fast-moving one, we will see the benefits very quickly, since Docker makes library and other dependency upgrades completely seamless. Rebuilding the entire environment with a different language version now becomes effortless. And if we realize after a difficult upgrade that the new version doesn’t work as well, rolling back is just as easy and instantaneous, because Docker keeps a cache of previous image builds around.
 
 ### 1.2.3 Writing More Dockerfiles
 

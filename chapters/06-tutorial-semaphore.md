@@ -45,7 +45,7 @@ On Semaphore, click on *New Project* at the top of the screen. Then, click on *C
 
 In the search field, start typing `semaphore-demo-cicd-kubernetes` and choose that repository.
 
-Semaphore will quickly initialize the project. Behind the scenes, it will set up everything that's needed to know about every Git push automatically pull the latest code — without you configuring anything.
+Semaphore will quickly initialize the project. Behind the scenes, it will set up everything that's needed to know about every Git push automatically pulling the latest code — without you configuring anything.
 
 The next screen lets you invite collaborators to your project. Semaphore mirrors access permissions of GitHub, so if you add some people to the GitHub repository later, you can "sync" them inside project settings on Semaphore.
 
@@ -93,7 +93,7 @@ Jobs inherit their configuration from their parent block. All the jobs in a bloc
 
 Blocks run sequentially. Once all the jobs in the block are complete, the next one starts.
 
-### 4.4.5 The Continous Integration Pipeline
+### 4.4.5 The Continuous Integration Pipeline
 
 We talked about the benefits of CI/CD in chapter 3. In the previous section, we created our very first pipeline. In this section, we’ll extend it with tests and a place to store the images.
 
@@ -143,7 +143,7 @@ The discerning reader will note that we introduced special environment variables
 
 ![Build block](./figures/05-sem-build-block-2.png){ width=95% }
 
-Now that we have a Docker image that we can test let’s add a second block. Click on the *+Add Block* dotted box.
+Now that we have a Docker image that we can test, let’s add a second block. Click on the *+Add Block* dotted box.
 
 The Test block will have jobs:
 

@@ -2,7 +2,7 @@
 
 © 2021 Rendered Text. All rights reserved.
 
-This work is licensed under Creative Commmons
+This work is licensed under Creative Commons
 Attribution-NonCommercial-NoDerivatives 4.0 International.
 To view a copy of this license, visit
 <https://creativecommons.org/licenses/by-nc-nd/4.0>
@@ -33,7 +33,7 @@ Today there's a massive change going on in the way we're using the cloud. To bor
 
 Doing so successfully, however, requires our applications to adapt. They need to be disposable and horizontally scalable. They should have a minimal divergence between development and production so that we can continuously deploy them multiple times per day.
 
-A new generation of tools has democratized the way of building such *cloud native* software. Docker container is now the standard way of packaging software in a way that can be deployed, scaled, and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will emerge, but it's almost certain that they will be based on Kubernetes.
+A new generation of tools has democratized the way of building such *cloud native* software. Docker containers are now the standard way of packaging software in a way that can be deployed, scaled, and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will emerge, but it's almost certain that they will be based on Kubernetes.
 
 The great opportunity comes potentially at a high cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
 
@@ -76,7 +76,7 @@ A few changes were introduced in this second edition:
 
 - Moved to Kubernetes version v1.20. All commands and actions were tested with this version.
 - Added comments about accessing services in local development Kubernetes clusters.
-- Added mention of new CI/CD features in Semaphore: parametrized pipelines, test results, code change detection.
+- Added mention of new CI/CD features in Semaphore: parameterized pipelines, test results, code change detection.
 - DigitalOcean deployment now uses their Private Container Registry service instead of Docker Hub.
 - Updated setup steps for DigitalOcean, Google Cloud, and AWS.
 - Updated UI screenshots using higher resolution.
