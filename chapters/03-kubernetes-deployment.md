@@ -2,7 +2,7 @@
 
 # 2 Deploying to Kubernetes
 
-When getting started with Kubernetes, one of the first commands that you learn and use is generally `kubectl run`. Folks who have experience with Docker tend to compare it to `docker run` and think: "Ah, this is how I can simply run a container!"
+When getting started with Kubernetes, one of the first commands you learn and use is generally `kubectl run`. Folks who have experience with Docker tend to compare it to `docker run` and think: "Ah, this is how I can simply run a container!"
 
 As it turns out, when you use Kubernetes, you don't simply run a container.
 
@@ -12,7 +12,7 @@ The way in which Kubernetes handles containers depends heavily on which version 
 $ kubectl version
 ```
 
-[^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.16 and 1.17. This book is based on and has been tested with those versions.
+[^book-versions]: At the time of writing, all major cloud vendors provide managed Kubernetes at versions 1.19 and 1.20. This book is based on and has been tested with those versions.
 
 **Kubernetes containers on versions 1.17 and lower**
 
@@ -30,8 +30,8 @@ $ kubectl get all
 NAME                      READY STATUS  RESTARTS AGE
 pod/web-65899c769f-dhtdx  1/1   Running 0        11s
 
-NAME                TYPE      CLUSTER-IP  PORT(S) AGE
-service/kubernetes  ClusterIP 10.96.0.1   443/TCP 46s
+NAME                TYPE      CLUSTER-IP  EXTERNAL-IP PORT(S) AGE
+service/kubernetes  ClusterIP 10.96.0.1   1.2.3.4     443/TCP 46s
 
 NAME                 DESIRED CURRENT UP-TO-DATE AVAILABLE AGE
 deployment.apps/web  1       1       1          1         11s
@@ -66,8 +66,8 @@ $ kubectl get all
 NAME      READY STATUS  RESTARTS AGE
 pod/web   1/1   Running 0        3m14s
 
-NAME                 TYPE      CLUSTER-IP PORT(S) AGE
-service/kubernetes   ClusterIP 10.96.0.1  443/TCP 4m16s
+NAME                 TYPE      CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+service/kubernetes   ClusterIP 10.96.0.1  1.2.3.4     443/TCP 4m16s
 ```
 
 So, if we want to create a deployment we must be more explicit. This command works as expected on all Kubernetes versions:
@@ -77,7 +77,7 @@ $ kubectl create deployment web --image=nginx
 deployment.apps/web created
 ```
 
-The bottom line is that we should always use the most explicit command available in order to future proof our deployments.
+The bottom line is that we should always use the most explicit command available to future-proof our deployments.
 
 Next, you'll learn the roles of these different objects and how they are essential to zero-downtime deployments in Kubernetes.
 
@@ -123,7 +123,7 @@ deployment?
 
 ## 2.2 Declarative vs Imperative Systems
 
-Kubernetes is a **declarative system** (which is the opposite of an imperative systems).
+Kubernetes is a **declarative system** (which is the opposite of an imperative system).
 This means that you can't give it orders.
 You can't say, "Run this container." All you can do is describe
 what you want to have and wait for Kubernetes to take action to reconcile
@@ -156,7 +156,7 @@ This is rather inconvenient, because it is now your job to keep track of
 all these pods, and to make sure that they are all in sync, using the
 same specification.
 
-To make things simpler, Kubernetes gives you a higher level construct--
+To make things simpler, Kubernetes gives you a higher level construct:
 the **replica set**. The specification of a replica set looks very much like
 the specification of a pod, except that it carries a number indicating how
 many *replicas*—i.e. pods with that particular specification—you want.
@@ -320,7 +320,7 @@ failing, Kubernetes will never move on to the next. The deployment stops,
 and your application keeps running with the old version until you address
 the issue.
 
-Note: if there is no readiness probe, then the container is
+**Note**: if there is no readiness probe, then the container is
 considered as ready, as long as it could be started. So make sure
 that you define a readiness probe if you want to leverage that feature!
 
@@ -354,7 +354,7 @@ to versions 1, 2, and 3 of the application) accordingly.
 ## 2.7 MaxSurge and MaxUnavailable
 
 Kubernetes doesn't exactly update deployments one pod at a time.
-Earlier, you learned that that deployments had "a few extra parameters": these
+Earlier, you learned that deployments had "a few extra parameters": these
 parameters include `MaxSurge` and `MaxUnavailable`, and they
 indicate the pace at which the update should proceed.
 
@@ -390,7 +390,7 @@ The default values for both parameters are 25%,
 meaning that when updating a deployment of size 100, 25 new pods
 are immediately created, while 25 old pods are shutdown. Each time
 a new pod comes up and is marked ready, another old pod can
-be shutdown. Each time an old pod has completed its shutdown
+be shutdown. Each time an old pod has completed its shut down
 and its resources have been freed, another new pod can be created.
 
 ## 2.8 Quick Demo
@@ -467,8 +467,8 @@ $ kubectl expose deployment web --port=80
 ```
 
 The service will have its own internal IP address
-(denoted by the name `ClusterIP`),
-and connections to this IP address on port 80 will be load-balanced
+(denoted by the name `ClusterIP`) and an optional external IP,
+and connections to these IP addresses on port 80 will be load-balanced
 across all the pods of this deployment.
 
 In fact, these connections will be load-balanced across all the pods
@@ -483,9 +483,9 @@ will receive connections automatically.
 This means that during a rollout, the deployment doesn't reconfigure
 or inform the load balancer that pods are started and stopped.
 It happens automatically through the selector of the service
-associated to the load balancer.
+associated with the load balancer.
 
-If you're wondering how probes and healthchecks play into this,
+If you're wondering how probes and health checks play into this,
 a pod is added as a valid endpoint for a service only if all its
 containers pass their readiness check. In other words, a pod starts
 receiving traffic only once it's actually ready for it.
@@ -538,7 +538,9 @@ send traffic anywhere:
 $ kubectl create service clusterip web --tcp=80
 ```
 
-Now, you can update the selector of service `web` by
+**Note**: when running a local development Kubernetes cluster, such as MiniKube[^minikube] or the one bundled with Docker Desktop, you'll wish to change the previous command to: `kubectl create service nodeport web --tcp=80`. The NodePort type of service is easier to access locally as the service ports are forwarded to `localhost` automatically. To see this port mapping run `kubectl get services`.
+
+Now, you can update the selector of the service `web` by
 running `kubectl edit service web`. This will retrieve the
 definition of service `web` from the Kubernetes API, and open
 it in a text editor. Look for the section that says:
@@ -570,6 +572,9 @@ The advantage of blue/green deployment is that the traffic
 switch is almost instantaneous, and you can roll back to the
 previous version just as fast by updating the service
 definition again.
+
+[^minikube]: The official local Kubernetes cluster for macOS, Linux, and Windows for testing and development.
+  _https://minikube.sigs.k8s.io/docs/_
 
 
 ### 2.10.2 Canary Deployment
@@ -649,3 +654,4 @@ The end result is a higher development velocity, lower time-to-market
 for fixes and new features, as well as better availability of your
 applications. Which is the whole point of implementing containers
 in the first place.
+

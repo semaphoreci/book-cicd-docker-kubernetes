@@ -1,0 +1,16 @@
+version: v1.0
+name: Publish to WordPress
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: SFTP Upload
+    task:
+      jobs:
+        - name: Upload PDF
+          commands:
+            - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - 'echo "put CICD_with_Docker_Kubernetes_Semaphore.pdf" | sshpass -p "$FTP_PASSWORD" sftp -P $FTP_PORT -o StrictHostKeyChecking=no $FTP_USER@$FTP_HOST:/wp-content/uploads/2020/05/'
+      secrets:
+        - name: wordpress-sftp

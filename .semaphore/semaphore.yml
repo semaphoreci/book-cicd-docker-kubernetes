@@ -15,7 +15,7 @@ blocks:
             - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
             - make pdf
             - ./deps/cpdf cover/cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o CICD_with_Docker_Kubernetes_Semaphore.pdf
-            - artifact push workflow build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - artifact push workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
         - name: Make ebook
           commands:
             - checkout
@@ -33,3 +33,8 @@ blocks:
             - 'curl -L https://github.com/w3c/epubcheck/releases/download/v4.2.4/epubcheck-4.2.4.zip -o epubcheck.zip'
             - unzip epubcheck.zip
             - java -jar epubcheck-4.2.4/epubcheck.jar CICD_with_Docker_Kubernetes_Semaphore.epub
+promotions:
+  - name: Publish
+    pipeline_file: pipeline_2.yml
+    auto_promote:
+      when: branch = 'master' AND result = 'passed'

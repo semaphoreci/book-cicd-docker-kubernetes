@@ -1,8 +1,8 @@
 \newpage
 
-© 2020 Rendered Text. All rights reserved.
+© 2021 Rendered Text. All rights reserved.
 
-This work is licensed under Creative Commmons
+This work is licensed under Creative Commons
 Attribution-NonCommercial-NoDerivatives 4.0 International.
 To view a copy of this license, visit
 <https://creativecommons.org/licenses/by-nc-nd/4.0>
@@ -13,7 +13,7 @@ This book is open source:
 Published on the Semaphore website:
 [https://semaphoreci.com](https://semaphoreci.com/?utm_source=ebook&utm_medium=pdf&utm_campaign=cicd-docker-kubernetes-semaphore)
 
-$MONTHYEAR: First edition v1.0 (revision $REVISION)
+$MONTHYEAR: Second edition v2.0 (revision $REVISION)
 
 \newpage
 
@@ -29,15 +29,18 @@ To maximize the rate of learning, we must minimize the time to try things.
 
 In software development, the cloud has been a critical factor in increasing the speed of building innovative products.
 
-Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft, who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
+Today there's a massive change going on in the way we're using the cloud. To borrow the metaphor from Adrian Cockroft[^cockroft], who led cloud architecture at Netflix, we need to think of cloud resources not as long-lived and stable pets, but as transitory and disposable cattle.
 
 Doing so successfully, however, requires our applications to adapt. They need to be disposable and horizontally scalable. They should have a minimal divergence between development and production so that we can continuously deploy them multiple times per day.
 
-A new generation of tools has democratized the way of building such *cloud native* software. Docker container is now the standard way of packaging software in a way that can be deployed, scaled, and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will emerge, but it's almost certain that they will be based on Kubernetes.
+A new generation of tools has democratized the way of building such *cloud native* software. Docker containers are now the standard way of packaging software in a way that can be deployed, scaled, and dynamically distributed on any cloud. And Kubernetes is the leading platform to run containers in production. Over time new platforms with higher-order interfaces will emerge, but it's almost certain that they will be based on Kubernetes.
 
 The great opportunity comes potentially at a high cost. Countless organizations have spent many engineering months learning how to deliver their apps with this new stack, making sense of disparate information from the web. Delaying new features by months is not exactly the outcome any business wants when engineers announce that they're moving to new tools that are supposed to make them more productive.
 
 This is where this book comes into play, dear reader. Our goal is to help you transition to delivering cloud native apps quickly. The fundamentals don't change: we still need a rock-solid delivery pipeline, which automatically configures, builds, tests, and deploys code. This book shows you how to do that in a cloud native way — so you can focus on building great products and solutions.
+
+[^cockroft]: Currently VP Amazon Sustainability Architecture at Amazon
+  _https://twitter.com/adrianco_
 
 \newpage
 
@@ -66,6 +69,19 @@ Chapter 2, "Deploying to Kubernetes", explains what you need to know about Kuber
 Chapter 3, "Best Practices for Cloud Native Applications", describes how both our culture and tools related to software delivery need to change to fully benefit from the agility that containers and cloud can offer.
 
 Chapter 4, "A Complete CI/CD Pipeline", is a step-by-step guide to implementing a CI/CD pipeline with Semaphore that builds, tests, and deploys a Dockerized microservice to Kubernetes.
+
+## Changes in the Second Edition
+
+A few changes were introduced in this second edition:
+
+- Moved to Kubernetes version v1.20. All commands and actions were tested with this version.
+- Added comments about accessing services in local development Kubernetes clusters.
+- Added mention of new CI/CD features in Semaphore: parameterized pipelines, test results, code change detection.
+- DigitalOcean deployment now uses their Private Container Registry service instead of Docker Hub.
+- Updated setup steps for DigitalOcean, Google Cloud, and AWS.
+- Updated UI screenshots using higher resolution.
+- Modified deployment tutorial to use parametrized promotions.
+- Other minor fixes.
 
 ## How to Contact Us
 
