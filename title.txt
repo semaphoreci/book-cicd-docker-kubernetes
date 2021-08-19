@@ -1,5 +1,5 @@
 ---
-title: CI/CD with Docker and Kubernetes
+title: CI/CD with Docker and Kubernetes — Second Edition
 subtitle: How to Deliver Cloud Native Applications at High Velocity
 author: Semaphore
 language: en-US
