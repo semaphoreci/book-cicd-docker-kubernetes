@@ -12,5 +12,13 @@ blocks:
           commands:
             - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
             - 'echo "put CICD_with_Docker_Kubernetes_Semaphore.pdf" | sshpass -p "$FTP_PASSWORD" sftp -P $FTP_PORT -o StrictHostKeyChecking=no $FTP_USER@$FTP_HOST:/wp-content/uploads/2020/05/'
+        - name: Upload EPUB
+          commands:
+            - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.epub
+            - 'echo "put CICD_with_Docker_Kubernetes_Semaphore.epub" | sshpass -p "$FTP_PASSWORD" sftp -P $FTP_PORT -o StrictHostKeyChecking=no $FTP_USER@$FTP_HOST:/wp-content/uploads/2020/05/'
+        - name: Upload MOBI
+          commands:
+            - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.mobi
+            - 'echo "put CICD_with_Docker_Kubernetes_Semaphore.mobi" | sshpass -p "$FTP_PASSWORD" sftp -P $FTP_PORT -o StrictHostKeyChecking=no $FTP_USER@$FTP_HOST:/wp-content/uploads/2020/05/'
       secrets:
         - name: wordpress-sftp
