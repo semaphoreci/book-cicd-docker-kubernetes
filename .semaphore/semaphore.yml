@@ -10,26 +10,35 @@ blocks:
       jobs:
         - name: Make PDF
           commands:
-            - checkout
-            - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction.md
-            - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
             - make pdf
-            - ./deps/cpdf cover/cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o CICD_with_Docker_Kubernetes_Semaphore.pdf
-            - artifact push workflow CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - ./deps/cpdf cover/cover.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf -o uploads/CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - artifact push workflow uploads
         - name: Make ebook
           commands:
-            - checkout
-            - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction-ebook.md
-            - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction-ebook.md
             - make ebook
-            - artifact push workflow build/epub/CICD_with_Docker_Kubernetes_Semaphore.epub
-            - artifact push workflow build/mobi/CICD_with_Docker_Kubernetes_Semaphore.mobi
+            - '#artifact push workflow build/epub/CICD_with_Docker_Kubernetes_Semaphore.epub'
+            - '#artifact push workflow build/mobi/CICD_with_Docker_Kubernetes_Semaphore.mobi'
+            - cp build/epub/CICD_with_Docker_Kubernetes_Semaphore.epub build/mobi/CICD_with_Docker_Kubernetes_Semaphore.mobi uploads
+            - artifact push workflow uploads
+        - name: Make sample (PDF)
+          commands:
+            - make more
+            - gs -sDEVICE=pdfwrite -dPrinted=false -dNOPAUSE -dBATCH -dSAFER -dFirstPage=1 -dLastPage=12 -sOutputFile=build/pdf/CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - ./deps/cpdf cover/cover-sample.pdf build/pdf/CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf build/pdf/more.pdf -o uploads/CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf
+            - artifact push workflow uploads
+      prologue:
+        commands:
+          - checkout
+          - sed -i -e "s/\$MONTHYEAR/$(date +'%b %Y')/g" chapters/01-introduction.md
+          - sed -i -e "s/\$REVISION/$(git rev-parse --short HEAD)/g" chapters/01-introduction.md
+          - mkdir -p uploads
   - name: test ebook
     task:
       jobs:
         - name: epubcheck
           commands:
-            - artifact pull workflow CICD_with_Docker_Kubernetes_Semaphore.epub
+            - artifact pull workflow uploads
+            - cd uploads
             - 'curl -L https://github.com/w3c/epubcheck/releases/download/v4.2.4/epubcheck-4.2.4.zip -o epubcheck.zip'
             - unzip epubcheck.zip
             - java -jar epubcheck-4.2.4/epubcheck.jar CICD_with_Docker_Kubernetes_Semaphore.epub
