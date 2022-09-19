@@ -30,6 +30,7 @@ epub: $(BUILD)/epub/$(BOOKNAME).epub
 mobi: $(BUILD)/mobi/$(BOOKNAME).mobi
 azw3: $(BUILD)/azw3/$(BOOKNAME).azw3
 html: $(BUILD)/html/$(BOOKNAME).html
+more: $(BUILD)/pdf/more.pdf
 
 clean:
 	rm -r $(BUILD)
@@ -40,14 +41,30 @@ $(BUILD)/docx/$(BOOKNAME).docx: $(TITLE) $(CHAPTERS)
 
 $(BUILD)/pdf/$(BOOKNAME).pdf: $(TITLE) $(CHAPTERS)
 	mkdir -p $(BUILD)/pdf
-	docker run --rm $(EXTRA_OPTS) --volume `pwd`:/data pandoc/latex:2.6 -f markdown-implicit_figures -H make-code-small.tex -V geometry:margin=1.5in -o /data/$@ $^
+	docker run --rm $(EXTRA_OPTS) \
+		--volume `pwd`:/data pandoc/latex:2.6 \
+		-f markdown-implicit_figures \
+		-H make-code-small.tex \
+		-V geometry:margin=1.5in \
+		-o /data/$@ $^
+
+$(BUILD)/pdf/more.pdf: chapters/10-wait-there-is-more.md
+	mkdir -p $(BUILD)/pdf
+	docker run --rm $(EXTRA_OPTS) \
+		--volume `pwd`:/data pandoc/latex:2.6 \
+		-f markdown-implicit_figures \
+		-H make-code-small.tex \
+		-V geometry:margin=1.5in \
+		-o /data/$@ $^
 
 # intermediate format for epub, uses small figures
 $(BUILD)/html/$(BOOKNAME).html: title.txt $(CHAPTERS_EBOOK)
 	mkdir -p $(BUILD)/html $(BUILD)/html/figures
 	cp figures/* $(BUILD)/html/figures
 	cp figures-ebook/* $(BUILD)/html/figures
-	docker run --rm $(EXTRA_OPTS) --volume `pwd`:/data pandoc/crossref:2.10 -o /data/$@ $^
+	docker run --rm $(EXTRA_OPTS) \
+		--volume `pwd`:/data pandoc/crossref:2.10 \
+		-o /data/$@ $^
  
 # kindle-optimized epub
 # note: output-profile=tablet converts best to kindle
