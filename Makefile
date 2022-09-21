@@ -53,7 +53,6 @@ $(BUILD)/pdf/more.pdf: chapters/10-wait-there-is-more.md
 	docker run --rm $(EXTRA_OPTS) \
 		--volume `pwd`:/data pandoc/latex:2.6 \
 		-f markdown-implicit_figures \
-		-H make-code-small.tex \
 		-V geometry:margin=1.5in \
 		-o /data/$@ $^
 
