@@ -50,7 +50,7 @@ blocks:
             - checkout
             - artifact pull workflow uploads
             - make more
-            - gs -sDEVICE=pdfwrite -dPrinted=false -dNOPAUSE -dBATCH -dSAFER -dFirstPage=1 -dLastPage=12 -sOutputFile=CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf uploads/CICD_with_Docker_Kubernetes_Semaphore.pdf
+            - gs -sDEVICE=pdfwrite -dPrinted=false -dNOPAUSE -dBATCH -dSAFER -dFirstPage=2 -dLastPage=12 -sOutputFile=CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf uploads/CICD_with_Docker_Kubernetes_Semaphore.pdf
             - ./deps/cpdf cover/cover-sample.pdf CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf build/pdf/more.pdf -o uploads/CICD_with_Docker_Kubernetes_Semaphore_Sample.pdf
             - artifact push workflow --force uploads
 promotions:
