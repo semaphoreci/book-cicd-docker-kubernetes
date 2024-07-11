@@ -1,6 +1,6 @@
 \newpage
 
-© 2022 Rendered Text. All rights reserved.
+© 2022 - present Semaphore Technologies doo. All rights reserved.
 
 This book is open source:
 <https://github.com/semaphoreci/book-cicd-docker-kubernetes>

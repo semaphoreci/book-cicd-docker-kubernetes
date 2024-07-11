@@ -1,6 +1,6 @@
 \newpage
 
-© 2022 Rendered Text. All rights reserved.
+© 2022 - present Semaphore Technologies doo. All rights reserved.
 
 This work is licensed under Creative Commons
 Attribution-NonCommercial-NoDerivatives 4.0 International.
